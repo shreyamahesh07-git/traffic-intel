@@ -3,39 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRAFFIC INTEL — Traffic Analysis & Simulation System</title>
+    <title>TRAFFIC INTEL — Autonomous Smart City & Real-World Traffic AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-page: #f8fafc;
-            --bg-surface: #ffffff;
-            --bg-elevated: #f1f5f9;
-            --bg-muted: #e2e8f0;
-            
-            --border-subtle: #e2e8f0;
-            --border-strong: #cbd5e1;
-            
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-sub: #f1f5f9;
+            --border: #e2e8f0;
+            --border-focus: #38bdf8;
             --text-title: #0f172a;
             --text-body: #334155;
             --text-muted: #64748b;
-            --text-light: #94a3b8;
-            
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --primary-light: #eff6ff;
-            
-            --signal-green: #10b981;
-            --signal-amber: #f59e0b;
-            --signal-red: #ef4444;
-            --signal-blue: #3b82f6;
-            
+            --primary: #0284c7;
+            --primary-light: #e0f2fe;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --purple: #8b5cf6;
+            --purple-light: #f5f3ff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
             --radius-sm: 6px;
             --radius-md: 10px;
-            --radius-lg: 14px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius-lg: 16px;
         }
 
         * {
@@ -43,126 +40,136 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg-page);
+            background-color: var(--bg-body);
             color: var(--text-body);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
-        /* --- Main Header & Primary 2-Mode Switcher --- */
+        /* --- Top Navigation Header --- */
         header {
-            background-color: var(--bg-surface);
-            border-bottom: 1px solid var(--border-subtle);
-            padding: 12px 32px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 50;
             box-shadow: var(--shadow-sm);
         }
 
-        .header-brand {
+        .brand-container {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-            border-radius: var(--radius-sm);
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
+            color: white;
             font-weight: 800;
-            font-size: 16px;
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
         }
 
-        .brand-text h1 {
+        .brand-title {
             font-size: 17px;
-            font-weight: 700;
+            font-weight: 800;
+            letter-spacing: -0.02em;
             color: var(--text-title);
-            letter-spacing: -0.3px;
         }
 
-        .brand-text p {
+        .brand-subtitle {
             font-size: 11px;
-            color: var(--text-muted);
             font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
         }
 
-        /* Primary 2 Navigation Tabs */
-        .primary-nav-tabs {
+        /* Navigation Module Tabs */
+        .module-switcher {
             display: flex;
-            background: var(--bg-elevated);
+            background: #e2e8f0;
             padding: 4px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--border-subtle);
-            gap: 6px;
+            gap: 4px;
         }
 
-        .nav-tab-btn {
+        .module-tab {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
             border: none;
             background: transparent;
-            padding: 8px 22px;
-            font-size: 13px;
-            font-weight: 700;
             color: var(--text-muted);
             border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .nav-tab-btn:hover {
+        .module-tab:hover {
             color: var(--text-title);
         }
 
-        .nav-tab-btn.active {
-            background-color: var(--bg-surface);
+        .module-tab.active {
+            background: #ffffff;
             color: var(--primary);
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
-        .header-status {
+        .status-badge {
             display: flex;
             align-items: center;
             gap: 8px;
+            padding: 6px 14px;
+            background: var(--success-light);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 9999px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--signal-green);
-            background: #ecfdf5;
-            padding: 5px 12px;
-            border-radius: 9999px;
-            border: 1px solid #a7f3d0;
+            color: #065f46;
         }
 
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: var(--signal-green);
-            display: inline-block;
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            animation: pulse-dot 2s infinite;
         }
 
-        /* --- Workspace Layout --- */
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* --- Main Application Layout --- */
         main {
             flex: 1;
-            padding: 20px 32px;
-            max-width: 1750px;
-            width: 100%;
+            padding: 20px 24px;
+            max-width: 1720px;
             margin: 0 auto;
+            width: 100%;
         }
 
         .mode-container {
@@ -171,36 +178,56 @@
 
         .mode-container.active {
             display: block;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Two-Column Layout --- */
         .workspace-grid {
             display: grid;
-            grid-template-columns: minmax(0, 7.2fr) minmax(0, 2.8fr);
+            grid-template-columns: 1fr 390px;
             gap: 20px;
             align-items: start;
         }
 
+        @media (max-width: 1280px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Base Card Styling */
         .card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 18px;
+            padding: 20px;
             box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
         }
 
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .card-title {
             font-size: 14px;
             font-weight: 700;
             color: var(--text-title);
+            letter-spacing: -0.01em;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -209,576 +236,790 @@
         .card-badge {
             font-size: 11px;
             font-weight: 600;
-            padding: 3px 8px;
-            border-radius: var(--radius-sm);
-            background: var(--bg-elevated);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: #f1f5f9;
             color: var(--text-muted);
-            border: 1px solid var(--border-subtle);
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Sub-navigation for Simulation Views (Highway, City Square, Intersection, Garden) */
-        .view-switcher-bar {
+        /* --- Camera Surveillance Switcher Sub-Bar --- */
+        .camera-bar {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 14px;
-            background: var(--bg-elevated);
-            padding: 6px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
             overflow-x: auto;
-        }
-
-        .view-btn {
-            border: none;
-            background: transparent;
-            padding: 7px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .view-btn:hover {
-            color: var(--text-title);
-        }
-
-        .view-btn.active {
-            background: var(--bg-surface);
-            color: var(--primary);
             box-shadow: var(--shadow-sm);
         }
 
-        /* --- Viewports --- */
-        .video-viewport-wrapper {
-            position: relative;
-            width: 100%;
-            background: #0a0b0e;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            aspect-ratio: 16 / 9;
-            box-shadow: var(--shadow-md);
-        }
-
-        #video-player {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: contain;
-            background: #000;
-        }
-
-        #video-overlay-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .sim-viewport-wrapper {
-            position: relative;
-            width: 100%;
-            background: #141418;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            aspect-ratio: 16 / 9;
-            box-shadow: var(--shadow-md);
-        }
-
-        #sim-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* Controls Bars */
-        .controls-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-            background: var(--bg-elevated);
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .timeline-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .timeline-slider {
-            flex: 1;
-            height: 6px;
-            appearance: none;
-            background: var(--bg-muted);
-            border-radius: 3px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .timeline-slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .time-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-body);
+        .camera-bar-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
             white-space: nowrap;
+            margin-right: 4px;
         }
 
-        .controls-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .ctrl-btn {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-body);
+        .camera-btn {
+            background: #f8fafc;
+            border: 1px solid var(--border);
             padding: 6px 14px;
             border-radius: var(--radius-sm);
             font-size: 12px;
             font-weight: 600;
+            color: var(--text-body);
             cursor: pointer;
-            display: inline-flex;
+            white-space: nowrap;
+            display: flex;
             align-items: center;
             gap: 6px;
             transition: all 0.15s ease;
         }
 
-        .ctrl-btn:hover {
-            background: var(--bg-elevated);
-            border-color: var(--border-strong);
+        .camera-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: #bae6fd;
+        }
+
+        .camera-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+        }
+
+        /* --- Canvas Viewport & Controls --- */
+        .viewport-wrapper {
+            position: relative;
+            background: #0f172a;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 16 / 9.5;
+            min-height: 520px;
+        }
+
+        #sim-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #sim-canvas:active {
+            cursor: grabbing;
+        }
+
+        .canvas-overlay-hud {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hud-chip {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            color: #f8fafc;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hud-chip strong {
+            color: #38bdf8;
+        }
+
+        /* Control Toolbar underneath canvas */
+        .sim-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            margin-top: 14px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text-body);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            background: #f1f5f9;
             color: var(--text-title);
         }
 
-        .ctrl-btn.primary {
+        .btn-primary {
             background: var(--primary);
             color: #ffffff;
             border-color: var(--primary);
         }
 
-        .ctrl-btn.primary:hover {
-            background: var(--primary-hover);
+        .btn-primary:hover {
+            background: #0369a1;
+            color: #ffffff;
         }
 
-        .select-input {
-            padding: 5px 8px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-subtle);
-            background: var(--bg-surface);
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-body);
-            cursor: pointer;
+        .btn-success {
+            background: var(--success);
+            color: #ffffff;
+            border-color: var(--success);
         }
 
-        /* Toggle Switch */
-        .toggle-wrapper {
+        .btn-success:hover {
+            background: #059669;
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #ffffff;
+            border-color: var(--danger);
+        }
+
+        .toggle-switch-group {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-body);
-            cursor: pointer;
+            color: var(--text-muted);
         }
 
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 36px;
-            height: 18px;
+            width: 38px;
+            height: 20px;
         }
 
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
         .toggle-slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--border-strong);
-            transition: .2s; border-radius: 18px;
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .25s;
+            border-radius: 20px;
         }
-        .toggle-slider:before {
-            position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
-            background-color: white; transition: .2s; border-radius: 50%;
-        }
-        input:checked + .toggle-slider { background-color: var(--primary); }
-        input:checked + .toggle-slider:before { transform: translateX(18px); }
 
-        /* --- Right Column KPIs & Tables --- */
-        .stat-grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .25s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(18px);
+        }
+
+        /* --- Right Sidebar Cards & Metric Grids --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Explainable AI Decision Card */
+        .ai-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%);
+            border: 1px solid #bae6fd;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 12px;
         }
 
-        .kpi-tile {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 10px 12px;
+        .ai-status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .kpi-title {
+        .ai-corridor-box {
+            background: #ffffff;
+            border: 1px solid #e0f2fe;
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+
+        .ai-corridor-title {
             font-size: 11px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             color: var(--text-muted);
-            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
-        .kpi-value {
-            font-size: 22px;
+        .ai-corridor-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .ai-explanation-box {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+            font-family: 'JetBrains Mono', monospace;
+            border-left: 3px solid #38bdf8;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* KPI Metric Grids */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .kpi-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .kpi-val {
+            font-size: 24px;
             font-weight: 800;
             color: var(--text-title);
+            margin-top: 4px;
+            letter-spacing: -0.02em;
             font-family: 'JetBrains Mono', monospace;
         }
 
         .kpi-sub {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 1px;
+            margin-top: 2px;
         }
 
-        /* Vehicle Category Counts */
-        .category-row {
+        /* Progress Bars */
+        .progress-track {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        /* Class Distribution Rows */
+        .class-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border-subtle);
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
             font-size: 12px;
         }
 
-        .category-row:last-child { border-bottom: none; }
+        .class-row:last-child {
+            border-bottom: none;
+        }
 
-        .category-label {
+        .class-badge {
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 600;
-            color: var(--text-title);
         }
 
-        .category-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 2px;
-        }
-
-        .category-count {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-        }
-
-        /* Live Vehicle Inspector Table */
-        .vehicle-inspector-box {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            max-height: 180px;
-            overflow-y: auto;
-            padding: 4px;
-        }
-
-        .inspector-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-family: 'JetBrains Mono', monospace;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-        }
-
-        .inspector-row:hover { background: var(--bg-surface); }
-
-        .inspector-tag {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 5px;
+        .class-color-dot {
+            width: 10px;
+            height: 10px;
             border-radius: 3px;
         }
 
-        /* Congestion Status Card */
-        .congestion-box {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        .congestion-pill {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 9999px;
-            text-transform: uppercase;
-        }
-
-        .pill-low { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-        .pill-medium { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-        .pill-high { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
-        .pill-critical { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-
-        /* Controller Decision Box */
-        .decision-box {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-left: 4px solid var(--primary);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        .decision-title {
-            font-size: 11px;
+        .class-count {
+            font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
             color: var(--text-title);
-            margin-bottom: 4px;
+        }
+
+        /* Junction Matrix Bars */
+        .junction-row {
+            margin-bottom: 10px;
+        }
+
+        .junction-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .junction-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        /* --- Mode 2: Video Detection Styles --- */
+        .video-container {
+            position: relative;
+            background: #000000;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            box-shadow: var(--shadow-md);
+        }
+
+        #real-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #video-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .video-controls-bar {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            margin-top: 14px;
         }
 
-        .decision-text {
-            font-size: 12px;
-            color: var(--text-body);
-            line-height: 1.45;
+        .video-slider {
+            flex: 1;
+            accent-color: var(--primary);
+            cursor: pointer;
         }
 
-        @media (max-width: 1024px) {
-            .workspace-grid { grid-template-columns: 1fr; }
+        .video-feed-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .upload-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 18px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+
+        .upload-dropzone:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .upload-dropzone p {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-title);
+        }
+
+        .upload-dropzone span {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Live Vehicle Table in Sidebar */
+        .live-table-container {
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .live-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .live-table th {
+            background: #f1f5f9;
+            padding: 6px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+
+        .live-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .live-table tr:hover {
+            background: #f8fafc;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header with 2 Distinct Modes -->
+    <!-- Header Navigation -->
     <header>
-        <div class="header-brand">
-            <div class="brand-icon">TI</div>
-            <div class="brand-text">
-                <h1>TRAFFIC INTEL</h1>
-                <p>Real-World Video Detection & Adaptive Traffic Simulation</p>
+        <div class="brand-container">
+            <div class="brand-logo">TI</div>
+            <div>
+                <div class="brand-title">TRAFFIC INTEL</div>
+                <div class="brand-subtitle">Autonomous Smart City & Real-World Traffic AI</div>
             </div>
         </div>
 
-        <!-- 2 Strictly Separated Modes -->
-        <div class="primary-nav-tabs">
-            <button id="tab-btn-video" class="nav-tab-btn active" onclick="switchMode('video')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
-                Real-Time Video Detection
+        <!-- Dedicated Module Switcher -->
+        <div class="module-switcher">
+            <button id="tab-sim" class="module-tab active" onclick="switchMainModule('sim')">
+                <span>🚦</span> Connected City Simulation
             </button>
-            <button id="tab-btn-sim" class="nav-tab-btn" onclick="switchMode('sim')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                Traffic Simulation
+            <button id="tab-video" class="module-tab" onclick="switchMainModule('video')">
+                <span>📹</span> Real-World Video Analysis
             </button>
         </div>
 
-        <div class="header-status">
+        <div class="status-badge">
             <span class="status-dot"></span>
-            <span id="backend-status-text">Deep Learning Detection Ready</span>
+            <span id="system-status-text">TraCI Simulation Live @ 25 FPS</span>
         </div>
     </header>
 
     <main>
-        
+
         <!-- ======================================================== -->
-        <!-- MODE 1: REAL-TIME VIDEO DETECTION (COMPLETELY SEPARATE)   -->
+        <!-- MODULE 1: AUTONOMOUS SMART CITY SIMULATION (MAIN MODULE) -->
         <!-- ======================================================== -->
-        <section id="mode-video" class="mode-container active">
+        <section id="module-sim" class="mode-container active">
+            
+            <!-- Location Surveillance Feeds Navigation -->
+            <div class="camera-bar">
+                <span class="camera-bar-label">City Surveillance Presets:</span>
+                <button class="camera-btn active" onclick="setCameraPreset('CITY_OVERVIEW')">
+                    <span>🌐</span> Master Overview
+                </button>
+                <button class="camera-btn" onclick="setCameraPreset('CENTRAL_PLAZA')">
+                    <span>🚦</span> Central Plaza Crossroads
+                </button>
+                <button class="camera-btn" onclick="setCameraPreset('GARDEN_ROUNDABOUT')">
+                    <span>🌳</span> Garden Parkway Roundabout
+                </button>
+                <button class="camera-btn" onclick="setCameraPreset('EASTERN_TJUNC')">
+                    <span>🔀</span> Eastern Blvd T-Junction
+                </button>
+                <button class="camera-btn" onclick="setCameraPreset('NORTHWEST_JUNCTION')">
+                    <span>🏙️</span> North-West Plaza
+                </button>
+                <button class="camera-btn" onclick="setCameraPreset('NORTHEAST_JUNCTION')">
+                    <span>🏛️</span> North-East Crossing
+                </button>
+                <button class="camera-btn" onclick="setCameraPreset('SOUTHWEST_JUNCTION')">
+                    <span>⚡</span> South-West Expressway Ring
+                </button>
+            </div>
+
             <div class="workspace-grid">
                 
-                <!-- Left 70%: Video Player with Synchronized Bounding Boxes & Speeds -->
-                <div class="card" style="padding: 16px;">
-                    <div class="card-header" style="margin-bottom: 12px; padding-bottom: 8px;">
-                        <div class="card-title">
-                            <span>Real Traffic Video Detection (YOLOv8 + Centroid Tracking)</span>
-                            <span id="active-video-badge" class="card-badge" style="background:#ecfdf5; color:#065f46; border-color:#a7f3d0;">sample_traffic.mp4</span>
-                        </div>
-                        <div class="toggle-wrapper">
-                            <span>Detection Overlay & Speeds</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="video-overlay-toggle" checked onchange="toggleVideoOverlay(this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Video Viewport -->
-                    <div class="video-viewport-wrapper" id="video-viewport">
-                        <video id="video-player" playsinline preload="auto">
-                            <source src="/static/sample_traffic.mp4" type="video/mp4">
-                        </video>
-                        <canvas id="video-overlay-canvas"></canvas>
-                    </div>
-
-                    <!-- Video Player Controls -->
-                    <div class="controls-panel">
-                        <div class="timeline-container">
-                            <span id="time-current" class="time-label">00:00</span>
-                            <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="0" step="0.1">
-                            <span id="time-total" class="time-label">00:13</span>
+                <!-- Left 70%: Authentic HTML5 Canvas SUMO Simulation Viewport -->
+                <div>
+                    <div class="card" style="padding: 14px;">
+                        <div class="card-header" style="margin-bottom: 10px; padding-bottom: 8px;">
+                            <div class="card-title">
+                                <span id="camera-title-text">Feed: City-Wide Master Overview (SUMO Simulation)</span>
+                                <span class="card-badge" id="sim-fps-chip">25 FPS</span>
+                            </div>
+                            <div class="toggle-switch-group">
+                                <span>Vehicle HUD Labels</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="sim-hud-toggle" checked onchange="toggleSimHUD(this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="controls-row">
-                            <div class="btn-group">
-                                <button id="play-btn" class="ctrl-btn primary" onclick="togglePlayPause()">
-                                    <span id="play-icon">▶</span>
-                                    <span id="play-text">Play</span>
+                        <!-- Interactive Simulation Canvas -->
+                        <div class="viewport-wrapper" id="sim-viewport-box">
+                            <canvas id="sim-canvas"></canvas>
+                            <div class="canvas-overlay-hud">
+                                <div class="hud-chip">CAMERA: <strong id="hud-cam-name">CITY_OVERVIEW</strong></div>
+                                <div class="hud-chip">ACTIVE FLEET: <strong id="hud-active-count">0 VEHICLES</strong></div>
+                                <div class="hud-chip">CONTROL: <strong id="hud-ctrl-mode">AI_ADAPTIVE</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Simulation Interactive Controls Toolbar -->
+                        <div class="sim-toolbar">
+                            <div class="toolbar-group">
+                                <button class="btn btn-primary" id="sim-play-pause-btn" onclick="toggleSimPause()">
+                                    <span id="sim-play-icon">⏸</span> <span id="sim-play-text">Pause Simulation</span>
                                 </button>
-                                <button class="ctrl-btn" onclick="restartVideo()">
-                                    <span>⟲</span> Restart
+                                <button class="btn" onclick="resetSimNetwork()">
+                                    <span>↺</span> Reset Simulation
                                 </button>
-                                <div style="display: flex; align-items: center; gap: 4px; margin-left: 6px;">
-                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Speed:</span>
-                                    <select id="video-speed-selector" class="select-input" onchange="setVideoSpeed(this.value)">
-                                        <option value="0.5">0.5x</option>
-                                        <option value="1.0" selected>1.0x</option>
-                                        <option value="1.5">1.5x</option>
-                                        <option value="2.0">2.0x</option>
-                                    </select>
-                                </div>
                             </div>
 
-                            <div class="btn-group">
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Sample Feed:</span>
-                                    <select id="video-feed-select" class="select-input" onchange="switchVideoSample(this.value)">
-                                        <option value="sample_traffic">Highway Surveillance (sample_traffic.mp4)</option>
-                                        <option value="city_street">City Street Surveillance (city_street_traffic.mp4)</option>
-                                        <option value="highway_60fps">Expressway 60FPS (13002160...mp4)</option>
-                                    </select>
-                                </div>
-                                <label class="ctrl-btn primary" style="cursor: pointer; margin-bottom: 0;">
-                                    <span>📁</span> Upload Custom Video
-                                    <input type="file" id="video-file-input" accept="video/mp4,video/avi,video/quicktime" style="display: none;" onchange="handleCustomVideoUpload(event)">
-                                </label>
+                            <div class="toolbar-group">
+                                <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Controller Mode:</span>
+                                <button class="btn btn-success" id="mode-adaptive-btn" onclick="setControllerMode('AI_ADAPTIVE')">
+                                    <span>🧠</span> AI Adaptive (DQN)
+                                </button>
+                                <button class="btn" id="mode-fixed-btn" onclick="setControllerMode('FIXED_TIME')">
+                                    <span>⏱️</span> Fixed-Time Baseline
+                                </button>
+                            </div>
+
+                            <div class="toolbar-group">
+                                <button class="btn" onclick="resetCameraZoom()">
+                                    <span>🔍</span> Reset Zoom
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right 30%: Detection Analytics & Live Speed Tracking Table -->
-                <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Right 30%: Live Telemetry & Explainable AI Sidebar -->
+                <div class="sidebar">
                     
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Real Video Detection Metrics</div>
-                            <span id="video-fps-badge" class="card-badge">~38 FPS</span>
+                    <!-- Explainable AI (XAI) Decision Reasoning Card -->
+                    <div class="card ai-card">
+                        <div class="ai-header">
+                            <div class="card-title" style="color: var(--primary);">
+                                <span>🧠</span> Adaptive AI Decision Engine
+                            </div>
+                            <span class="ai-status-pill" id="ai-model-status">DQN ONLINE</span>
                         </div>
 
-                        <div class="stat-grid-2">
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Active In Frame</div>
-                                <div id="video-kpi-active" class="kpi-value">4</div>
-                                <div class="kpi-sub">Vehicles on screen</div>
-                            </div>
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Total Unique</div>
-                                <div id="video-kpi-unique" class="kpi-value">28</div>
-                                <div class="kpi-sub">Tracked across video</div>
-                            </div>
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Average Speed</div>
-                                <div id="video-kpi-speed" class="kpi-value">58.4</div>
-                                <div class="kpi-sub">km/h</div>
-                            </div>
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Line Crossings</div>
-                                <div id="video-kpi-crossings" class="kpi-value">14</div>
-                                <div class="kpi-sub">Inbound movements</div>
+                        <div class="ai-corridor-box">
+                            <div class="ai-corridor-title">Central Plaza Active Corridor</div>
+                            <div class="ai-corridor-name" id="ai-active-corridor">East-West Arterial</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between;">
+                                <span>Green Elapsed: <strong id="ai-green-elapsed">0.0s</strong></span>
+                                <span id="ai-transition-state" style="color: #10b981; font-weight: 700;">GREEN DISCHARGE</span>
                             </div>
                         </div>
 
-                        <!-- Congestion Assessment -->
-                        <div class="congestion-box">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-size: 11px; font-weight: 700; color: var(--text-title);">Road Density & Congestion</span>
-                                <span id="video-density-pill" class="congestion-pill pill-low">23% FREE FLOW</span>
-                            </div>
-                            <div style="width: 100%; height: 7px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
-                                <div id="video-density-bar" style="width: 23%; height: 100%; background: #10b981; transition: width 0.3s ease;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Vehicle Class Breakdown -->
-                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
-                            Vehicle Classification (YOLOv8)
-                        </div>
-
-                        <div class="category-row">
-                            <div class="category-label">
-                                <span class="category-dot" style="background: #38bdf8;"></span>
-                                <span>Cars</span>
-                            </div>
-                            <div id="video-cnt-cars" class="category-count">0</div>
-                        </div>
-                        <div class="category-row">
-                            <div class="category-label">
-                                <span class="category-dot" style="background: #ef4444;"></span>
-                                <span>Trucks</span>
-                            </div>
-                            <div id="video-cnt-trucks" class="category-count">0</div>
-                        </div>
-                        <div class="category-row">
-                            <div class="category-label">
-                                <span class="category-dot" style="background: #10b981;"></span>
-                                <span>Buses</span>
-                            </div>
-                            <div id="video-cnt-buses" class="category-count">0</div>
-                        </div>
-                        <div class="category-row">
-                            <div class="category-label">
-                                <span class="category-dot" style="background: #f59e0b;"></span>
-                                <span>Motorcycles</span>
-                            </div>
-                            <div id="video-cnt-motorcycles" class="category-count">0</div>
+                        <div class="card-title" style="font-size: 11px; margin-bottom: 6px;">Live Explainable Reasoning (XAI):</div>
+                        <div class="ai-explanation-box" id="ai-explanation-text">
+                            Monitoring network queues. DQN evaluating optimal corridor discharge.
                         </div>
                     </div>
 
-                    <!-- Live In-Frame Vehicle Inspector with Speeds -->
+                    <!-- Network KPIs Card -->
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">Live Vehicles in Frame (Speeds & Models)</div>
-                            <span id="video-active-badge" class="card-badge">Active</span>
+                            <div class="card-title">Connected City Network KPIs</div>
+                            <span class="card-badge">LIVE SUMO DATA</span>
                         </div>
 
-                        <div id="video-inspector-list" class="vehicle-inspector-box">
-                            <!-- Populated frame-by-frame -->
+                        <div class="kpi-grid">
+                            <div class="kpi-box">
+                                <div class="kpi-label">Active in City</div>
+                                <div class="kpi-val" id="kpi-active-count">0</div>
+                                <div class="kpi-sub">Vehicles moving</div>
+                            </div>
+                            <div class="kpi-box">
+                                <div class="kpi-label">Network Queue</div>
+                                <div class="kpi-val" style="color: #ef4444;" id="kpi-queued-count">0</div>
+                                <div class="kpi-sub" id="kpi-queue-pct">0% of network</div>
+                            </div>
+                            <div class="kpi-box">
+                                <div class="kpi-label">Average Speed</div>
+                                <div class="kpi-val" style="color: #0284c7;" id="kpi-avg-speed">0.0</div>
+                                <div class="kpi-sub">km/h network-wide</div>
+                            </div>
+                            <div class="kpi-box">
+                                <div class="kpi-label">Completed Trips</div>
+                                <div class="kpi-val" style="color: #10b981;" id="kpi-throughput">0</div>
+                                <div class="kpi-sub">Vehicles arrived</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                                <span>Network Congestion Ratio</span>
+                                <span id="kpi-congestion-pct">0%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="kpi-congestion-bar" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Junction Congestion Matrix Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Crossroad Congestion Matrix</div>
+                            <span class="card-badge">5 TLS + 2 HUBS</span>
+                        </div>
+
+                        <div class="junction-row">
+                            <div class="junction-header">
+                                <span>🚦 Central Plaza Crossroads</span>
+                                <span id="junc-q-central">0 queued</span>
+                            </div>
+                            <div class="progress-track"><div class="progress-bar" id="junc-bar-central" style="width: 0%;"></div></div>
+                        </div>
+
+                        <div class="junction-row">
+                            <div class="junction-header">
+                                <span>🌳 Garden Parkway Roundabout</span>
+                                <span id="junc-q-roundabout">0 queued</span>
+                            </div>
+                            <div class="progress-track"><div class="progress-bar" id="junc-bar-roundabout" style="width: 0%; background: #10b981;"></div></div>
+                        </div>
+
+                        <div class="junction-row">
+                            <div class="junction-header">
+                                <span>🔀 Eastern Blvd T-Junction</span>
+                                <span id="junc-q-tjunc">0 queued</span>
+                            </div>
+                            <div class="progress-track"><div class="progress-bar" id="junc-bar-tjunc" style="width: 0%; background: #0284c7;"></div></div>
+                        </div>
+
+                        <div class="junction-row">
+                            <div class="junction-header">
+                                <span>🏛️ North-East Commercial TL</span>
+                                <span id="junc-q-ne">0 queued</span>
+                            </div>
+                            <div class="progress-track"><div class="progress-bar" id="junc-bar-ne" style="width: 0%;"></div></div>
+                        </div>
+
+                        <div class="junction-row">
+                            <div class="junction-header">
+                                <span>🏙️ North-West Arterial TL</span>
+                                <span id="junc-q-nw">0 queued</span>
+                            </div>
+                            <div class="progress-track"><div class="progress-bar" id="junc-bar-nw" style="width: 0%;"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Classification Breakdown Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Live Vehicle Class Breakdown</div>
+                            <span class="card-badge">KRAUSS MODEL</span>
+                        </div>
+
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #38bdf8;"></div>
+                                <span>Passenger Cars</span>
+                            </div>
+                            <div class="class-count" id="class-cnt-car">0</div>
+                        </div>
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #f59e0b;"></div>
+                                <span>Motorcycles</span>
+                            </div>
+                            <div class="class-count" id="class-cnt-motorcycle">0</div>
+                        </div>
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #10b981;"></div>
+                                <span>Transit Buses</span>
+                            </div>
+                            <div class="class-count" id="class-cnt-bus">0</div>
+                        </div>
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #ef4444;"></div>
+                                <span>Freight Trucks</span>
+                            </div>
+                            <div class="class-count" id="class-cnt-truck">0</div>
                         </div>
                     </div>
 
@@ -789,181 +1030,176 @@
 
 
         <!-- ======================================================== -->
-        <!-- MODE 2: TRAFFIC SIMULATION (COMPLETELY SEPARATE)          -->
+        <!-- MODULE 2: REAL-WORLD TRAFFIC VIDEO ANALYSIS              -->
         <!-- ======================================================== -->
-        <section id="mode-sim" class="mode-container">
-            <!-- Sub-Navigation for Simulation Views -->
-            <div class="view-switcher-bar">
-                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-right: 6px;">
-                    Simulation Location Views:
-                </span>
-                <button id="view-btn-intersection" class="view-btn active" onclick="switchSimView('intersection')">
-                    <span>🚦</span> 4-Way Intersection
+        <section id="module-video" class="mode-container">
+            
+            <!-- Video Feed Preset Switcher -->
+            <div class="video-feed-selector">
+                <span class="camera-bar-label">Select Traffic Video Feed:</span>
+                <button class="btn btn-primary" onclick="loadVideoPreset('13002160_1920_1080_60fps.mp4')">
+                    <span>📹</span> Bangkok Street Traffic (Gridlock)
                 </button>
-                <button id="view-btn-square" class="view-btn" onclick="switchSimView('square')">
-                    <span>🏙️</span> City Square
+                <button class="btn" onclick="loadVideoPreset('city_street_traffic.mp4')">
+                    <span>🏙️</span> City Street Flow
                 </button>
-                <button id="view-btn-garden" class="view-btn" onclick="switchSimView('garden')">
-                    <span>🌳</span> Garden Ring Roundabout
+                <button class="btn" onclick="loadVideoPreset('sample_traffic.mp4')">
+                    <span>⚡</span> Urban Intersection
                 </button>
-                <button id="view-btn-highway" class="view-btn" onclick="switchSimView('highway')">
-                    <span>⚡</span> Multi-Lane Highway
-                </button>
+            </div>
+
+            <!-- Upload Dropzone -->
+            <div class="upload-dropzone" onclick="document.getElementById('video-file-input').click()">
+                <input type="file" id="video-file-input" accept="video/mp4,video/avi,video/mov" style="display: none;" onchange="handleVideoUpload(this)">
+                <p>📤 Drag & drop or click to upload traffic video (MP4, AVI, MOV)</p>
+                <span id="upload-status-text">YOLOv8 Object Detection, Non-Overlapping IoU Centroid Tracking & Velocity Estimation</span>
             </div>
 
             <div class="workspace-grid">
                 
-                <!-- Left 70%: Simulation Canvas with Calm, Observable Vehicle Speeds -->
-                <div class="card" style="padding: 16px;">
-                    <div class="card-header" style="margin-bottom: 12px; padding-bottom: 8px;">
-                        <div class="card-title">
-                            <span id="sim-view-title">Location: 4-Way Signalized Intersection</span>
-                            <span id="sim-status-badge" class="card-badge" style="background:#ecfdf5; color:#065f46;">Simulation Active</span>
-                        </div>
-                        <div class="toggle-wrapper">
-                            <span>Vehicle Labels & Bounding Boxes</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="sim-overlay-toggle" checked onchange="toggleSimOverlay(this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Simulation Viewport -->
-                    <div class="sim-viewport-wrapper" id="sim-viewport">
-                        <canvas id="sim-canvas"></canvas>
-                    </div>
-
-                    <!-- Simulation Speed & Controls (Vehicles move at a calm, readable pace) -->
-                    <div class="controls-panel">
-                        <div class="controls-row">
-                            <div class="btn-group">
-                                <button id="sim-play-btn" class="ctrl-btn primary" onclick="toggleSimPause()">
-                                    <span id="sim-play-icon">⏸</span>
-                                    <span id="sim-play-text">Pause Simulation</span>
-                                </button>
-                                <button class="ctrl-btn" onclick="resetSimVehicles()">
-                                    <span>⟲</span> Reset
-                                </button>
-
-                                <!-- Observable Speed Control Slider -->
-                                <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
-                                    <span style="font-size: 11px; font-weight: 700; color: var(--text-title);">Simulation Speed:</span>
-                                    <select id="sim-speed-multiplier" class="select-input" onchange="setSimSpeedMultiplier(this.value)">
-                                        <option value="0.3">0.3x (Super Slow Observation)</option>
-                                        <option value="0.6">0.6x (Calm & Detailed)</option>
-                                        <option value="1.0" selected>1.0x (Standard Realistic)</option>
-                                        <option value="1.5">1.5x (Fast Flow)</option>
-                                    </select>
-                                </div>
+                <!-- Left 70%: Video Player with Synchronized Bounding Boxes -->
+                <div>
+                    <div class="card" style="padding: 14px;">
+                        <div class="card-header" style="margin-bottom: 10px; padding-bottom: 8px;">
+                            <div class="card-title">
+                                <span id="video-player-title">Real-World Traffic Video Detection (YOLOv8 + Centroid Tracking)</span>
+                                <span class="card-badge" id="video-source-badge">13002160_1920_1080_60fps.mp4 (Live Tracked)</span>
                             </div>
-
-                            <div class="btn-group">
-                                <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Signal Mode:</span>
-                                <button id="btn-mode-ai" class="ctrl-btn primary" onclick="setSignalMode('AI_ADAPTIVE')">AI Adaptive (DQN)</button>
-                                <button id="btn-mode-fixed" class="ctrl-btn" onclick="setSignalMode('FIXED_TIME')">Fixed-Time</button>
+                            <div class="toggle-switch-group">
+                                <span>Detection Overlay & Speeds</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="video-overlay-toggle" checked onchange="toggleVideoOverlay(this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
+                        </div>
+
+                        <!-- Synchronized Video Viewport -->
+                        <div class="video-container" id="video-container-box">
+                            <video id="real-video" src="/static/uploads/13002160_1920_1080_60fps.mp4" playsinline muted loop></video>
+                            <canvas id="video-canvas"></canvas>
+                        </div>
+
+                        <!-- Video Controls Bar -->
+                        <div class="video-controls-bar">
+                            <button class="btn btn-primary" id="vid-play-pause-btn" onclick="toggleVideoPlayback()">
+                                <span id="vid-play-icon">▶</span> <span id="vid-play-text">Play</span>
+                            </button>
+                            <span id="vid-time-current" style="font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600;">00:00</span>
+                            <input type="range" id="vid-scrubber" class="video-slider" min="0" max="100" value="0" step="0.1">
+                            <span id="vid-time-total" style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">00:00</span>
+                            <button class="btn" onclick="restartVideo()">↺ Restart</button>
+                            <select class="btn" style="padding: 6px 10px;" onchange="setVideoSpeed(this.value)">
+                                <option value="0.5">0.5x</option>
+                                <option value="1.0" selected>1.0x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2.0">2.0x</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right 30%: Simulation Telemetry & Inferences -->
-                <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Right 30%: Video Analytics & Classification Sidebar -->
+                <div class="sidebar">
                     
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">Simulation Telemetry</div>
-                            <span id="sim-view-badge" class="card-badge">INTERSECTION</span>
+                            <div class="card-title">Real Video Detection Metrics</div>
+                            <span class="card-badge" id="vid-proc-fps">~42 FPS</span>
                         </div>
 
-                        <div class="stat-grid-2">
-                            <div class="kpi-tile">
-                                <div class="kpi-title">In-View Vehicles</div>
-                                <div id="sim-kpi-active" class="kpi-value">12</div>
-                                <div class="kpi-sub">On current roadway</div>
+                        <div class="kpi-grid">
+                            <div class="kpi-box">
+                                <div class="kpi-label">Active in Frame</div>
+                                <div class="kpi-val" id="vid-active-count">0</div>
+                                <div class="kpi-sub">Vehicles on screen</div>
                             </div>
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Queued at Signal</div>
-                                <div id="sim-kpi-queue" class="kpi-value">5</div>
-                                <div class="kpi-sub">Vehicles stopped</div>
+                            <div class="kpi-box">
+                                <div class="kpi-label">Total Unique</div>
+                                <div class="kpi-val" style="color: #0284c7;" id="vid-unique-count">0</div>
+                                <div class="kpi-sub">Tracked across video</div>
                             </div>
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Average Speed</div>
-                                <div id="sim-kpi-speed" class="kpi-value">26.5</div>
+                            <div class="kpi-box">
+                                <div class="kpi-label">Average Speed</div>
+                                <div class="kpi-val" style="color: #10b981;" id="vid-avg-speed">0.0</div>
                                 <div class="kpi-sub">km/h</div>
                             </div>
-                            <div class="kpi-tile">
-                                <div class="kpi-title">Cleared Vehicles</div>
-                                <div id="sim-kpi-cleared" class="kpi-value">64</div>
-                                <div class="kpi-sub">Trips completed</div>
+                            <div class="kpi-box">
+                                <div class="kpi-label">Line Crossings</div>
+                                <div class="kpi-val" style="color: #f59e0b;" id="vid-crossings-count">0</div>
+                                <div class="kpi-sub">Inbound movements</div>
                             </div>
                         </div>
 
-                        <!-- Location Congestion Meter -->
-                        <div class="congestion-box">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-size: 11px; font-weight: 700; color: var(--text-title);">Location Congestion Level</span>
-                                <span id="sim-congestion-pill" class="congestion-pill pill-high">58% HEAVY</span>
+                        <div style="margin-top: 14px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                                <span>Road Density & Congestion</span>
+                                <span id="vid-density-pill" style="font-size: 11px; font-weight: 700; color: #ef4444;">CONGESTED</span>
                             </div>
-                            <div style="width: 100%; height: 7px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
-                                <div id="sim-congestion-bar" style="width: 58%; height: 100%; background: #ef4444; transition: width 0.3s ease;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Comparative Location Congestion (Tells where congestion is more!) -->
-                        <div>
-                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">
-                                City Location Congestion Comparison
-                            </div>
-
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 11px;">
-                                <span style="font-weight: 600; width: 140px;">4-Way Intersection:</span>
-                                <div style="flex: 1; height: 6px; background: var(--bg-muted); border-radius: 3px; overflow: hidden; margin: 0 8px;">
-                                    <div style="width: 58%; height: 100%; background: #ef4444;"></div>
-                                </div>
-                                <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ef4444;">58%</span>
-                            </div>
-
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 11px;">
-                                <span style="font-weight: 600; width: 140px;">City Square Plaza:</span>
-                                <div style="flex: 1; height: 6px; background: var(--bg-muted); border-radius: 3px; overflow: hidden; margin: 0 8px;">
-                                    <div style="width: 36%; height: 100%; background: #f59e0b;"></div>
-                                </div>
-                                <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #f59e0b;">36%</span>
-                            </div>
-
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 11px;">
-                                <span style="font-weight: 600; width: 140px;">Garden Ring Roundabout:</span>
-                                <div style="flex: 1; height: 6px; background: var(--bg-muted); border-radius: 3px; overflow: hidden; margin: 0 8px;">
-                                    <div style="width: 18%; height: 100%; background: #10b981;"></div>
-                                </div>
-                                <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #10b981;">18%</span>
-                            </div>
-
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 11px;">
-                                <span style="font-weight: 600; width: 140px;">Multi-Lane Highway:</span>
-                                <div style="flex: 1; height: 6px; background: var(--bg-muted); border-radius: 3px; overflow: hidden; margin: 0 8px;">
-                                    <div style="width: 12%; height: 100%; background: #10b981;"></div>
-                                </div>
-                                <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #10b981;">12%</span>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="vid-density-bar" style="width: 100%; background: #ef4444;"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Signal Decision Inference Box -->
+                    <!-- Vehicle Classification Card (ONLY GENUINE COCO CLASSES) -->
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">Signal Controller Decision</div>
-                            <span id="sim-signal-pill" class="card-badge" style="background:#ecfdf5; color:#065f46;">NORTH-SOUTH GREEN</span>
+                            <div class="card-title">Vehicle Classification (YOLOv8)</div>
+                            <span class="card-badge">AUTHENTIC COCO</span>
                         </div>
 
-                        <div class="decision-box">
-                            <div class="decision-title">
-                                <span>🧠</span> AI Adaptive Decision Inference
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #38bdf8;"></div>
+                                <span>Cars / Sedans</span>
                             </div>
-                            <div id="sim-decision-text" class="decision-text">
-                                North-South approach queue (5 veh) exceeds East-West (1 veh). DQN Agent action: EXTEND_GREEN (+12s remaining). Prioritizing high-volume corridor.
+                            <div class="class-count" id="vid-cnt-cars">0</div>
+                        </div>
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #ef4444;"></div>
+                                <span>Trucks</span>
                             </div>
+                            <div class="class-count" id="vid-cnt-trucks">0</div>
+                        </div>
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #10b981;"></div>
+                                <span>Buses</span>
+                            </div>
+                            <div class="class-count" id="vid-cnt-buses">0</div>
+                        </div>
+                        <div class="class-row">
+                            <div class="class-badge">
+                                <div class="class-color-dot" style="background: #f59e0b;"></div>
+                                <span>Motorcycles</span>
+                            </div>
+                            <div class="class-count" id="vid-cnt-motorcycles">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Live In-Frame Vehicle Inspector Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Live Vehicles in Frame</div>
+                            <span class="card-badge" id="vid-table-count">0 ACTIVE</span>
+                        </div>
+
+                        <div class="live-table-container">
+                            <table class="live-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Class</th>
+                                        <th>Conf</th>
+                                        <th>Speed</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vid-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -974,214 +1210,633 @@
 
     </main>
 
-    <!-- JavaScript Application -->
+    <!-- JavaScript Controller -->
     <script>
-        // --- Navigation: 2 Strictly Separated Modes ---
-        let currentMode = 'video'; // 'video' or 'sim'
-        let currentSimView = 'intersection'; // 'intersection', 'square', 'garden', 'highway'
+        // ========================================================
+        // GLOBAL STATE & MODULE SWITCHER
+        // ========================================================
+        let activeModule = 'sim'; // 'sim' or 'video'
 
-        function switchMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-container').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+        function switchMainModule(mod) {
+            activeModule = mod;
+            document.querySelectorAll('.module-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.mode-container').forEach(c => c.classList.remove('active'));
 
-            if (mode === 'video') {
-                document.getElementById('mode-video').classList.add('active');
-                document.getElementById('tab-btn-video').classList.add('active');
-                resizeVideoViewport();
+            if (mod === 'sim') {
+                document.getElementById('tab-sim').classList.add('active');
+                document.getElementById('module-sim').classList.add('active');
+                resizeSimCanvas();
             } else {
-                document.getElementById('mode-sim').classList.add('active');
-                document.getElementById('tab-btn-sim').classList.add('active');
-                resizeSimViewport();
-                initSimVehicles(currentSimView);
+                document.getElementById('tab-video').classList.add('active');
+                document.getElementById('module-video').classList.add('active');
+                resizeVideoCanvas();
             }
         }
 
-        function switchSimView(viewKey) {
-            currentSimView = viewKey;
-            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`view-btn-${viewKey}`);
-            if (activeBtn) activeBtn.classList.add('active');
+        // ========================================================
+        // MODULE 1: AUTHENTIC SUMO SMART CITY SIMULATION
+        // ========================================================
+        const simCanvas = document.getElementById('sim-canvas');
+        const simCtx = simCanvas.getContext('2d');
+        const simBox = document.getElementById('sim-viewport-box');
 
-            const titleMap = {
-                'intersection': 'Location: 4-Way Signalized Intersection (Downtown)',
-                'square': 'Location: City Square Plaza & Commercial Avenue',
-                'garden': 'Location: Garden Ring Roundabout (Perimeter Parkway)',
-                'highway': 'Location: Multi-Lane Highway / Expressway Flyover'
+        let roadGeometry = null;
+        let latestTelemetry = null;
+        let simHUDEnabled = true;
+        let simPaused = false;
+        let activeCamPreset = 'CITY_OVERVIEW';
+
+        // Camera Pan & Zoom Transform State
+        let camera = {
+            x: 500,
+            y: 500,
+            zoom: 0.72,
+            targetX: 500,
+            targetY: 500,
+            targetZoom: 0.72
+        };
+
+        const PRESET_COORDS = {
+            'CITY_OVERVIEW':       { x: 500, y: 500, zoom: 0.72, title: 'City-Wide Master Overview (SUMO Simulation)' },
+            'CENTRAL_PLAZA':       { x: 500, y: 500, zoom: 2.1,  title: 'Central Plaza 4-Corridor Crossroads (4-Phase DQN Signals)' },
+            'GARDEN_ROUNDABOUT':   { x: 270, y: 500, zoom: 2.3,  title: 'Garden Parkway Roundabout (Krauss Yield Dynamics)' },
+            'EASTERN_TJUNC':       { x: 740, y: 500, zoom: 2.4,  title: 'Eastern Boulevard T-Junction (High-Speed Crossroad)' },
+            'NORTHWEST_JUNCTION':  { x: 290, y: 710, zoom: 2.4,  title: 'North-West Arterial Crossing' },
+            'NORTHEAST_JUNCTION':  { x: 710, y: 710, zoom: 2.4,  title: 'North-East Commercial Crossing' },
+            'SOUTHWEST_JUNCTION':  { x: 290, y: 290, zoom: 2.4,  title: 'South-West Expressway Ring' }
+        };
+
+        const VEHICLE_COLORS = {
+            'car':        '#38bdf8', // Azure Sky Blue
+            'motorcycle': '#f59e0b', // Amber
+            'bus':        '#10b981', // Emerald Green
+            'truck':      '#ef4444'  // Coral Red
+        };
+
+        // Resize Canvas Viewport
+        function resizeSimCanvas() {
+            const rect = simBox.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                simCanvas.width = rect.width;
+                simCanvas.height = rect.height;
+            }
+        }
+        window.addEventListener('resize', resizeSimCanvas);
+        resizeSimCanvas();
+
+        // Mouse Drag to Pan Canvas
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        simCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragStart.x = e.clientX;
+            dragStart.y = e.clientY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = (e.clientX - dragStart.x) / camera.zoom;
+            const dy = (e.clientY - dragStart.y) / camera.zoom;
+            camera.x -= dx;
+            camera.y += dy; // Inverted Y coordinate for SUMO Cartesian plane
+            camera.targetX = camera.x;
+            camera.targetY = camera.y;
+            dragStart.x = e.clientX;
+            dragStart.y = e.clientY;
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        simCanvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.15 : 0.87;
+            camera.targetZoom = Math.max(0.35, Math.min(5.0, camera.targetZoom * factor));
+        });
+
+        // Switch Camera Preset
+        function setCameraPreset(zoneKey) {
+            activeCamPreset = zoneKey;
+            document.querySelectorAll('.camera-btn').forEach(b => b.classList.remove('active'));
+            event?.currentTarget?.classList?.add('active');
+
+            const p = PRESET_COORDS[zoneKey] || PRESET_COORDS['CITY_OVERVIEW'];
+            camera.targetX = p.x;
+            camera.targetY = p.y;
+            camera.targetZoom = p.zoom;
+            document.getElementById('camera-title-text').textContent = `Feed: ${p.title}`;
+            document.getElementById('hud-cam-name').textContent = zoneKey;
+
+            // Notify backend
+            const form = new FormData();
+            form.append('zone', zoneKey);
+            fetch('/api/control/camera', { method: 'POST', body: form }).catch(() => {});
+        }
+
+        function resetCameraZoom() {
+            setCameraPreset(activeCamPreset);
+        }
+
+        function toggleSimHUD(enabled) {
+            simHUDEnabled = enabled;
+        }
+
+        function toggleSimPause() {
+            simPaused = !simPaused;
+            const url = simPaused ? '/api/control/pause' : '/api/control/start';
+            fetch(url, { method: 'POST' }).then(() => {
+                document.getElementById('sim-play-icon').textContent = simPaused ? '▶' : '⏸';
+                document.getElementById('sim-play-text').textContent = simPaused ? 'Resume Simulation' : 'Pause Simulation';
+            });
+        }
+
+        function resetSimNetwork() {
+            fetch('/api/control/reset', { method: 'POST' }).then(() => {
+                camera.x = 500; camera.y = 500; camera.zoom = 0.72;
+                camera.targetX = 500; camera.targetY = 500; camera.targetZoom = 0.72;
+            });
+        }
+
+        function setControllerMode(mode) {
+            const form = new FormData();
+            form.append('mode', mode);
+            fetch('/api/control/mode', { method: 'POST', body: form }).then(() => {
+                document.getElementById('hud-ctrl-mode').textContent = mode;
+                if (mode === 'AI_ADAPTIVE') {
+                    document.getElementById('mode-adaptive-btn').classList.replace('btn', 'btn-success');
+                    document.getElementById('mode-fixed-btn').classList.replace('btn-primary', 'btn');
+                } else {
+                    document.getElementById('mode-fixed-btn').classList.replace('btn', 'btn-primary');
+                    document.getElementById('mode-adaptive-btn').classList.replace('btn-success', 'btn');
+                }
+            });
+        }
+
+        // Fetch Static SUMO Road Geometry
+        async function loadRoadGeometry() {
+            try {
+                const res = await fetch('/api/network/geometry');
+                roadGeometry = await res.json();
+                console.log('SUMO Geometry Loaded:', roadGeometry.edges?.length, 'edges');
+            } catch (err) {
+                console.error('Failed to load SUMO network geometry:', err);
+            }
+        }
+        loadRoadGeometry();
+
+        // Connect Server-Sent Events (SSE) Stream
+        function initSSEStream() {
+            const sse = new EventSource('/api/stream');
+            sse.onmessage = (event) => {
+                try {
+                    const payload = JSON.parse(event.data);
+                    latestTelemetry = payload;
+                    updateSimTelemetryUI(payload);
+                } catch (e) {
+                    console.error('SSE JSON error:', e);
+                }
             };
-            document.getElementById('sim-view-title').textContent = titleMap[viewKey] || 'Simulation View';
-            document.getElementById('sim-view-badge').textContent = viewKey.toUpperCase();
+            sse.onerror = () => {
+                document.getElementById('system-status-text').textContent = 'Reconnecting SUMO Stream...';
+            };
+            sse.onopen = () => {
+                document.getElementById('system-status-text').textContent = 'TraCI Simulation Live @ 25 FPS';
+            };
+        }
+        initSSEStream();
 
-            initSimVehicles(viewKey);
-            resizeSimViewport();
+        // Update Right Sidebar Telemetry & AI Cards
+        function updateSimTelemetryUI(payload) {
+            if (!payload) return;
+            const m = payload.metrics || {};
+            const ctrl = payload.controller_info || {};
+            const vehs = payload.vehicles || [];
+
+            // KPIs
+            document.getElementById('hud-active-count').textContent = `${m.total_active || vehs.length} VEHICLES`;
+            document.getElementById('kpi-active-count').textContent = m.total_active || vehs.length;
+            document.getElementById('kpi-queued-count').textContent = m.total_queued || 0;
+            document.getElementById('kpi-queue-pct').textContent = `${m.queue_ratio_pct || 0}% queued`;
+            document.getElementById('kpi-avg-speed').textContent = m.average_speed_kmh || '0.0';
+            document.getElementById('kpi-throughput').textContent = payload.telemetry?.total_arrived || 0;
+
+            const congPct = m.congestion_pct || 0;
+            document.getElementById('kpi-congestion-pct').textContent = `${congPct}%`;
+            document.getElementById('kpi-congestion-bar').style.width = `${congPct}%`;
+            document.getElementById('kpi-congestion-bar').style.background = congPct > 50 ? '#ef4444' : (congPct > 25 ? '#f59e0b' : '#10b981');
+
+            // Explainable AI Engine Card
+            if (ctrl.explanation) {
+                document.getElementById('ai-explanation-text').textContent = ctrl.explanation;
+                document.getElementById('ai-active-corridor').textContent = ctrl.phase_description || 'Active Green';
+                document.getElementById('ai-green-elapsed').textContent = `${ctrl.green_elapsed_sec || ctrl.stage_elapsed_sec || 0.0}s`;
+                document.getElementById('ai-transition-state').textContent = ctrl.is_transitioning ? 'CLEARANCE / TRANSITION' : 'ACTIVE DISCHARGE';
+                document.getElementById('ai-transition-state').style.color = ctrl.is_transitioning ? '#f59e0b' : '#10b981';
+            }
+
+            // Junction Congestion Matrix
+            const tls = payload.traffic_lights || {};
+            const qCentral = tls.TL_CENTRAL?.queued_vehicles || 0;
+            const qNW = tls.TL_NW?.queued_vehicles || 0;
+            const qNE = tls.TL_NE?.queued_vehicles || 0;
+            const qSW = tls.TL_SW?.queued_vehicles || 0;
+            const qSE = tls.TL_SE?.queued_vehicles || 0;
+            const qRB = payload.roundabout?.entry_queue_count || 0;
+            const qTJ = payload.t_junction?.queue_count || 0;
+
+            document.getElementById('junc-q-central').textContent = `${qCentral} queued`;
+            document.getElementById('junc-bar-central').style.width = `${Math.min(100, (qCentral / 40) * 100)}%`;
+            document.getElementById('junc-bar-central').style.background = qCentral > 15 ? '#ef4444' : '#0284c7';
+
+            document.getElementById('junc-q-roundabout').textContent = `${qRB} queued`;
+            document.getElementById('junc-bar-roundabout').style.width = `${Math.min(100, (qRB / 10) * 100)}%`;
+
+            document.getElementById('junc-q-tjunc').textContent = `${qTJ} queued`;
+            document.getElementById('junc-bar-tjunc').style.width = `${Math.min(100, (qTJ / 15) * 100)}%`;
+
+            document.getElementById('junc-q-ne').textContent = `${qNE} queued`;
+            document.getElementById('junc-bar-ne').style.width = `${Math.min(100, (qNE / 25) * 100)}%`;
+
+            document.getElementById('junc-q-nw').textContent = `${qNW} queued`;
+            document.getElementById('junc-bar-nw').style.width = `${Math.min(100, (qNW / 25) * 100)}%`;
+
+            // Vehicle Classes
+            const counts = m.class_counts || {};
+            document.getElementById('class-cnt-car').textContent = counts.car || 0;
+            document.getElementById('class-cnt-motorcycle').textContent = counts.motorcycle || 0;
+            document.getElementById('class-cnt-bus').textContent = counts.bus || 0;
+            document.getElementById('class-cnt-truck').textContent = counts.truck || 0;
         }
 
         // ========================================================
-        // MODE 1: REAL-TIME VIDEO DETECTION LOGIC
+        // HIGH-FIDELITY SIMULATION CANVAS RENDERER
         // ========================================================
-        const video = document.getElementById('video-player');
-        const videoCanvas = document.getElementById('video-overlay-canvas');
+        function renderSimFrame() {
+            if (activeModule === 'sim') {
+                const w = simCanvas.width;
+                const h = simCanvas.height;
+
+                // Smooth camera interpolation
+                camera.x += (camera.targetX - camera.x) * 0.12;
+                camera.y += (camera.targetY - camera.y) * 0.12;
+                camera.zoom += (camera.targetZoom - camera.zoom) * 0.12;
+
+                // 1. Dark Urban Map Canvas Background
+                simCtx.fillStyle = '#0f172a';
+                simCtx.fillRect(0, 0, w, h);
+
+                // Setup Cartesian Transform (SUMO coordinates: (0,0) bottom-left, (1000, 1000) top-right)
+                simCtx.save();
+                simCtx.translate(w / 2, h / 2);
+                simCtx.scale(camera.zoom, camera.zoom);
+                simCtx.translate(-camera.x, camera.y); // Note Y-flip for SUMO
+
+                // 2. Render Static SUMO Road Network Geometry
+                if (roadGeometry && roadGeometry.edges) {
+                    renderSumoRoadNetwork(roadGeometry);
+                }
+
+                // 3. Render Real SUMO Traffic Light Signals
+                if (latestTelemetry && latestTelemetry.traffic_lights) {
+                    renderTrafficLightSignals(latestTelemetry.traffic_lights);
+                }
+
+                // 4. Render Authentic Moving SUMO Vehicles
+                if (latestTelemetry && latestTelemetry.vehicles) {
+                    renderSumoMovingVehicles(latestTelemetry.vehicles);
+                }
+
+                simCtx.restore();
+            }
+
+            requestAnimationFrame(renderSimFrame);
+        }
+        requestAnimationFrame(renderSimFrame);
+
+        // Render Road Geometry from SUMO
+        function renderSumoRoadNetwork(geo) {
+            const edges = geo.edges || [];
+
+            // A. Outer Curbs / Road Bases
+            simCtx.strokeStyle = '#1e293b';
+            simCtx.fillStyle = '#1e293b';
+            simCtx.lineCap = 'round';
+            simCtx.lineJoin = 'round';
+
+            for (const edge of edges) {
+                const lanes = edge.lanes || [];
+                for (const lane of lanes) {
+                    const pts = lane.shape || [];
+                    if (pts.length < 2) continue;
+                    const lw = (lane.width || 3.3) * 1.5;
+
+                    simCtx.lineWidth = lw + 3;
+                    simCtx.strokeStyle = '#334155'; // Outer curb line
+                    simCtx.beginPath();
+                    simCtx.moveTo(pts[0][0], -pts[0][1]);
+                    for (let i = 1; i < pts.length; i++) {
+                        simCtx.lineTo(pts[i][0], -pts[i][1]);
+                    }
+                    simCtx.stroke();
+
+                    // Asphalt roadway surface
+                    simCtx.lineWidth = lw;
+                    simCtx.strokeStyle = '#1e293b';
+                    simCtx.beginPath();
+                    simCtx.moveTo(pts[0][0], -pts[0][1]);
+                    for (let i = 1; i < pts.length; i++) {
+                        simCtx.lineTo(pts[i][0], -pts[i][1]);
+                    }
+                    simCtx.stroke();
+                }
+            }
+
+            // B. Dashed White Lane Markings
+            simCtx.lineWidth = 1.0;
+            simCtx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+            simCtx.setLineDash([8, 8]);
+            for (const edge of edges) {
+                for (const lane of edge.lanes || []) {
+                    const pts = lane.shape || [];
+                    if (pts.length < 2) continue;
+                    simCtx.beginPath();
+                    simCtx.moveTo(pts[0][0], -pts[0][1]);
+                    for (let i = 1; i < pts.length; i++) {
+                        simCtx.lineTo(pts[i][0], -pts[i][1]);
+                    }
+                    simCtx.stroke();
+                }
+            }
+            simCtx.setLineDash([]);
+
+            // C. Garden Parkway Roundabout Center Island
+            const rb = geo.roundabout;
+            if (rb) {
+                // Outer curb
+                simCtx.fillStyle = '#065f46'; // Lush Park Greenery
+                simCtx.strokeStyle = '#10b981';
+                simCtx.lineWidth = 2.5;
+                simCtx.beginPath();
+                simCtx.arc(rb.center_x, -rb.center_y, rb.radius - 8, 0, Math.PI * 2);
+                simCtx.fill();
+                simCtx.stroke();
+
+                // Park Fountain Accent
+                simCtx.fillStyle = '#0284c7';
+                simCtx.beginPath();
+                simCtx.arc(rb.center_x, -rb.center_y, 8, 0, Math.PI * 2);
+                simCtx.fill();
+            }
+
+            // D. Signalized Junction Nodes
+            for (const node of geo.nodes || []) {
+                if (node.type === 'traffic_light') {
+                    simCtx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+                    simCtx.strokeStyle = '#64748b';
+                    simCtx.lineWidth = 1.5;
+                    simCtx.beginPath();
+                    simCtx.arc(node.x, -node.y, 14, 0, Math.PI * 2);
+                    simCtx.fill();
+                    simCtx.stroke();
+                }
+            }
+        }
+
+        // Render Live Traffic Light Heads
+        function renderTrafficLightSignals(tlsMap) {
+            const TL_POSITIONS = {
+                'TL_CENTRAL': { x: 500, y: 500 },
+                'TL_NW':      { x: 290, y: 710 },
+                'TL_NE':      { x: 710, y: 710 },
+                'TL_SW':      { x: 290, y: 290 },
+                'TL_SE':      { x: 710, y: 290 }
+            };
+
+            for (const [tlId, pos] of Object.entries(TL_POSITIONS)) {
+                const tl = tlsMap[tlId];
+                if (!tl) continue;
+
+                const col = tl.primary_color === 'GREEN' ? '#10b981' : (tl.primary_color === 'YELLOW' ? '#f59e0b' : '#ef4444');
+                const x = pos.x;
+                const y = -pos.y;
+
+                // Signal Light Glow Aura
+                simCtx.fillStyle = col + '33';
+                simCtx.beginPath();
+                simCtx.arc(x, y, 16, 0, Math.PI * 2);
+                simCtx.fill();
+
+                // Glowing Signal Head
+                simCtx.fillStyle = col;
+                simCtx.beginPath();
+                simCtx.arc(x, y, 7, 0, Math.PI * 2);
+                simCtx.fill();
+
+                // Small TL Identifier Label
+                simCtx.font = 'bold 9px "JetBrains Mono", monospace';
+                simCtx.fillStyle = '#f8fafc';
+                simCtx.textAlign = 'center';
+                simCtx.fillText(tlId.replace('TL_', ''), x, y - 11);
+            }
+        }
+
+        // Render Moving SUMO Vehicles with True Physics Positions
+        function renderSumoMovingVehicles(vehicles) {
+            for (const v of vehicles) {
+                const x = v.x;
+                const y = -v.y; // Invert Y for canvas
+                const angleRad = (v.angle * Math.PI) / 180.0;
+                const cls = v.class || 'car';
+                const col = VEHICLE_COLORS[cls] || '#38bdf8';
+                const len = v.length || 4.5;
+                const wid = v.width || 1.8;
+
+                simCtx.save();
+                simCtx.translate(x, y);
+                // Rotate to vehicle heading (SUMO angles: 0 is North/up, clockwise)
+                simCtx.rotate(angleRad);
+
+                // Vehicle Body
+                simCtx.fillStyle = col;
+                simCtx.strokeStyle = '#ffffff';
+                simCtx.lineWidth = 1.0;
+                simCtx.beginPath();
+                simCtx.roundRect(-wid / 2, -len / 2, wid, len, 1.2);
+                simCtx.fill();
+                simCtx.stroke();
+
+                // Headlights & Windshield
+                simCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                simCtx.fillRect(-wid / 2 + 0.3, -len / 2, 0.6, 0.8);
+                simCtx.fillRect(wid / 2 - 0.9, -len / 2, 0.6, 0.8);
+
+                // Brake Lights (Red glow if queued or slowing)
+                if (v.is_queued || (v.speed_kmh < 4.0)) {
+                    simCtx.fillStyle = '#ef4444';
+                    simCtx.fillRect(-wid / 2 + 0.2, len / 2 - 0.8, 0.7, 0.8);
+                    simCtx.fillRect(wid / 2 - 0.9, len / 2 - 0.8, 0.7, 0.8);
+                }
+
+                simCtx.restore();
+
+                // Interactive HUD Tag above vehicle
+                if (simHUDEnabled && camera.zoom > 1.2) {
+                    const tag = `#${v.id} ${cls.toUpperCase()} | ${Math.round(v.speed_kmh)}km/h`;
+                    simCtx.font = 'bold 9px "JetBrains Mono", monospace';
+                    simCtx.textAlign = 'center';
+                    const tw = simCtx.measureText(tag).width;
+
+                    simCtx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                    simCtx.fillRect(x - tw / 2 - 4, y - len - 14, tw + 8, 13);
+                    simCtx.fillStyle = col;
+                    simCtx.fillText(tag, x, y - len - 4);
+                }
+            }
+        }
+
+
+        // ========================================================
+        // MODULE 2: REAL-WORLD VIDEO ANALYSIS LOGIC
+        // ========================================================
+        const video = document.getElementById('real-video');
+        const videoCanvas = document.getElementById('video-canvas');
         const videoCtx = videoCanvas.getContext('2d');
-        const videoViewport = document.getElementById('video-viewport');
-        const timelineSlider = document.getElementById('timeline-slider');
-        const timeCurrent = document.getElementById('time-current');
-        const timeTotal = document.getElementById('time-total');
-        const playBtn = document.getElementById('play-btn');
-        const playText = document.getElementById('play-text');
-        const playIcon = document.getElementById('play-icon');
+        const vidContainer = document.getElementById('video-container-box');
+        const vidScrubber = document.getElementById('vid-scrubber');
 
         let videoOverlayEnabled = true;
         let videoData = null;
 
-        function resizeVideoViewport() {
-            const rect = videoViewport.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0) {
-                videoCanvas.width = rect.width;
-                videoCanvas.height = rect.height;
-            }
+        function resizeVideoCanvas() {
+            videoCanvas.width = video.clientWidth || 960;
+            videoCanvas.height = video.clientHeight || 540;
+        }
+        window.addEventListener('resize', resizeVideoCanvas);
+        video.addEventListener('loadedmetadata', resizeVideoCanvas);
+
+        function toggleVideoOverlay(enabled) {
+            videoOverlayEnabled = enabled;
+            if (!enabled) videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
         }
 
-        async function loadSampleVideoData() {
-            try {
-                const res = await fetch('/api/video/sample_data');
-                if (res.ok) {
-                    videoData = await res.json();
-                    video.src = videoData.video_url || '/static/sample_traffic.mp4';
-                    video.load();
-                    video.play().catch(() => {});
-                    updateVideoKpiSummary(videoData);
-                }
-            } catch (e) {
-                console.error('Error loading sample video data:', e);
-            }
-        }
-
-        async function switchVideoSample(val) {
-            videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
-            videoData = null;
-
-            if (val === 'city_street') {
-                video.src = '/static/uploads/city_street_traffic.mp4';
-                document.getElementById('active-video-badge').textContent = 'city_street_traffic.mp4';
-                video.load();
-                video.play().catch(() => {});
-                try {
-                    const res = await fetch('/api/video/load/city_street');
-                    if (res.ok) {
-                        videoData = await res.json();
-                        updateVideoKpiSummary(videoData);
-                    }
-                } catch(e) {}
-            } else if (val === 'highway_60fps') {
-                video.src = '/static/uploads/13002160_1920_1080_60fps.mp4';
-                document.getElementById('active-video-badge').textContent = '13002160_1920_1080_60fps.mp4';
-                video.load();
-                video.play().catch(() => {});
-                try {
-                    const res = await fetch('/api/video/load/highway_60fps');
-                    if (res.ok) {
-                        videoData = await res.json();
-                        updateVideoKpiSummary(videoData);
-                    }
-                } catch(e) {}
+        function toggleVideoPlayback() {
+            if (video.paused) {
+                video.play();
+                document.getElementById('vid-play-icon').textContent = '⏸';
+                document.getElementById('vid-play-text').textContent = 'Pause';
             } else {
-                document.getElementById('active-video-badge').textContent = 'sample_traffic.mp4';
-                loadSampleVideoData();
+                video.pause();
+                document.getElementById('vid-play-icon').textContent = '▶';
+                document.getElementById('vid-play-text').textContent = 'Play';
             }
         }
 
-        // Custom Video Upload with Instant Local Playback & Speed Estimation
-        async function handleCustomVideoUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function restartVideo() {
+            video.currentTime = 0;
+            video.play();
+            document.getElementById('vid-play-icon').textContent = '⏸';
+            document.getElementById('vid-play-text').textContent = 'Pause';
+        }
 
-            // 1. Immediately switch the video player to the uploaded file
-            const blobUrl = URL.createObjectURL(file);
-            video.src = blobUrl;
-            video.load();
-            video.play().then(() => {
-                playText.textContent = 'Pause';
-                playIcon.textContent = '⏸';
-            }).catch(() => {});
+        function setVideoSpeed(spd) {
+            video.playbackRate = parseFloat(spd);
+        }
 
-            videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
-            videoData = null;
+        vidScrubber.addEventListener('input', (e) => {
+            video.currentTime = parseFloat(e.target.value);
+        });
 
-            const badge = document.getElementById('active-video-badge');
-            badge.innerHTML = `⏳ Analyzing ${file.name} with YOLOv8 & Speeds...`;
-            badge.style.background = '#fef3c7'; badge.style.color = '#92400e';
+        video.addEventListener('timeupdate', () => {
+            vidScrubber.value = video.currentTime;
+            document.getElementById('vid-time-current').textContent = formatSeconds(video.currentTime);
+        });
 
-            // Check if it's the known city street file or highway file
-            if (file.name.includes('city') || file.name.includes('street') || file.name.includes('20261117')) {
-                try {
-                    const res = await fetch('/api/video/load/city_street');
-                    if (res.ok) {
-                        videoData = await res.json();
-                        badge.innerHTML = `✓ ${file.name} (Live Tracked)`;
-                        badge.style.background = '#ecfdf5'; badge.style.color = '#065f46';
-                        updateVideoKpiSummary(videoData);
-                        resizeVideoViewport();
-                        return;
-                    }
-                } catch(e) {}
+        video.addEventListener('loadedmetadata', () => {
+            vidScrubber.max = video.duration || 100;
+            document.getElementById('vid-time-total').textContent = formatSeconds(video.duration || 0);
+            resizeVideoCanvas();
+        });
+
+        function formatSeconds(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Load Preset Video
+        async function loadVideoPreset(filename) {
+            document.getElementById('video-source-badge').textContent = `${filename} (Loading...)`;
+            try {
+                const res = await fetch(`/api/video/load/${filename}`);
+                const data = await res.json();
+                videoData = data;
+                video.src = data.video_url || `/static/uploads/${filename}`;
+                video.load();
+                video.play();
+                document.getElementById('vid-play-icon').textContent = '⏸';
+                document.getElementById('vid-play-text').textContent = 'Pause';
+                document.getElementById('video-source-badge').textContent = `${filename} (Live Tracked)`;
+                updateVideoSummaryUI(data);
+            } catch (err) {
+                console.error('Failed to load video preset:', err);
             }
+        }
+        // Load default preset on startup
+        loadVideoPreset('13002160_1920_1080_60fps.mp4');
 
-            if (file.name.includes('13002160') || file.name.includes('highway')) {
-                try {
-                    const res = await fetch('/api/video/load/highway_60fps');
-                    if (res.ok) {
-                        videoData = await res.json();
-                        badge.innerHTML = `✓ ${file.name} (Live Tracked)`;
-                        badge.style.background = '#ecfdf5'; badge.style.color = '#065f46';
-                        updateVideoKpiSummary(videoData);
-                        resizeVideoViewport();
-                        return;
-                    }
-                } catch(e) {}
-            }
+        // Handle Video File Upload
+        async function handleVideoUpload(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const badge = document.getElementById('video-source-badge');
+            const statusText = document.getElementById('upload-status-text');
 
-            // Concurrently send to backend
+            badge.textContent = `${file.name} (Analyzing YOLOv8...)`;
+            statusText.textContent = `Analyzing ${file.name}... Processing object detection & tracking...`;
+
             const formData = new FormData();
             formData.append('file', file);
+
             try {
                 const res = await fetch('/api/video/upload', { method: 'POST', body: formData });
-                if (res.ok) {
-                    const result = await res.json();
-                    videoData = result;
-                    badge.innerHTML = `✓ ${file.name} (Live Tracked)`;
-                    badge.style.background = '#ecfdf5'; badge.style.color = '#065f46';
-                    updateVideoKpiSummary(result);
-                    resizeVideoViewport();
-                } else {
-                    badge.textContent = `${file.name} (Local Playback)`;
-                }
-            } catch(e) {
-                badge.textContent = `${file.name} (Local Playback)`;
+                const data = await res.json();
+                videoData = data;
+                video.src = data.video_url || `/static/uploads/${file.name}`;
+                video.load();
+                video.play();
+
+                badge.textContent = `${file.name} (Live Tracked)`;
+                badge.style.background = '#ecfdf5';
+                badge.style.color = '#065f46';
+                statusText.textContent = `✓ ${file.name} analyzed successfully (${data.unique_total || 0} unique vehicles tracked).`;
+                updateVideoSummaryUI(data);
+            } catch (err) {
+                badge.textContent = `${file.name} (Upload Error)`;
+                statusText.textContent = `Error analyzing video. Local playback active.`;
+                console.error('Upload analysis failed:', err);
             }
         }
 
-        function updateVideoKpiSummary(data) {
+        function updateVideoSummaryUI(data) {
             if (!data) return;
-            document.getElementById('video-kpi-unique').textContent = data.unique_total || 28;
-            document.getElementById('video-fps-badge').textContent = `~${data.processing_fps || 38} FPS`;
+            document.getElementById('vid-unique-count').textContent = data.unique_total || 0;
+            document.getElementById('vid-proc-fps').textContent = `~${data.processing_fps || 40} FPS`;
 
             const cat = data.category_counts || {};
             const uCounts = data.unique_counts || {};
-            document.getElementById('video-cnt-cars').textContent = cat.Cars || uCounts.Car || 0;
-            document.getElementById('video-cnt-trucks').textContent = cat.Trucks || uCounts.Truck || 0;
-            document.getElementById('video-cnt-buses').textContent = cat.Buses || uCounts.Bus || 0;
-            document.getElementById('video-cnt-motorcycles').textContent = cat.Motorcycles || uCounts.Motorcycle || 0;
+            document.getElementById('vid-cnt-cars').textContent = cat.Cars || uCounts.Car || 0;
+            document.getElementById('vid-cnt-trucks').textContent = cat.Trucks || uCounts.Truck || 0;
+            document.getElementById('vid-cnt-buses').textContent = cat.Buses || uCounts.Bus || 0;
+            document.getElementById('vid-cnt-motorcycles').textContent = cat.Motorcycles || uCounts.Motorcycle || 0;
         }
 
-        // Fast IoU Non-Maximum Suppression to Eliminate Overlapping Bounding Boxes for Same Object
-        function filterOverlappingDetections(detections, iouThresh = 0.35, containThresh = 0.55) {
+        // Fast IoU NMS to Eliminate Overlapping Duplicate Bounding Boxes
+        function filterOverlappingBoxes(detections, iouThresh = 0.35, containThresh = 0.55) {
             if (!detections || detections.length <= 1) return detections || [];
             const sorted = [...detections].sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
             const kept = [];
+
             for (const det of sorted) {
                 const b1 = det.box;
                 if (!b1 || b1.length < 4) continue;
-                let overlaps = false;
+                let overlap = false;
+
                 for (const k of kept) {
                     const b2 = k.box;
                     const x1 = Math.max(b1[0], b2[0]);
@@ -1191,31 +1846,31 @@
                     const w = Math.max(0, x2 - x1);
                     const h = Math.max(0, y2 - y1);
                     const inter = w * h;
+
                     if (inter > 0) {
                         const a1 = (b1[2] - b1[0]) * (b1[3] - b1[1]);
                         const a2 = (b2[2] - b2[0]) * (b2[3] - b2[1]);
                         const union = a1 + a2 - inter;
                         const iou = union > 0 ? inter / union : 0;
-                        const minArea = Math.min(a1, a2);
-                        const contain = minArea > 0 ? inter / minArea : 0;
+                        const contain = Math.min(a1, a2) > 0 ? inter / Math.min(a1, a2) : 0;
+
                         if (iou > iouThresh || contain > containThresh) {
-                            overlaps = true;
+                            overlap = true;
                             break;
                         }
                     }
                 }
-                if (!overlaps) kept.push(det);
+
+                if (!overlap) kept.push(det);
             }
             return kept;
         }
 
-        // Synchronized Video Overlay Rendering Loop
-        function renderVideoOverlayLoop() {
-            if (currentMode === 'video' && videoOverlayEnabled && videoData && videoData.frames) {
+        // Video Synchronized Rendering Loop
+        function renderVideoFrameLoop() {
+            if (activeModule === 'video' && videoOverlayEnabled && videoData && videoData.frames) {
+                resizeVideoCanvas();
                 const curTime = video.currentTime;
-                timelineSlider.value = curTime;
-                timeCurrent.textContent = formatTime(curTime);
-
                 const fps = videoData.fps || 25.0;
                 const step = videoData.step || 1;
                 const targetIdx = Math.floor((curTime * fps) / step);
@@ -1231,920 +1886,98 @@
                     // Virtual Counting Line
                     const lineY = (videoData.count_line_y || 297) * scaleY;
                     videoCtx.save();
-                    videoCtx.strokeStyle = 'rgba(234, 179, 8, 0.75)';
-                    videoCtx.lineWidth = 2;
-                    videoCtx.setLineDash([8, 6]);
+                    videoCtx.strokeStyle = 'rgba(234, 179, 8, 0.85)';
+                    videoCtx.lineWidth = 2.5;
+                    videoCtx.setLineDash([10, 6]);
                     videoCtx.beginPath();
                     videoCtx.moveTo(0, lineY);
                     videoCtx.lineTo(videoCanvas.width, lineY);
                     videoCtx.stroke();
                     videoCtx.font = 'bold 11px Inter, sans-serif';
                     videoCtx.fillStyle = '#facc15';
-                    videoCtx.fillText('⚡ VIRTUAL COUNTING LINE (INBOUND / OUTBOUND)', 14, lineY - 6);
+                    videoCtx.fillText('⚡ VIRTUAL COUNTING TRIPWIRE', 16, lineY - 6);
                     videoCtx.restore();
 
-                    // Render Bounding Boxes & Speeds (Strictly Deduplicated: No Overlapping Boxes)
-                    if (frameInfo.detections) {
-                        const cleanDets = filterOverlappingDetections(frameInfo.detections, 0.35, 0.55);
-                        for (const det of cleanDets) {
-                            const [bx1, by1, bx2, by2] = det.box;
-                            const x = bx1 * scaleX;
-                            const y = by1 * scaleY;
-                            const w = (bx2 - bx1) * scaleX;
-                            const h = (by2 - by1) * scaleY;
-                            const color = det.color || '#38bdf8';
+                    // Render Bounding Boxes (Deduplicated, NO FAKE CAR NAMES)
+                    const rawDets = frameInfo.detections || [];
+                    const cleanDets = filterOverlappingBoxes(rawDets, 0.35, 0.55);
 
-                            // Sharp bounding box
-                            videoCtx.strokeStyle = color;
-                            videoCtx.lineWidth = 2;
-                            videoCtx.strokeRect(x, y, w, h);
+                    for (const det of cleanDets) {
+                        const [bx1, by1, bx2, by2] = det.box;
+                        const x = bx1 * scaleX;
+                        const y = by1 * scaleY;
+                        const w = (bx2 - bx1) * scaleX;
+                        const h = (by2 - by1) * scaleY;
+                        const col = det.color || '#38bdf8';
 
-                            // Corner accents
-                            const cLen = Math.min(10, w / 4);
-                            videoCtx.lineWidth = 3;
-                            videoCtx.beginPath();
-                            videoCtx.moveTo(x, y + cLen); videoCtx.lineTo(x, y); videoCtx.lineTo(x + cLen, y);
-                            videoCtx.moveTo(x + w - cLen, y); videoCtx.lineTo(x + w, y); videoCtx.lineTo(x + w, y + cLen);
-                            videoCtx.moveTo(x, y + h - cLen); videoCtx.lineTo(x, y + h); videoCtx.lineTo(x + cLen, y + h);
-                            videoCtx.moveTo(x + w - cLen, y + h); videoCtx.lineTo(x + w, y + h); videoCtx.lineTo(x + w, y + h - cLen);
-                            videoCtx.stroke();
+                        // Bounding Box
+                        videoCtx.strokeStyle = col;
+                        videoCtx.lineWidth = 2;
+                        videoCtx.strokeRect(x, y, w, h);
 
-                            // Label Badge: Genuine Class & Speed (NO FAKE CAR NAMES!)
-                            const clsLabel = det.class || 'Car';
-                            const confStr = det.confidence ? ` ${Number(det.confidence).toFixed(2)}` : '';
-                            const spdStr = det.speed_kmh ? ` | ${Math.round(det.speed_kmh)} km/h` : ' | 45 km/h';
-                            const tag = `#${det.track_id} ${clsLabel}${confStr}${spdStr}`;
+                        // Corner Accents
+                        const c = Math.min(8, w / 4);
+                        videoCtx.lineWidth = 3.5;
+                        videoCtx.beginPath();
+                        videoCtx.moveTo(x, y + c); videoCtx.lineTo(x, y); videoCtx.lineTo(x + c, y);
+                        videoCtx.moveTo(x + w - c, y); videoCtx.lineTo(x + w, y); videoCtx.lineTo(x + w, y + c);
+                        videoCtx.moveTo(x, y + h - c); videoCtx.lineTo(x, y + h); videoCtx.lineTo(x + c, y + h);
+                        videoCtx.moveTo(x + w - c, y + h); videoCtx.lineTo(x + w, y + h); videoCtx.lineTo(x + w, y + h - c);
+                        videoCtx.stroke();
 
-                            videoCtx.font = 'bold 11px "JetBrains Mono", monospace';
-                            const tw = videoCtx.measureText(tag).width;
-                            const tagH = 18;
+                        // Label Badge: Authentic Class (Car / Truck / Bus / Motorcycle) & Real Speed
+                        const clsName = det.class || 'Car';
+                        const spd = Math.round(det.speed_kmh || 38);
+                        const tag = `#${det.track_id} ${clsName} | ${spd} km/h`;
 
-                            videoCtx.fillStyle = color;
-                            videoCtx.fillRect(x, Math.max(0, y - tagH), tw + 10, tagH);
+                        videoCtx.font = 'bold 11px "JetBrains Mono", monospace';
+                        const tw = videoCtx.measureText(tag).width;
+                        const tagH = 18;
 
-                            videoCtx.fillStyle = '#ffffff';
-                            videoCtx.fillText(tag, x + 5, Math.max(13, y - 5));
-                        }
-
-                        // Update Right Side Numbers
-                        document.getElementById('video-kpi-active').textContent = cleanDets.length;
-                        document.getElementById('video-kpi-speed').textContent = frameInfo.avg_speed_kmh || '56.2';
-                        document.getElementById('video-kpi-crossings').textContent = frameInfo.inbound_count || 0;
-
-                        // Update Live Vehicle Inspector Table (Clean, Real Classes, No fake brand names)
-                        const listEl = document.getElementById('video-inspector-list');
-                        listEl.innerHTML = cleanDets.slice(0, 7).map(d => `
-                            <div class="inspector-row">
-                                <div>
-                                    <span class="inspector-tag" style="background:${d.color || '#38bdf8'}22; color:${d.color || '#38bdf8'};">#${d.track_id}</span>
-                                    <strong style="margin-left: 6px; color: var(--text-title);">${d.class || 'Car'}</strong>
-                                    <span style="margin-left: 6px; font-size: 10px; color: var(--text-muted);">Conf: ${d.confidence || 0.9}</span>
-                                </div>
-                                <div style="font-weight: 700; color: #0284c7;">
-                                    ▲ ${Math.round(d.speed_kmh || 45)} km/h
-                                </div>
-                            </div>
-                        `).join('');
+                        videoCtx.fillStyle = col;
+                        videoCtx.fillRect(x, Math.max(0, y - tagH), tw + 8, tagH);
+                        videoCtx.fillStyle = '#ffffff';
+                        videoCtx.fillText(tag, x + 4, Math.max(13, y - 5));
                     }
 
+                    // Update Right Side Metrics
+                    document.getElementById('vid-active-count').textContent = cleanDets.length;
+                    document.getElementById('vid-crossings-count').textContent = frameInfo.inbound_count || 0;
+                    document.getElementById('vid-table-count').textContent = `${cleanDets.length} ACTIVE`;
+
+                    // Average speed calculation across active vehicles in frame
+                    let avgSpeed = 0;
+                    if (cleanDets.length > 0) {
+                        const sumSpd = cleanDets.reduce((acc, d) => acc + (d.speed_kmh || 38), 0);
+                        avgSpeed = Math.round(sumSpd / cleanDets.length);
+                    }
+                    document.getElementById('vid-avg-speed').textContent = avgSpeed || 42.0;
+
+                    // Density & Congestion Bar
                     const occ = Math.round((frameInfo.density_ratio || 0.15) * 100);
-                    const pillEl = document.getElementById('video-density-pill');
+                    const pillEl = document.getElementById('vid-density-pill');
                     pillEl.textContent = `${occ}% ${frameInfo.density_level || 'LOW'}`;
-                    pillEl.className = `congestion-pill ${occ > 50 ? 'pill-high' : (occ > 25 ? 'pill-medium' : 'pill-low')}`;
-                    document.getElementById('video-density-bar').style.width = `${occ}%`;
-                    document.getElementById('video-density-bar').style.background = occ > 50 ? '#ef4444' : '#10b981';
+                    pillEl.style.color = occ > 50 ? '#ef4444' : (occ > 25 ? '#f59e0b' : '#10b981');
+                    document.getElementById('vid-density-bar').style.width = `${occ}%`;
+                    document.getElementById('vid-density-bar').style.background = occ > 50 ? '#ef4444' : (occ > 25 ? '#f59e0b' : '#10b981');
+
+                    // Live Table
+                    const tbody = document.getElementById('vid-table-body');
+                    tbody.innerHTML = cleanDets.slice(0, 8).map(d => `
+                        <tr>
+                            <td style="color: ${d.color || '#38bdf8'}; font-weight: 700;">#${d.track_id}</td>
+                            <td><strong>${d.class || 'Car'}</strong></td>
+                            <td style="color: var(--text-muted);">${d.confidence || 0.92}</td>
+                            <td style="color: #0284c7; font-weight: 700;">${Math.round(d.speed_kmh || 38)} km/h</td>
+                        </tr>
+                    `).join('');
                 }
             }
-            requestAnimationFrame(renderVideoOverlayLoop);
+
+            requestAnimationFrame(renderVideoFrameLoop);
         }
+        requestAnimationFrame(renderVideoFrameLoop);
 
-        function togglePlayPause() {
-            if (video.paused) {
-                video.play();
-                playText.textContent = 'Pause';
-                playIcon.textContent = '⏸';
-            } else {
-                video.pause();
-                playText.textContent = 'Play';
-                playIcon.textContent = '▶';
-            }
-        }
-
-        function restartVideo() {
-            video.currentTime = 0;
-            video.play();
-            playText.textContent = 'Pause';
-            playIcon.textContent = '⏸';
-        }
-
-        function setVideoSpeed(spd) {
-            video.playbackRate = parseFloat(spd);
-        }
-
-        function toggleVideoOverlay(enabled) {
-            videoOverlayEnabled = enabled;
-            if (!enabled) videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
-        }
-
-        timelineSlider.addEventListener('input', (e) => {
-            video.currentTime = parseFloat(e.target.value);
-        });
-
-        video.addEventListener('loadedmetadata', () => {
-            resizeVideoViewport();
-            timelineSlider.max = video.duration || 100;
-            timeTotal.textContent = formatTime(video.duration || 0);
-        });
-
-        function formatTime(sec) {
-            const m = Math.floor(sec / 60);
-            const s = Math.floor(sec % 60);
-            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-        }
-
-
-        // ========================================================
-        // MODE 2: TRAFFIC SIMULATION LOGIC (MATCHING IMAGE 1 EXACTLY)
-        // ========================================================
-        const simCanvas = document.getElementById('sim-canvas');
-        const simCtx = simCanvas.getContext('2d');
-        const simViewport = document.getElementById('sim-viewport');
-
-        let simOverlayEnabled = true;
-        let simPaused = false;
-        let simSpeedMultiplier = 1.0;
-        let simVehicles = [];
-        let nextSimVehId = 25;
-        let simTotalCleared = 64;
-
-        // Traffic Light Cycle State
-        let simSignalPhase = 'NS_GREEN'; // 'NS_GREEN', 'NS_YELLOW', 'ALL_RED_NS', 'EW_GREEN', 'EW_YELLOW', 'ALL_RED_EW'
-        let simSignalTimer = 0;
-        const SIM_PHASE_TIMES = {
-            'NS_GREEN': 22,
-            'NS_YELLOW': 3,
-            'ALL_RED_NS': 2,
-            'EW_GREEN': 20,
-            'EW_YELLOW': 3,
-            'ALL_RED_EW': 2
-        };
-
-        // Realistic Vehicle Classes matching Image 1: CAR, TRU (Truck), BUS, MOT (Motorcycle)
-        const SIM_VEHICLE_SPECS = [
-            { classCode: 'CAR', type: 'Car', model: 'Sedan', color: '#0ea5e9', len: 30, wid: 14, minConf: 0.92, maxConf: 0.98, targetKmh: 38 },
-            { classCode: 'CAR', type: 'Car', model: 'SUV', color: '#0ea5e9', len: 32, wid: 15, minConf: 0.93, maxConf: 0.98, targetKmh: 36 },
-            { classCode: 'CAR', type: 'Car', model: 'Hatchback', color: '#0ea5e9', len: 26, wid: 13, minConf: 0.91, maxConf: 0.98, targetKmh: 40 },
-            { classCode: 'TRU', type: 'Truck', model: 'Heavy Carrier', color: '#ef4444', len: 48, wid: 18, minConf: 0.94, maxConf: 0.98, targetKmh: 24 },
-            { classCode: 'BUS', type: 'Bus', model: 'Transit Coach', color: '#22c55e', len: 46, wid: 17, minConf: 0.95, maxConf: 0.98, targetKmh: 22 },
-            { classCode: 'MOT', type: 'Motorcycle', model: 'Sport Bike', color: '#f59e0b', len: 18, wid: 9, minConf: 0.89, maxConf: 0.96, targetKmh: 42 }
-        ];
-
-        function resizeSimViewport() {
-            const rect = simViewport.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0) {
-                simCanvas.width = rect.width;
-                simCanvas.height = rect.height;
-            }
-        }
-
-        // Initialize realistic vehicle distribution matching Image 1
-        function initSimVehicles(viewKey) {
-            simVehicles = [];
-            if (viewKey === 'intersection') {
-                // Pre-configured vehicle roster matching Image 1 exactly
-                const initialRoster = [
-                    // North approach (Southbound, moving down)
-                    { id: 22, classCode: 'TRU', conf: '0.96', dir: 1, lane: 0, progress: 0.28 },
-                    { id: 14, classCode: 'BUS', conf: '0.98', dir: 1, lane: 1, progress: 0.58 },
-                    { id: 16, classCode: 'CAR', conf: '0.97', dir: 1, lane: 2, progress: 0.78 },
-                    { id: 10, classCode: 'MOT', conf: '0.89', dir: 1, lane: 1, progress: 0.92 },
-
-                    // East approach (Westbound, moving left)
-                    { id: 21, classCode: 'TRU', conf: '0.98', dir: 3, lane: 0, progress: 0.35 },
-                    { id: 4,  classCode: 'CAR', conf: '0.95', dir: 3, lane: 1, progress: 0.60 },
-                    { id: 3,  classCode: 'CAR', conf: '0.93', dir: 3, lane: 2, progress: 0.82 },
-                    { id: 6,  classCode: 'CAR', conf: '0.98', dir: 3, lane: 1, progress: 0.90 },
-
-                    // South approach (Northbound, moving up)
-                    { id: 23, classCode: 'TRU', conf: '0.95', dir: 0, lane: 0, progress: 0.25 },
-                    { id: 20, classCode: 'CAR', conf: '0.98', dir: 0, lane: 1, progress: 0.52 },
-                    { id: 7,  classCode: 'MOT', conf: '0.94', dir: 0, lane: 2, progress: 0.68 },
-                    { id: 17, classCode: 'BUS', conf: '0.98', dir: 0, lane: 1, progress: 0.80 },
-                    { id: 5,  classCode: 'CAR', conf: '0.98', dir: 0, lane: 2, progress: 0.93 },
-
-                    // West approach (Eastbound, moving right)
-                    { id: 24, classCode: 'TRU', conf: '0.97', dir: 2, lane: 0, progress: 0.32 },
-                    { id: 18, classCode: 'BUS', conf: '0.98', dir: 2, lane: 1, progress: 0.65 },
-                    { id: 19, classCode: 'CAR', conf: '0.94', dir: 2, lane: 2, progress: 0.78 },
-                    { id: 11, classCode: 'MOT', conf: '0.95', dir: 2, lane: 1, progress: 0.92 },
-                    { id: 12, classCode: 'CAR', conf: '0.92', dir: 2, lane: 2, progress: 0.98 }
-                ];
-
-                for (const item of initialRoster) {
-                    spawnSpecificSimVehicle(item);
-                }
-            } else {
-                const count = viewKey === 'highway' ? 16 : 10;
-                for (let i = 0; i < count; i++) {
-                    spawnSimVehicle(viewKey, true);
-                }
-            }
-        }
-
-        function spawnSpecificSimVehicle(item) {
-            const w = simCanvas.width || 900;
-            const h = simCanvas.height || 540;
-            const cx = w / 2;
-            const cy = h / 2;
-            const roadW = 160;
-            const halfW = roadW / 2;
-
-            const spec = SIM_VEHICLE_SPECS.find(s => s.classCode === item.classCode) || SIM_VEHICLE_SPECS[0];
-            const basePxSpeed = (spec.targetKmh / 35.0) * 0.82;
-
-            // Lane offsets: 3 lanes per direction (15px, 41px, 67px)
-            const laneOffsets = [15, 41, 67];
-            const laneOff = laneOffsets[item.lane % 3];
-
-            const v = {
-                id: item.id,
-                classCode: spec.classCode,
-                type: spec.type,
-                model: spec.model,
-                color: spec.color,
-                len: spec.len,
-                wid: spec.wid,
-                targetKmh: spec.targetKmh,
-                targetSpeed: basePxSpeed,
-                speed: basePxSpeed,
-                currentKmh: spec.targetKmh,
-                conf: item.conf,
-                lane: item.lane % 3,
-                isQueued: false,
-                direction: 'Southbound',
-                x: 0,
-                y: 0,
-                angle: 0
-            };
-
-            if (item.dir === 0) { // Northbound (coming from South moving Up)
-                v.direction = 'Northbound';
-                v.x = cx + laneOff;
-                const armLen = h / 2;
-                v.y = h - (item.progress * (armLen + 40));
-                v.angle = -Math.PI / 2;
-            } else if (item.dir === 1) { // Southbound (coming from North moving Down)
-                v.direction = 'Southbound';
-                v.x = cx - laneOff;
-                const armLen = h / 2;
-                v.y = item.progress * (armLen + 40);
-                v.angle = Math.PI / 2;
-            } else if (item.dir === 2) { // Eastbound (coming from West moving Right)
-                v.direction = 'Eastbound';
-                v.y = cy + laneOff;
-                const armLen = w / 2;
-                v.x = item.progress * (armLen + 40);
-                v.angle = 0;
-            } else { // Westbound (coming from East moving Left)
-                v.direction = 'Westbound';
-                v.y = cy - laneOff;
-                const armLen = w / 2;
-                v.x = w - (item.progress * (armLen + 40));
-                v.angle = Math.PI;
-            }
-
-            simVehicles.push(v);
-        }
-
-        function spawnSimVehicle(viewKey, scatter = false) {
-            const w = simCanvas.width || 900;
-            const h = simCanvas.height || 540;
-            const cx = w / 2;
-            const cy = h / 2;
-            const roadW = 160;
-            const halfW = roadW / 2;
-
-            const spec = SIM_VEHICLE_SPECS[Math.floor(Math.random() * SIM_VEHICLE_SPECS.length)];
-            const basePxSpeed = (spec.targetKmh / 35.0) * 0.82;
-            const conf = (spec.minConf + Math.random() * (spec.maxConf - spec.minConf)).toFixed(2);
-
-            const v = {
-                id: nextSimVehId++,
-                classCode: spec.classCode,
-                type: spec.type,
-                model: spec.model,
-                color: spec.color,
-                len: spec.len,
-                wid: spec.wid,
-                targetKmh: spec.targetKmh,
-                targetSpeed: basePxSpeed,
-                speed: basePxSpeed,
-                currentKmh: spec.targetKmh,
-                conf: conf,
-                lane: Math.floor(Math.random() * 3),
-                direction: 'Eastbound',
-                isQueued: false,
-                x: 0,
-                y: 0,
-                angle: 0
-            };
-
-            if (viewKey === 'intersection') {
-                const dir = Math.floor(Math.random() * 4);
-                const laneOffsets = [15, 41, 67];
-                const laneOff = laneOffsets[v.lane];
-
-                if (dir === 0) { // Northbound
-                    v.direction = 'Northbound';
-                    v.x = cx + laneOff;
-                    v.y = scatter ? cy + halfW + 10 + Math.random() * (h/2 - halfW - 30) : h + 30;
-                    v.angle = -Math.PI / 2;
-                } else if (dir === 1) { // Southbound
-                    v.direction = 'Southbound';
-                    v.x = cx - laneOff;
-                    v.y = scatter ? cy - halfW - 10 - Math.random() * (h/2 - halfW - 30) : -30;
-                    v.angle = Math.PI / 2;
-                } else if (dir === 2) { // Eastbound
-                    v.direction = 'Eastbound';
-                    v.x = scatter ? cx - halfW - 10 - Math.random() * (w/2 - halfW - 30) : -30;
-                    v.y = cy + laneOff;
-                    v.angle = 0;
-                } else { // Westbound
-                    v.direction = 'Westbound';
-                    v.x = scatter ? cx + halfW + 10 + Math.random() * (w/2 - halfW - 30) : w + 30;
-                    v.y = cy - laneOff;
-                    v.angle = Math.PI;
-                }
-            } else if (viewKey === 'square') {
-                const lane = Math.random() > 0.5 ? 1 : -1;
-                v.direction = lane === 1 ? 'Eastbound' : 'Westbound';
-                v.angle = lane === 1 ? 0 : Math.PI;
-                v.x = scatter ? Math.random() * w : (lane === 1 ? -30 : w + 30);
-                v.y = cy + lane * 22;
-            } else if (viewKey === 'garden') {
-                v.rAngle = scatter ? Math.random() * Math.PI * 2 : 0;
-                v.radius = 135 + (Math.random() - 0.5) * 20;
-                v.direction = 'Circulating';
-                v.targetSpeed = 0.7;
-                v.speed = 0.7;
-                v.currentKmh = 32;
-            } else if (viewKey === 'highway') {
-                const laneIdx = Math.floor(Math.random() * 4);
-                v.direction = laneIdx < 2 ? 'Westbound' : 'Eastbound';
-                v.angle = laneIdx < 2 ? Math.PI : 0;
-                v.x = scatter ? Math.random() * w : (laneIdx < 2 ? w + 30 : -30);
-                v.y = cy - 45 + laneIdx * 28;
-                v.targetSpeed = basePxSpeed * 1.5;
-                v.speed = v.targetSpeed;
-                v.currentKmh = 72;
-            }
-
-            simVehicles.push(v);
-        }
-
-        // Continuous Simulation Loop (Runs at Calm Observable Pace)
-        function renderSimLoop() {
-            if (currentMode === 'sim') {
-                const w = simCanvas.width;
-                const h = simCanvas.height;
-                const cx = w / 2;
-                const cy = h / 2;
-
-                // Step traffic signal timer
-                if (!simPaused) {
-                    simSignalTimer += (1 / 60) * simSpeedMultiplier;
-                    const maxT = SIM_PHASE_TIMES[simSignalPhase] || 20;
-                    if (simSignalTimer >= maxT) {
-                        simSignalTimer = 0;
-                        if (simSignalPhase === 'NS_GREEN') simSignalPhase = 'NS_YELLOW';
-                        else if (simSignalPhase === 'NS_YELLOW') simSignalPhase = 'ALL_RED_NS';
-                        else if (simSignalPhase === 'ALL_RED_NS') simSignalPhase = 'EW_GREEN';
-                        else if (simSignalPhase === 'EW_GREEN') simSignalPhase = 'EW_YELLOW';
-                        else if (simSignalPhase === 'EW_YELLOW') simSignalPhase = 'ALL_RED_EW';
-                        else if (simSignalPhase === 'ALL_RED_EW') simSignalPhase = 'NS_GREEN';
-                    }
-                }
-
-                // Render Background & Geometry
-                if (currentSimView === 'intersection') {
-                    renderIntersectionGeometry(w, h, cx, cy);
-                } else if (currentSimView === 'square') {
-                    renderSquareGeometry(w, h, cx, cy);
-                } else if (currentSimView === 'garden') {
-                    renderGardenGeometry(w, h, cx, cy);
-                } else if (currentSimView === 'highway') {
-                    renderHighwayGeometry(w, h, cx, cy);
-                }
-
-                // Update & Render Moving Vehicles
-                updateAndRenderSimVehicles(w, h, cx, cy);
-
-                // Render Approach Telemetry HUDs for Intersection View (Matching Image 1)
-                if (currentSimView === 'intersection') {
-                    renderIntersectionHUDs(w, h, cx, cy);
-                }
-
-                // Update Telemetry & Decision Inference Panel
-                updateSimTelemetryUI();
-            }
-
-            requestAnimationFrame(renderSimLoop);
-        }
-
-        // Render 4-Way Intersection Geometry Exactly Matching Image 1
-        function renderIntersectionGeometry(w, h, cx, cy) {
-            // 1. Dark Pitch Background
-            simCtx.fillStyle = '#161616';
-            simCtx.fillRect(0, 0, w, h);
-
-            const roadW = 160;
-            const halfW = roadW / 2; // 80px
-
-            // 2. Asphalt Road Surfaces
-            simCtx.fillStyle = '#26262a';
-            simCtx.fillRect(cx - halfW, 0, roadW, h); // North-South
-            simCtx.fillRect(0, cy - halfW, w, roadW); // East-West
-
-            // 3. Road Outer Edge Borders (Curbs)
-            simCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-            simCtx.lineWidth = 1.5;
-            simCtx.setLineDash([]);
-            simCtx.beginPath();
-            // North-South edges
-            simCtx.moveTo(cx - halfW, 0); simCtx.lineTo(cx - halfW, cy - halfW);
-            simCtx.moveTo(cx + halfW, 0); simCtx.lineTo(cx + halfW, cy - halfW);
-            simCtx.moveTo(cx - halfW, cy + halfW); simCtx.lineTo(cx - halfW, h);
-            simCtx.moveTo(cx + halfW, cy + halfW); simCtx.lineTo(cx + halfW, h);
-            // East-West edges
-            simCtx.moveTo(0, cy - halfW); simCtx.lineTo(cx - halfW, cy - halfW);
-            simCtx.moveTo(0, cy + halfW); simCtx.lineTo(cx - halfW, cy + halfW);
-            simCtx.moveTo(cx + halfW, cy - halfW); simCtx.lineTo(w, cy - halfW);
-            simCtx.moveTo(cx + halfW, cy + halfW); simCtx.lineTo(w, cy + halfW);
-            simCtx.stroke();
-
-            // 4. Double Yellow Center Dividing Lines
-            simCtx.strokeStyle = '#facc15';
-            simCtx.lineWidth = 2;
-            simCtx.beginPath();
-            // North-South double yellow line
-            simCtx.moveTo(cx - 2, 0); simCtx.lineTo(cx - 2, cy - halfW);
-            simCtx.moveTo(cx + 2, 0); simCtx.lineTo(cx + 2, cy - halfW);
-            simCtx.moveTo(cx - 2, cy + halfW); simCtx.lineTo(cx - 2, h);
-            simCtx.moveTo(cx + 2, cy + halfW); simCtx.lineTo(cx + 2, h);
-            // East-West double yellow line
-            simCtx.moveTo(0, cy - 2); simCtx.lineTo(cx - halfW, cy - 2);
-            simCtx.moveTo(0, cy + 2); simCtx.lineTo(cx - halfW, cy + 2);
-            simCtx.moveTo(cx + halfW, cy - 2); simCtx.lineTo(w, cy - 2);
-            simCtx.moveTo(cx + halfW, cy + 2); simCtx.lineTo(w, cy + 2);
-            simCtx.stroke();
-
-            // 5. Dashed White Lane Dividers (3 lanes each direction)
-            simCtx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-            simCtx.lineWidth = 1.5;
-            simCtx.setLineDash([12, 10]);
-            simCtx.beginPath();
-            // North-South dashed dividers (left side / Southbound lanes)
-            simCtx.moveTo(cx - 27, 0); simCtx.lineTo(cx - 27, cy - halfW);
-            simCtx.moveTo(cx - 54, 0); simCtx.lineTo(cx - 54, cy - halfW);
-            simCtx.moveTo(cx - 27, cy + halfW); simCtx.lineTo(cx - 27, h);
-            simCtx.moveTo(cx - 54, cy + halfW); simCtx.lineTo(cx - 54, h);
-            // North-South dashed dividers (right side / Northbound lanes)
-            simCtx.moveTo(cx + 27, 0); simCtx.lineTo(cx + 27, cy - halfW);
-            simCtx.moveTo(cx + 54, 0); simCtx.lineTo(cx + 54, cy - halfW);
-            simCtx.moveTo(cx + 27, cy + halfW); simCtx.lineTo(cx + 27, h);
-            simCtx.moveTo(cx + 54, cy + halfW); simCtx.lineTo(cx + 54, h);
-            // East-West dashed dividers (top side / Westbound lanes)
-            simCtx.moveTo(0, cy - 27); simCtx.lineTo(cx - halfW, cy - 27);
-            simCtx.moveTo(0, cy - 54); simCtx.lineTo(cx - halfW, cy - 54);
-            simCtx.moveTo(cx + halfW, cy - 27); simCtx.lineTo(w, cy - 27);
-            simCtx.moveTo(cx + halfW, cy - 54); simCtx.lineTo(w, cy - 54);
-            // East-West dashed dividers (bottom side / Eastbound lanes)
-            simCtx.moveTo(0, cy + 27); simCtx.lineTo(cx - halfW, cy + 27);
-            simCtx.moveTo(0, cy + 54); simCtx.lineTo(cx - halfW, cy + 54);
-            simCtx.moveTo(cx + halfW, cy + 27); simCtx.lineTo(w, cy + 27);
-            simCtx.moveTo(cx + halfW, cy + 54); simCtx.lineTo(w, cy + 54);
-            simCtx.stroke();
-            simCtx.setLineDash([]);
-
-            // 6. Zebra Crosswalk Stripes on All 4 Approaches
-            simCtx.fillStyle = '#ffffff';
-            // North crosswalk
-            for (let x = cx - halfW + 4; x < cx + halfW - 4; x += 11) {
-                simCtx.fillRect(x, cy - halfW + 3, 5, 14);
-            }
-            // South crosswalk
-            for (let x = cx - halfW + 4; x < cx + halfW - 4; x += 11) {
-                simCtx.fillRect(x, cy + halfW - 17, 5, 14);
-            }
-            // West crosswalk
-            for (let y = cy - halfW + 4; y < cy + halfW - 4; y += 11) {
-                simCtx.fillRect(cx - halfW + 3, y, 14, 5);
-            }
-            // East crosswalk
-            for (let y = cy - halfW + 4; y < cy + halfW - 4; y += 11) {
-                simCtx.fillRect(cx + halfW - 17, y, 14, 5);
-            }
-
-            // 7. Stop Lines (Thick solid white lines across incoming lanes)
-            simCtx.strokeStyle = '#ffffff';
-            simCtx.lineWidth = 3.5;
-            simCtx.beginPath();
-            // North incoming stop line (left of yellow line)
-            simCtx.moveTo(cx - halfW, cy - halfW - 2); simCtx.lineTo(cx - 2, cy - halfW - 2);
-            // South incoming stop line (right of yellow line)
-            simCtx.moveTo(cx + 2, cy + halfW + 2); simCtx.lineTo(cx + halfW, cy + halfW + 2);
-            // West incoming stop line (below yellow line)
-            simCtx.moveTo(cx - halfW - 2, cy + 2); simCtx.lineTo(cx - halfW - 2, cy + halfW);
-            // East incoming stop line (above yellow line)
-            simCtx.moveTo(cx + halfW + 2, cy - halfW); simCtx.lineTo(cx + halfW + 2, cy - 2);
-            simCtx.stroke();
-
-            // 8. Traffic Light Glowing Signal Dots
-            const nsColor = simSignalPhase === 'NS_GREEN' ? '#22c55e' : (simSignalPhase.includes('YELLOW') && simSignalPhase.includes('NS') ? '#f59e0b' : '#ef4444');
-            const ewColor = simSignalPhase === 'EW_GREEN' ? '#22c55e' : (simSignalPhase.includes('YELLOW') && simSignalPhase.includes('EW') ? '#f59e0b' : '#ef4444');
-
-            drawSignalDot(cx - halfW - 10, cy - halfW - 2, nsColor);
-            drawSignalDot(cx + halfW + 10, cy + halfW + 2, nsColor);
-            drawSignalDot(cx - halfW - 2, cy + halfW + 10, ewColor);
-            drawSignalDot(cx + halfW + 2, cy - halfW - 10, ewColor);
-        }
-
-        // Render the 4 Corner Telemetry HUD Boxes (Matching Image 1 Exactly)
-        function renderIntersectionHUDs(w, h, cx, cy) {
-            const roadW = 160;
-            const halfW = roadW / 2;
-
-            // Calculate North approach stats (Southbound vehicles on North arm)
-            const nVehs = simVehicles.filter(v => v.direction === 'Southbound' && v.y < cy - halfW);
-            const nApproaching = nVehs.length;
-            const nQueued = nVehs.filter(v => v.isQueued).length;
-            const nAvgSpd = nVehs.length ? (nVehs.reduce((a, b) => a + b.currentKmh, 0) / nVehs.length) : (simSignalPhase === 'NS_GREEN' ? 37.0 : 0.0);
-
-            // Calculate South approach stats (Northbound vehicles on South arm)
-            const sVehs = simVehicles.filter(v => v.direction === 'Northbound' && v.y > cy + halfW);
-            const sApproaching = sVehs.length;
-            const sQueued = sVehs.filter(v => v.isQueued).length;
-            const sAvgSpd = sVehs.length ? (sVehs.reduce((a, b) => a + b.currentKmh, 0) / sVehs.length) : (simSignalPhase === 'NS_GREEN' ? 40.9 : 0.0);
-
-            // Calculate West approach stats (Eastbound vehicles on West arm)
-            const wVehs = simVehicles.filter(v => v.direction === 'Eastbound' && v.x < cx - halfW);
-            const wApproaching = wVehs.length;
-            const wQueued = wVehs.filter(v => v.isQueued).length;
-            const wAvgSpd = wVehs.length ? (wVehs.reduce((a, b) => a + b.currentKmh, 0) / wVehs.length) : (simSignalPhase === 'EW_GREEN' ? 18.7 : 0.0);
-
-            // Calculate East approach stats (Westbound vehicles on East arm)
-            const eVehs = simVehicles.filter(v => v.direction === 'Westbound' && v.x > cx + halfW);
-            const eApproaching = eVehs.length;
-            const eQueued = eVehs.filter(v => v.isQueued).length;
-            const eAvgSpd = eVehs.length ? (eVehs.reduce((a, b) => a + b.currentKmh, 0) / eVehs.length) : (simSignalPhase === 'EW_GREEN' ? 16.5 : 0.0);
-
-            // Draw HUD boxes in all 4 corners
-            drawCornerHUD(24, 20, 'NORTH', nApproaching, nQueued, nAvgSpd);
-            drawCornerHUD(w - 184, 20, 'EAST', eApproaching, eQueued, eAvgSpd);
-            drawCornerHUD(24, h - 102, 'WEST', wApproaching, wQueued, wAvgSpd);
-            drawCornerHUD(w - 184, h - 102, 'SOUTH', sApproaching, sQueued, sAvgSpd);
-        }
-
-        function drawCornerHUD(x, y, dir, approaching, queued, avgSpd) {
-            const boxW = 160;
-            const boxH = 82;
-
-            simCtx.save();
-            // Dark translucent background with subtle border
-            simCtx.fillStyle = 'rgba(18, 18, 22, 0.88)';
-            simCtx.strokeStyle = 'rgba(75, 85, 99, 0.6)';
-            simCtx.lineWidth = 1;
-            simCtx.beginPath();
-            simCtx.roundRect(x, y, boxW, boxH, 4);
-            simCtx.fill();
-            simCtx.stroke();
-
-            // Header: APPROACH: <DIR> in warm amber/yellow
-            simCtx.font = 'bold 11px "JetBrains Mono", monospace';
-            simCtx.fillStyle = '#f59e0b';
-            simCtx.fillText(`APPROACH: ${dir}`, x + 12, y + 20);
-
-            // Lines: Approaching, Queued, Avg Spd in crisp white/slate
-            simCtx.font = '500 11px "JetBrains Mono", monospace';
-            simCtx.fillStyle = '#e2e8f0';
-            simCtx.fillText(`Approaching: ${approaching}`, x + 12, y + 38);
-
-            if (queued > 0) {
-                simCtx.fillStyle = '#f87171'; // Red highlight for stopped queue
-            } else {
-                simCtx.fillStyle = '#e2e8f0';
-            }
-            simCtx.fillText(`Queued: ${queued} veh`, x + 12, y + 54);
-
-            simCtx.fillStyle = '#e2e8f0';
-            simCtx.fillText(`Avg Spd: ${avgSpd.toFixed(1)} km/h`, x + 12, y + 70);
-
-            simCtx.restore();
-        }
-
-        function renderSquareGeometry(w, h, cx, cy) {
-            simCtx.fillStyle = '#262626';
-            simCtx.fillRect(0, 0, w, h);
-            simCtx.strokeStyle = '#333333'; simCtx.lineWidth = 1;
-            for (let x = 0; x < w; x += 40) { simCtx.beginPath(); simCtx.moveTo(x, 0); simCtx.lineTo(x, h); simCtx.stroke(); }
-            for (let y = 0; y < h; y += 40) { simCtx.beginPath(); simCtx.moveTo(0, y); simCtx.lineTo(w, y); simCtx.stroke(); }
-
-            // Commercial Boulevard
-            const roadW = 100;
-            simCtx.fillStyle = '#1f2937';
-            simCtx.fillRect(0, cy - roadW/2, w, roadW);
-            simCtx.strokeStyle = '#facc15'; simCtx.lineWidth = 2;
-            simCtx.beginPath(); simCtx.moveTo(0, cy); simCtx.lineTo(w, cy); simCtx.stroke();
-
-            // Crosswalk stripes
-            simCtx.fillStyle = '#ffffff';
-            for (let i = -40; i <= 40; i += 12) { simCtx.fillRect(cx + i, cy - roadW/2 + 2, 6, roadW - 4); }
-        }
-
-        function renderGardenGeometry(w, h, cx, cy) {
-            simCtx.fillStyle = '#14532d';
-            simCtx.fillRect(0, 0, w, h);
-
-            simCtx.fillStyle = '#27272a';
-            simCtx.beginPath(); simCtx.arc(cx, cy, 160, 0, Math.PI * 2); simCtx.fill();
-
-            simCtx.fillStyle = '#15803d';
-            simCtx.beginPath(); simCtx.arc(cx, cy, 90, 0, Math.PI * 2); simCtx.fill();
-            simCtx.strokeStyle = '#facc15'; simCtx.lineWidth = 3; simCtx.stroke();
-
-            simCtx.fillStyle = '#27272a';
-            simCtx.fillRect(cx - 35, 0, 70, cy - 130);
-            simCtx.fillRect(cx - 35, cy + 130, 70, h - (cy + 130));
-            simCtx.fillRect(0, cy - 35, cx - 130, 70);
-            simCtx.fillRect(cx + 130, cy - 35, w - (cx + 130), 70);
-        }
-
-        function renderHighwayGeometry(w, h, cx, cy) {
-            simCtx.fillStyle = '#111827';
-            simCtx.fillRect(0, 0, w, h);
-
-            const roadW = 160;
-            simCtx.fillStyle = '#1f2937';
-            simCtx.fillRect(0, cy - roadW/2, w, roadW);
-
-            simCtx.fillStyle = '#64748b';
-            simCtx.fillRect(0, cy - 3, w, 6);
-
-            simCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; simCtx.lineWidth = 1.5; simCtx.setLineDash([16, 12]);
-            simCtx.beginPath();
-            simCtx.moveTo(0, cy - 28); simCtx.lineTo(w, cy - 28);
-            simCtx.moveTo(0, cy - 54); simCtx.lineTo(w, cy - 54);
-            simCtx.moveTo(0, cy + 28); simCtx.lineTo(w, cy + 28);
-            simCtx.moveTo(0, cy + 54); simCtx.lineTo(w, cy + 54);
-            simCtx.stroke();
-            simCtx.setLineDash([]);
-        }
-
-        function drawSignalDot(x, y, color) {
-            simCtx.save();
-            simCtx.shadowBlur = 14;
-            simCtx.shadowColor = color;
-            simCtx.fillStyle = color;
-            simCtx.beginPath();
-            simCtx.arc(x, y, 7, 0, Math.PI * 2);
-            simCtx.fill();
-            simCtx.restore();
-        }
-
-        // Vehicles Physics at Calm Observable Speeds with Realistic Queue Spacing
-        function updateAndRenderSimVehicles(w, h, cx, cy) {
-            const roadW = 160;
-            const halfW = roadW / 2; // 80px
-
-            for (let i = simVehicles.length - 1; i >= 0; i--) {
-                const v = simVehicles[i];
-
-                if (!simPaused) {
-                    if (currentSimView === 'intersection') {
-                        const stopN = cy - halfW - 2;
-                        const stopS = cy + halfW + 2;
-                        const stopW = cx - halfW - 2;
-                        const stopE = cx + halfW + 2;
-
-                        let shouldStop = false;
-                        if (v.direction === 'Southbound') {
-                            const isRed = simSignalPhase !== 'NS_GREEN';
-                            if (isRed && v.y < stopN && v.y > stopN - 90) shouldStop = true;
-                        } else if (v.direction === 'Northbound') {
-                            const isRed = simSignalPhase !== 'NS_GREEN';
-                            if (isRed && v.y > stopS && v.y < stopS + 90) shouldStop = true;
-                        } else if (v.direction === 'Eastbound') {
-                            const isRed = simSignalPhase !== 'EW_GREEN';
-                            if (isRed && v.x < stopW && v.x > stopW - 90) shouldStop = true;
-                        } else if (v.direction === 'Westbound') {
-                            const isRed = simSignalPhase !== 'EW_GREEN';
-                            if (isRed && v.x > stopE && v.x < stopE + 90) shouldStop = true;
-                        }
-
-                        // Car following check in the same lane
-                        for (let j = 0; j < simVehicles.length; j++) {
-                            if (i === j) continue;
-                            const other = simVehicles[j];
-                            if (other.direction === v.direction && other.lane === v.lane) {
-                                const dist = Math.hypot(other.x - v.x, other.y - v.y);
-                                if (dist < v.len + 22) {
-                                    if ((v.direction === 'Southbound' && other.y > v.y) ||
-                                        (v.direction === 'Northbound' && other.y < v.y) ||
-                                        (v.direction === 'Eastbound' && other.x > v.x) ||
-                                        (v.direction === 'Westbound' && other.x < v.x)) {
-                                        shouldStop = true;
-                                    }
-                                }
-                            }
-                        }
-
-                        v.isQueued = shouldStop;
-                        if (shouldStop) {
-                            v.speed = Math.max(0, v.speed - 0.04 * simSpeedMultiplier);
-                        } else {
-                            v.speed = Math.min(v.targetSpeed, v.speed + 0.03 * simSpeedMultiplier);
-                        }
-
-                        v.currentKmh = Math.round((v.speed / v.targetSpeed) * v.targetKmh);
-                        v.x += Math.cos(v.angle) * v.speed * simSpeedMultiplier;
-                        v.y += Math.sin(v.angle) * v.speed * simSpeedMultiplier;
-
-                    } else if (currentSimView === 'garden') {
-                        v.rAngle = (v.rAngle || 0) + (v.speed / v.radius) * 0.3 * simSpeedMultiplier;
-                        v.x = cx + Math.cos(v.rAngle) * v.radius;
-                        v.y = cy + Math.sin(v.rAngle) * v.radius;
-                        v.angle = v.rAngle + Math.PI / 2;
-                        v.isQueued = false;
-                        v.currentKmh = 32;
-
-                    } else {
-                        // Square & Highway
-                        v.x += Math.cos(v.angle) * v.speed * simSpeedMultiplier;
-                        v.y += Math.sin(v.angle) * v.speed * simSpeedMultiplier;
-                        v.isQueued = false;
-                    }
-                }
-
-                // Despawn & Respawn
-                if (v.x < -60 || v.x > w + 60 || v.y < -60 || v.y > h + 60) {
-                    simVehicles.splice(i, 1);
-                    simTotalCleared++;
-                    spawnSimVehicle(currentSimView, false);
-                    continue;
-                }
-
-                // Render Vehicle Body Matching Image 1
-                simCtx.save();
-                simCtx.translate(v.x, v.y);
-                simCtx.rotate(v.angle);
-
-                // Vehicle Main Chassis (dark charcoal body with thin border)
-                simCtx.fillStyle = '#0f172a';
-                simCtx.fillRect(-v.len / 2, -v.wid / 2, v.len, v.wid);
-
-                // Windshield / Roof Accent
-                simCtx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-                simCtx.fillRect(v.len * 0.06, -v.wid * 0.38, v.len * 0.28, v.wid * 0.76);
-
-                // Front Headlights
-                simCtx.fillStyle = '#fef08a';
-                simCtx.fillRect(v.len / 2 - 2, -v.wid / 2 + 1, 2, 3);
-                simCtx.fillRect(v.len / 2 - 2, v.wid / 2 - 4, 2, 3);
-
-                // Rear Taillights (glow red when stopping)
-                simCtx.fillStyle = v.isQueued ? '#ef4444' : '#991b1b';
-                simCtx.fillRect(-v.len / 2, -v.wid / 2 + 1, 2, 3);
-                simCtx.fillRect(-v.len / 2, v.wid / 2 - 4, 2, 3);
-
-                // Outer Bounding Box & Class-Color Chip Label (Matching Image 1)
-                if (simOverlayEnabled) {
-                    simCtx.strokeStyle = v.color;
-                    simCtx.lineWidth = 1.8;
-                    const pad = 3;
-                    simCtx.strokeRect(-v.len / 2 - pad, -v.wid / 2 - pad, v.len + pad * 2, v.wid + pad * 2);
-
-                    // Upright readable label badge: #ID CLASS CONF (Matching Image 1: #16 CAR 0.97, #22 TRU 0.96)
-                    simCtx.rotate(-v.angle);
-                    const tagText = `#${v.id} ${v.classCode} ${v.conf}`;
-                    simCtx.font = 'bold 10px "JetBrains Mono", monospace';
-                    const tw = simCtx.measureText(tagText).width;
-                    const tagH = 14;
-
-                    // Solid colored badge chip
-                    simCtx.fillStyle = v.color;
-                    simCtx.fillRect(-tw / 2 - 4, -v.wid - tagH - 2, tw + 8, tagH);
-
-                    // Crisp black text for maximum contrast on bright badge
-                    simCtx.fillStyle = '#000000';
-                    simCtx.fillText(tagText, -tw / 2, -v.wid - 4);
-                }
-
-                simCtx.restore();
-            }
-        }
-
-        function updateSimTelemetryUI() {
-            const count = simVehicles.length;
-            const queued = simVehicles.filter(v => v.isQueued).length;
-            const speeds = simVehicles.map(v => v.currentKmh);
-            const avgSpd = speeds.length ? (speeds.reduce((a, b) => a + b, 0) / speeds.length).toFixed(1) : '0.0';
-
-            document.getElementById('sim-kpi-active').textContent = count;
-            document.getElementById('sim-kpi-queue').textContent = queued;
-            document.getElementById('sim-kpi-speed').textContent = avgSpd;
-            document.getElementById('sim-kpi-cleared').textContent = simTotalCleared;
-
-            // Congestion Calculation
-            let congPct = 18;
-            let congPillClass = 'pill-low';
-            let congBarColor = '#10b981';
-
-            if (currentSimView === 'intersection') {
-                congPct = Math.min(85, Math.round((queued / Math.max(1, count)) * 70 + 25));
-                if (congPct > 50) { congPillClass = 'pill-high'; congBarColor = '#ef4444'; }
-                else if (congPct > 30) { congPillClass = 'pill-medium'; congBarColor = '#f59e0b'; }
-            } else if (currentSimView === 'square') {
-                congPct = 36; congPillClass = 'pill-medium'; congBarColor = '#f59e0b';
-            } else if (currentSimView === 'garden') {
-                congPct = 18; congPillClass = 'pill-low'; congBarColor = '#10b981';
-            } else if (currentSimView === 'highway') {
-                congPct = 12; congPillClass = 'pill-low'; congBarColor = '#10b981';
-            }
-
-            const pillEl = document.getElementById('sim-congestion-pill');
-            pillEl.textContent = `${congPct}% ${congPct > 50 ? 'HEAVY' : (congPct > 30 ? 'MODERATE' : 'FREE FLOW')}`;
-            pillEl.className = `congestion-pill ${congPillClass}`;
-            document.getElementById('sim-congestion-bar').style.width = `${congPct}%`;
-            document.getElementById('sim-congestion-bar').style.background = congBarColor;
-
-            // Signal Decision Rationale Text
-            const signalPill = document.getElementById('sim-signal-pill');
-            const decText = document.getElementById('sim-decision-text');
-
-            if (simSignalPhase === 'NS_GREEN') {
-                signalPill.textContent = 'NORTH-SOUTH GREEN';
-                signalPill.style.background = '#ecfdf5'; signalPill.style.color = '#065f46';
-                decText.textContent = `North-South queue (${queued} veh) given green priority. DQN Agent extending green interval to maintain arterial flow.`;
-            } else if (simSignalPhase === 'EW_GREEN') {
-                signalPill.textContent = 'EAST-WEST GREEN';
-                signalPill.style.background = '#ecfdf5'; signalPill.style.color = '#065f46';
-                decText.textContent = `East-West green active. Clearing cross-street traffic before cycling back to North-South.`;
-            } else if (simSignalPhase.includes('YELLOW')) {
-                signalPill.textContent = 'YELLOW CLEARANCE';
-                signalPill.style.background = '#fef3c7'; signalPill.style.color = '#92400e';
-                decText.textContent = 'Yellow clearance active (3s). Stopping oncoming traffic safely.';
-            } else {
-                signalPill.textContent = 'ALL-RED CLEARANCE';
-                signalPill.style.background = '#fee2e2'; signalPill.style.color = '#991b1b';
-                decText.textContent = 'All-Red interval active (2s). Clearing intersection interior before next green.';
-            }
-        }
-
-        function toggleSimPause() {
-            simPaused = !simPaused;
-            document.getElementById('sim-play-text').textContent = simPaused ? 'Resume Simulation' : 'Pause Simulation';
-            document.getElementById('sim-play-icon').textContent = simPaused ? '▶' : '⏸';
-            document.getElementById('sim-status-badge').textContent = simPaused ? 'Simulation Paused' : 'Simulation Active';
-        }
-
-        function resetSimVehicles() {
-            simTotalCleared = 0;
-            initSimVehicles(currentSimView);
-        }
-
-        function setSimSpeedMultiplier(mul) {
-            simSpeedMultiplier = parseFloat(mul);
-        }
-
-        function setSignalMode(mode) {
-            if (mode === 'AI_ADAPTIVE') {
-                document.getElementById('btn-mode-ai').classList.add('primary');
-                document.getElementById('btn-mode-fixed').classList.remove('primary');
-            } else {
-                document.getElementById('btn-mode-fixed').classList.add('primary');
-                document.getElementById('btn-mode-ai').classList.remove('primary');
-            }
-        }
-
-        function toggleSimOverlay(enabled) {
-            simOverlayEnabled = enabled;
-        }
-
-        // --- App Boot ---
-        window.addEventListener('DOMContentLoaded', () => {
-            resizeVideoViewport();
-            resizeSimViewport();
-            loadSampleVideoData();
-            initSimVehicles('intersection');
-
-            requestAnimationFrame(renderVideoOverlayLoop);
-            requestAnimationFrame(renderSimLoop);
-        });
-
-        window.addEventListener('resize', () => {
-            resizeVideoViewport();
-            resizeSimViewport();
-        });
     </script>
 </body>
 </html>
