@@ -1,0 +1,21 @@
+{
+  "benchmark_type": "MULTI_JUNCTION_FIXED_TIME_BASELINE",
+  "total_steps": 500,
+  "simulated_duration_sec": 250.0,
+  "average_network_queue": 38.55,
+  "peak_network_queue": 74,
+  "average_network_speed_kmh": 25.97,
+  "final_cumulative_waiting_sec": 1210.5,
+  "total_throughput_vehicles": 67,
+  "total_departed_vehicles": 233,
+  "average_delay_per_vehicle_sec": 5.2,
+  "junction_peak_queues": {
+    "TL_CENTRAL": 62,
+    "TL_NW": 26,
+    "TL_NE": 15,
+    "TL_SW": 14,
+    "TL_SE": 18
+  },
+  "roundabout_peak_entry_queue": 2,
+  "roundabout_avg_speed_kmh": 32.43
+}

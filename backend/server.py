@@ -36,6 +36,7 @@ from backend.simulation.sim_runner import (
 )
 from backend.density.density_estimator import TrafficDensityEstimator
 from backend.controllers.fixed_controller import FixedTimeController
+from backend.controllers.multi_junction_fixed import MultiJunctionFixedController
 from backend.controllers.adaptive_controller import AdaptiveDQNController
 from backend.detection.detector import VideoAnalysisEngine
 
@@ -60,7 +61,7 @@ class SimulationManager:
         
         # Modules
         self.city_runner: Optional[CitySimulationRunner] = None
-        self.fixed_controller = FixedTimeController()
+        self.fixed_controller = MultiJunctionFixedController()
         self.adaptive_controller = AdaptiveDQNController()
 
         # Telemetry cache
@@ -122,6 +123,12 @@ class SimulationManager:
         while not self.stop_signal:
             if not self.is_paused and self.city_runner and self.city_runner.is_running:
                 try:
+                    # Apply fixed-time baseline if selected
+                    if self.controller_mode == "FIXED_TIME":
+                        target_phases = self.fixed_controller.step()
+                        for tlid, pidx in target_phases.items():
+                            self.city_runner.set_tl_phase(tlid, pidx)
+
                     telemetry = self.city_runner.step()
                     with self.lock:
                         self.latest_telemetry = telemetry

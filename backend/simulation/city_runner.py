@@ -413,3 +413,4 @@ class CitySimulationRunner:
                 self.next_vid_num = 1
                 self.total_departed = 0
                 self.total_arrived = 0
+
