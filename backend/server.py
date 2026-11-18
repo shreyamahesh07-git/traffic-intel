@@ -3,6 +3,7 @@ import sys
 import time
 import json
 import shutil
+import asyncio
 import threading
 import numpy as np
 from typing import Dict, Any, Optional
@@ -23,6 +24,7 @@ from backend.config import (
     YOLO_MODEL_PATH,
     DQN_MODEL_PATH
 )
+from backend.simulation.city_runner import CitySimulationRunner, CAMERA_ZONES
 from backend.simulation.sim_runner import (
     SumoSimulationRunner,
     PHASE_NS_GREEN,
@@ -47,23 +49,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global Simulation & AI Manager
+# Global Connected Smart City Simulation & AI Manager
 class SimulationManager:
     def __init__(self):
         self.lock = threading.Lock()
         self.is_running = False
         self.is_paused = False
         self.controller_mode = "AI_ADAPTIVE"  # "AI_ADAPTIVE" or "FIXED_TIME"
+        self.active_camera = "CITY_OVERVIEW"
         
         # Modules
-        self.runner: Optional[SumoSimulationRunner] = None
-        self.density_estimator = TrafficDensityEstimator()
+        self.city_runner: Optional[CitySimulationRunner] = None
         self.fixed_controller = FixedTimeController()
         self.adaptive_controller = AdaptiveDQNController()
 
         # Telemetry cache
         self.latest_telemetry: Dict[str, Any] = {}
-        self.latest_density: Dict[str, Any] = {}
         self.worker_thread: Optional[threading.Thread] = None
         self.stop_signal = False
 
@@ -74,11 +75,11 @@ class SimulationManager:
                 return
             
             try:
-                if self.runner is None:
-                    self.runner = SumoSimulationRunner(use_gui=False)
-                self.runner.start()
+                if self.city_runner is None:
+                    self.city_runner = CitySimulationRunner(use_gui=False)
+                self.city_runner.start()
             except Exception as e:
-                print(f"SimulationManager: Could not start SUMO runner: {e}")
+                print(f"SimulationManager: Could not start City runner: {e}")
             
             self.fixed_controller.reset()
             self.adaptive_controller.reset()
@@ -98,9 +99,9 @@ class SimulationManager:
     def reset_simulation(self):
         with self.lock:
             self.is_paused = True
-            if self.runner:
+            if self.city_runner:
                 try:
-                    self.runner.restart()
+                    self.city_runner.restart()
                 except Exception as e:
                     print(f"SimulationManager restart error: {e}")
             self.fixed_controller.reset()
@@ -112,45 +113,18 @@ class SimulationManager:
             if mode in ["AI_ADAPTIVE", "FIXED_TIME"]:
                 self.controller_mode = mode
 
+    def set_camera_zone(self, zone_id: str):
+        with self.lock:
+            if zone_id in CAMERA_ZONES:
+                self.active_camera = zone_id
+
     def _run_loop(self):
         while not self.stop_signal:
-            if not self.is_paused and self.runner and self.runner.is_running:
+            if not self.is_paused and self.city_runner and self.city_runner.is_running:
                 try:
-                    # 1. Step simulation
-                    telemetry = self.runner.step()
-                    density_info = self.density_estimator.compute_density(telemetry)
-                    dqn_state = density_info["dqn_state"]
-
-                    # 2. Controller phase decision
-                    if self.controller_mode == "AI_ADAPTIVE":
-                        next_phase = self.adaptive_controller.step(dqn_state, telemetry=telemetry)
-                    else:
-                        next_phase = self.fixed_controller.step(telemetry=telemetry)
-                    
-                    self.runner.set_phase(next_phase)
-
-                    # 3. Add explicit signal statuses for frontend rendering
-                    cur_phase = telemetry.get("traffic_light", {}).get("current_phase", 0)
-                    signals = {"NORTH": "RED", "SOUTH": "RED", "EAST": "RED", "WEST": "RED"}
-                    if cur_phase == PHASE_NS_GREEN:
-                        signals["NORTH"] = "GREEN"
-                        signals["SOUTH"] = "GREEN"
-                    elif cur_phase == PHASE_NS_YELLOW:
-                        signals["NORTH"] = "YELLOW"
-                        signals["SOUTH"] = "YELLOW"
-                    elif cur_phase == PHASE_EW_GREEN:
-                        signals["EAST"] = "GREEN"
-                        signals["WEST"] = "GREEN"
-                    elif cur_phase == PHASE_EW_YELLOW:
-                        signals["EAST"] = "YELLOW"
-                        signals["WEST"] = "YELLOW"
-
-                    telemetry["traffic_light"]["signals"] = signals
-
+                    telemetry = self.city_runner.step()
                     with self.lock:
                         self.latest_telemetry = telemetry
-                        self.latest_density = density_info
-
                 except Exception as e:
                     print(f"SimulationManager error in step: {e}")
                     time.sleep(0.5)
@@ -160,13 +134,24 @@ class SimulationManager:
     def get_status_payload(self) -> Dict[str, Any]:
         with self.lock:
             ctrl_info = self.adaptive_controller.get_info() if self.controller_mode == "AI_ADAPTIVE" else self.fixed_controller.get_info()
+            tl_map = self.latest_telemetry.get("traffic_lights", {})
+            central_tl = tl_map.get("TL_CENTRAL", {})
+            metrics = self.latest_telemetry.get("metrics", {})
+
             return {
                 "is_running": self.is_running,
                 "is_paused": self.is_paused,
                 "controller_mode": self.controller_mode,
                 "controller_info": ctrl_info,
+                "active_camera": self.active_camera,
+                "camera_zones": CAMERA_ZONES,
                 "telemetry": self.latest_telemetry,
-                "density": self.latest_density
+                "metrics": metrics,
+                "traffic_light": central_tl,
+                "traffic_lights": tl_map,
+                "roundabout": self.latest_telemetry.get("roundabout", {}),
+                "t_junction": self.latest_telemetry.get("t_junction", {}),
+                "vehicles": self.latest_telemetry.get("vehicles", [])
             }
 
 sim_manager = SimulationManager()
@@ -182,10 +167,33 @@ def get_video_engine() -> VideoAnalysisEngine:
 
 # --- API Endpoints ---
 
+@app.get("/api/network/geometry")
+def get_network_geometry():
+    """Return static road geometry, lane paths, and junctions for high-fidelity canvas rendering."""
+    if sim_manager.city_runner is None:
+        sim_manager.city_runner = CitySimulationRunner(use_gui=False)
+    geo = sim_manager.city_runner.get_network_geometry()
+    return JSONResponse(geo)
+
 @app.get("/api/telemetry")
 def get_telemetry():
     """Return latest simulation, controller explanation, and traffic metrics."""
     return JSONResponse(sim_manager.get_status_payload())
+
+@app.get("/api/stream")
+async def stream_telemetry():
+    """Server-Sent Events (SSE) streaming real-time simulation updates at ~25 FPS."""
+    async def event_generator():
+        while True:
+            payload = sim_manager.get_status_payload()
+            yield f"data: {json.dumps(payload)}\n\n"
+            await asyncio.sleep(0.04)
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.post("/api/control/camera")
+def control_camera(zone: str = Form(...)):
+    sim_manager.set_camera_zone(zone)
+    return {"status": "camera_updated", "active_camera": sim_manager.active_camera}
 
 @app.post("/api/control/start")
 def control_start():

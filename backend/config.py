@@ -24,6 +24,10 @@ NET_FILE = os.path.join(NETWORKS_DIR, "intersection.net.xml")
 ROU_FILE = os.path.join(NETWORKS_DIR, "intersection.rou.xml")
 SUMOCFG_FILE = os.path.join(NETWORKS_DIR, "intersection.sumocfg")
 
+CITY_NET_FILE = os.path.join(NETWORKS_DIR, "city.net.xml")
+CITY_ROU_FILE = os.path.join(NETWORKS_DIR, "city.rou.xml")
+CITY_SUMOCFG_FILE = os.path.join(NETWORKS_DIR, "city.sumocfg")
+
 # Model Paths
 MODELS_DIR = os.path.join(BACKEND_DIR, "models")
 YOLO_MODEL_PATH = os.path.join(MODELS_DIR, "yolov8n.pt")
