@@ -196,3 +196,4 @@ def run_fixed_baseline_benchmark(total_steps: int = 500) -> dict:
 
 if __name__ == "__main__":
     run_fixed_baseline_benchmark(total_steps=500)
+

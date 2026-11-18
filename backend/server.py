@@ -37,7 +37,7 @@ from backend.simulation.sim_runner import (
 from backend.density.density_estimator import TrafficDensityEstimator
 from backend.controllers.fixed_controller import FixedTimeController
 from backend.controllers.multi_junction_fixed import MultiJunctionFixedController
-from backend.controllers.adaptive_controller import AdaptiveDQNController
+from backend.controllers.adaptive_city_controller import AdaptiveCityController
 from backend.detection.detector import VideoAnalysisEngine
 
 app = FastAPI(title="TRAFFIC INTEL API", version="2.6.0")
@@ -62,7 +62,7 @@ class SimulationManager:
         # Modules
         self.city_runner: Optional[CitySimulationRunner] = None
         self.fixed_controller = MultiJunctionFixedController()
-        self.adaptive_controller = AdaptiveDQNController()
+        self.adaptive_controller = AdaptiveCityController()
 
         # Telemetry cache
         self.latest_telemetry: Dict[str, Any] = {}
@@ -123,13 +123,16 @@ class SimulationManager:
         while not self.stop_signal:
             if not self.is_paused and self.city_runner and self.city_runner.is_running:
                 try:
-                    # Apply fixed-time baseline if selected
-                    if self.controller_mode == "FIXED_TIME":
+                    telemetry = self.city_runner.step()
+
+                    # Apply active controller policy
+                    if self.controller_mode == "AI_ADAPTIVE":
+                        self.adaptive_controller.step(telemetry, self.city_runner)
+                    elif self.controller_mode == "FIXED_TIME":
                         target_phases = self.fixed_controller.step()
                         for tlid, pidx in target_phases.items():
                             self.city_runner.set_tl_phase(tlid, pidx)
 
-                    telemetry = self.city_runner.step()
                     with self.lock:
                         self.latest_telemetry = telemetry
                 except Exception as e:
@@ -279,8 +282,8 @@ async def upload_video(file: UploadFile = File(...)):
     with open(save_path, "wb") as f:
         f.write(contents)
 
-    # Mirror to frontend static for direct browser playback
-    frontend_upload_dir = os.path.join(FRONTEND_DIR, "static", "uploads")
+    # Mirror to frontend uploads for direct browser playback
+    frontend_upload_dir = os.path.join(FRONTEND_DIR, "uploads")
     os.makedirs(frontend_upload_dir, exist_ok=True)
     shutil.copy2(save_path, os.path.join(frontend_upload_dir, file.filename))
 

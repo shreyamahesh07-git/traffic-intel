@@ -1,0 +1,42 @@
+{
+  "benchmark_duration_steps": 500,
+  "fixed_baseline": {
+    "benchmark_type": "MULTI_JUNCTION_FIXED_TIME_BASELINE",
+    "total_steps": 500,
+    "simulated_duration_sec": 250.0,
+    "average_network_queue": 38.55,
+    "peak_network_queue": 74,
+    "average_network_speed_kmh": 25.97,
+    "final_cumulative_waiting_sec": 1210.5,
+    "total_throughput_vehicles": 67,
+    "total_departed_vehicles": 233,
+    "average_delay_per_vehicle_sec": 5.2,
+    "junction_peak_queues": {
+      "TL_CENTRAL": 62,
+      "TL_NW": 26,
+      "TL_NE": 15,
+      "TL_SW": 14,
+      "TL_SE": 18
+    },
+    "roundabout_peak_entry_queue": 2,
+    "roundabout_avg_speed_kmh": 32.43,
+    "mean_waiting_delay_sec": 826.2
+  },
+  "adaptive_dqn": {
+    "average_network_queue": 37.66,
+    "peak_network_queue": 80,
+    "average_network_speed_kmh": 26.53,
+    "mean_waiting_delay_sec": 1273.9,
+    "final_cumulative_waiting_sec": 4165.0,
+    "total_throughput_vehicles": 69,
+    "central_peak_queue": 68
+  },
+  "percentage_improvements": {
+    "average_queue_reduction_pct": 2.3,
+    "peak_queue_reduction_pct": -8.1,
+    "central_plaza_peak_queue_reduction_pct": -9.7,
+    "average_speed_gain_pct": 2.2,
+    "mean_delay_reduction_pct": -54.2,
+    "throughput_gain_pct": 3.0
+  }
+}
