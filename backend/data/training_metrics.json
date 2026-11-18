@@ -1,0 +1,60 @@
+{
+  "total_training_time_sec": 39.7,
+  "episodes": [
+    {
+      "episode": 1,
+      "total_reward": -394.43,
+      "avg_loss": 2.0317,
+      "epsilon": 0.98,
+      "actions": {
+        "0": 61,
+        "1": 54
+      },
+      "duration_sec": 8.0
+    },
+    {
+      "episode": 2,
+      "total_reward": -273.0,
+      "avg_loss": 0.8674,
+      "epsilon": 0.96,
+      "actions": {
+        "0": 54,
+        "1": 61
+      },
+      "duration_sec": 8.0
+    },
+    {
+      "episode": 3,
+      "total_reward": -260.57,
+      "avg_loss": 1.1116,
+      "epsilon": 0.941,
+      "actions": {
+        "0": 72,
+        "1": 43
+      },
+      "duration_sec": 7.8
+    },
+    {
+      "episode": 4,
+      "total_reward": -318.25,
+      "avg_loss": 1.2397,
+      "epsilon": 0.922,
+      "actions": {
+        "0": 61,
+        "1": 54
+      },
+      "duration_sec": 8.0
+    },
+    {
+      "episode": 5,
+      "total_reward": -267.27,
+      "avg_loss": 1.5269,
+      "epsilon": 0.904,
+      "actions": {
+        "0": 58,
+        "1": 57
+      },
+      "duration_sec": 7.8
+    }
+  ]
+}

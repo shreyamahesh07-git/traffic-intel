@@ -1,0 +1,10 @@
+venv/
+sumo/
+backend/data/*.mp4
+backend/data/uploads/
+frontend/uploads/
+frontend/static/uploads/
+frontend/*.mp4
+__pycache__/
+*.pyc
+.ultralytics/

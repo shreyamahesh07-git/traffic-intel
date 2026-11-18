@@ -1,0 +1,22 @@
+# AI-Driven Adaptive Traffic Management System Requirements
+# Core Deep Learning & Reinforcement Learning
+torch>=2.2.0
+numpy>=1.26.0
+
+# Computer Vision & Vehicle Detection
+ultralytics>=8.1.0
+opencv-python>=4.9.0
+
+# SUMO Simulation & TraCI Interface
+traci>=1.20.0
+sumolib>=1.20.0
+
+# Backend API & Live Telemetry Server
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+
+# Analytics, Evaluation & Charting
+matplotlib>=3.8.0
+pandas>=2.2.0
+

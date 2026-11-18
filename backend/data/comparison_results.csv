@@ -1,0 +1,6 @@
+Metric,Fixed-Time Baseline,AI Adaptive (DQN),AI Improvement (%)
+Total Waiting Time (s),15362.0,2964.5,-80.7%
+Average Queue Length (veh),8.52,3.34,-60.8%
+Max Queue Observed (veh),17.0,10.0,-7 veh
+Average Delay / Vehicle (s),202.13,39.01,-80.7%
+Total Throughput (veh),42.0,52.0,+23.81%
