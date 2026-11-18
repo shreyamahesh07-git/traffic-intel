@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/edges_file.xsd">
+    <!-- ========================================== -->
+    <!-- ROUNDABOUT INTERNAL CIRCULATING EDGES (2 lanes, counter-clockwise) -->
+    <!-- ========================================== -->
+    <edge id="rb_W2S" from="RB_W" to="RB_S" priority="100" numLanes="2" speed="11.11"/>
+    <edge id="rb_S2E" from="RB_S" to="RB_E" priority="100" numLanes="2" speed="11.11"/>
+    <edge id="rb_E2N" from="RB_E" to="RB_N" priority="100" numLanes="2" speed="11.11"/>
+    <edge id="rb_N2W" from="RB_N" to="RB_W" priority="100" numLanes="2" speed="11.11"/>
+
+    <!-- Roundabout West Leg (Expressway Entry/Exit) -->
+    <edge id="gateW_to_rb" from="GATE_WEST_EXP" to="RB_W" priority="70" numLanes="2" speed="16.67"/>
+    <edge id="rb_to_gateW" from="RB_W" to="GATE_WEST_EXP" priority="70" numLanes="2" speed="16.67"/>
+
+    <!-- Roundabout East Leg connecting to Central Avenue -->
+    <edge id="rb_to_central" from="RB_E" to="TL_CENTRAL" priority="70" numLanes="2" speed="13.89"/>
+    <edge id="central_to_rb" from="TL_CENTRAL" to="RB_E" priority="70" numLanes="2" speed="13.89"/>
+
+    <!-- Roundabout Legs to TL_NW and TL_SW -->
+    <edge id="rb_to_nw" from="RB_N" to="TL_NW" priority="70" numLanes="2" speed="13.89"/>
+    <edge id="nw_to_rb" from="TL_NW" to="RB_N" priority="70" numLanes="2" speed="13.89"/>
+    <edge id="rb_to_sw" from="RB_S" to="TL_SW" priority="70" numLanes="2" speed="13.89"/>
+    <edge id="sw_to_rb" from="TL_SW" to="RB_S" priority="70" numLanes="2" speed="13.89"/>
+
+    <!-- ========================================== -->
+    <!-- GRID ARTERIAL CONNECTORS -->
+    <!-- ========================================== -->
+    <!-- North Horizontal Corridor: TL_NW <-> GATE_MID_N <-> TL_NE -->
+    <edge id="nw_to_midN" from="TL_NW" to="GATE_MID_N" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="midN_to_nw" from="GATE_MID_N" to="TL_NW" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="midN_to_ne" from="GATE_MID_N" to="TL_NE" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="ne_to_midN" from="TL_NE" to="GATE_MID_N" priority="80" numLanes="2" speed="13.89"/>
+
+    <!-- South Horizontal Corridor: TL_SW <-> GATE_MID_S <-> TL_SE -->
+    <edge id="sw_to_midS" from="TL_SW" to="GATE_MID_S" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="midS_to_sw" from="GATE_MID_S" to="TL_SW" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="midS_to_se" from="GATE_MID_S" to="TL_SE" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="se_to_midS" from="TL_SE" to="GATE_MID_S" priority="80" numLanes="2" speed="13.89"/>
+
+    <!-- Central Vertical Boulevard: GATE_MID_N <-> TL_CENTRAL <-> GATE_MID_S (3 lanes) -->
+    <edge id="midN_to_central" from="GATE_MID_N" to="TL_CENTRAL" priority="85" numLanes="3" speed="13.89"/>
+    <edge id="central_to_midN" from="TL_CENTRAL" to="GATE_MID_N" priority="85" numLanes="3" speed="13.89"/>
+    <edge id="midS_to_central" from="GATE_MID_S" to="TL_CENTRAL" priority="85" numLanes="3" speed="13.89"/>
+    <edge id="central_to_midS" from="TL_CENTRAL" to="GATE_MID_S" priority="85" numLanes="3" speed="13.89"/>
+
+    <!-- Diagonal Radial Avenues to City Center -->
+    <edge id="nw_to_central" from="TL_NW" to="TL_CENTRAL" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="central_to_nw" from="TL_CENTRAL" to="TL_NW" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="ne_to_central" from="TL_NE" to="TL_CENTRAL" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="central_to_ne" from="TL_CENTRAL" to="TL_NE" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="sw_to_central" from="TL_SW" to="TL_CENTRAL" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="central_to_sw" from="TL_CENTRAL" to="TL_SW" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="se_to_central" from="TL_SE" to="TL_CENTRAL" priority="85" numLanes="2" speed="13.89"/>
+    <edge id="central_to_se" from="TL_CENTRAL" to="TL_SE" priority="85" numLanes="2" speed="13.89"/>
+
+    <!-- Western Vertical Corridor: TL_NW <-> TL_SW -->
+    <edge id="nw_to_sw" from="TL_NW" to="TL_SW" priority="75" numLanes="2" speed="13.89"/>
+    <edge id="sw_to_nw" from="TL_SW" to="TL_NW" priority="75" numLanes="2" speed="13.89"/>
+
+    <!-- Eastern Vertical Corridor: TL_NE <-> TJUNC_EAST <-> TL_SE -->
+    <edge id="ne_to_tjunc" from="TL_NE" to="TJUNC_EAST" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="tjunc_to_ne" from="TJUNC_EAST" to="TL_NE" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="se_to_tjunc" from="TL_SE" to="TJUNC_EAST" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="tjunc_to_se" from="TJUNC_EAST" to="TL_SE" priority="80" numLanes="2" speed="13.89"/>
+
+    <!-- Central to Eastern T-Junction Main Boulevard (3 lanes) -->
+    <edge id="central_to_tjunc" from="TL_CENTRAL" to="TJUNC_EAST" priority="85" numLanes="3" speed="13.89"/>
+    <edge id="tjunc_to_central" from="TJUNC_EAST" to="TL_CENTRAL" priority="85" numLanes="3" speed="13.89"/>
+
+    <!-- T-Junction to Eastern Highway Gate (2 lanes, 60 km/h) -->
+    <edge id="tjunc_to_gateE" from="TJUNC_EAST" to="GATE_EAST_HWY" priority="95" numLanes="2" speed="16.67"/>
+    <edge id="gateE_to_tjunc" from="GATE_EAST_HWY" to="TJUNC_EAST" priority="95" numLanes="2" speed="16.67"/>
+
+    <!-- ========================================== -->
+    <!-- EXTERNAL BOUNDARY ACCESS GATES -->
+    <!-- ========================================== -->
+    <edge id="gateNW_to_nw" from="GATE_NW_N" to="TL_NW" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="nw_to_gateNW" from="TL_NW" to="GATE_NW_N" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="gateNE_to_ne" from="GATE_NE_N" to="TL_NE" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="ne_to_gateNE" from="TL_NE" to="GATE_NE_N" priority="80" numLanes="2" speed="13.89"/>
+
+    <edge id="gateSW_to_sw" from="GATE_SW_S" to="TL_SW" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="sw_to_gateSW" from="TL_SW" to="GATE_SW_S" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="gateSE_to_se" from="GATE_SE_S" to="TL_SE" priority="80" numLanes="2" speed="13.89"/>
+    <edge id="se_to_gateSE" from="TL_SE" to="GATE_SE_S" priority="80" numLanes="2" speed="13.89"/>
+</edges>

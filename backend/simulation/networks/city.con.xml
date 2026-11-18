@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/connections_file.xsd">
+    <!-- Roundabout Internal Circulating Continuity (Lane-to-Lane) -->
+    <connection from="rb_W2S" to="rb_S2E" fromLane="0" toLane="0"/>
+    <connection from="rb_W2S" to="rb_S2E" fromLane="1" toLane="1"/>
+    <connection from="rb_W2S" to="rb_to_sw"  fromLane="0" toLane="0"/>
+    <connection from="rb_W2S" to="rb_to_sw"  fromLane="1" toLane="1"/>
+
+    <connection from="rb_S2E" to="rb_E2N" fromLane="0" toLane="0"/>
+    <connection from="rb_S2E" to="rb_E2N" fromLane="1" toLane="1"/>
+    <connection from="rb_S2E" to="rb_to_central" fromLane="0" toLane="0"/>
+    <connection from="rb_S2E" to="rb_to_central" fromLane="1" toLane="1"/>
+
+    <connection from="rb_E2N" to="rb_N2W" fromLane="0" toLane="0"/>
+    <connection from="rb_E2N" to="rb_N2W" fromLane="1" toLane="1"/>
+    <connection from="rb_E2N" to="rb_to_nw" fromLane="0" toLane="0"/>
+    <connection from="rb_E2N" to="rb_to_nw" fromLane="1" toLane="1"/>
+
+    <connection from="rb_N2W" to="rb_W2S" fromLane="0" toLane="0"/>
+    <connection from="rb_N2W" to="rb_W2S" fromLane="1" toLane="1"/>
+    <connection from="rb_N2W" to="rb_to_gateW" fromLane="0" toLane="0"/>
+    <connection from="rb_N2W" to="rb_to_gateW" fromLane="1" toLane="1"/>
+
+    <!-- Roundabout Entry Connections -->
+    <connection from="gateW_to_rb" to="rb_W2S" fromLane="0" toLane="0"/>
+    <connection from="gateW_to_rb" to="rb_W2S" fromLane="1" toLane="1"/>
+
+    <connection from="sw_to_rb" to="rb_S2E" fromLane="0" toLane="0"/>
+    <connection from="sw_to_rb" to="rb_S2E" fromLane="1" toLane="1"/>
+
+    <connection from="central_to_rb" to="rb_E2N" fromLane="0" toLane="0"/>
+    <connection from="central_to_rb" to="rb_E2N" fromLane="1" toLane="1"/>
+
+    <connection from="nw_to_rb" to="rb_N2W" fromLane="0" toLane="0"/>
+    <connection from="nw_to_rb" to="rb_N2W" fromLane="1" toLane="1"/>
+</connections>
