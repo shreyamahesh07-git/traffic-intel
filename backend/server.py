@@ -53,7 +53,7 @@ app.add_middleware(
 # Global Connected Smart City Simulation & AI Manager
 class SimulationManager:
     def __init__(self):
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
         self.is_running = False
         self.is_paused = False
         self.controller_mode = "AI_ADAPTIVE"  # "AI_ADAPTIVE", "GREEN_WAVE", "FIXED_TIME", "MANUAL"
@@ -178,6 +178,7 @@ class SimulationManager:
                 "traffic_lights": tl_map,
                 "roundabout": self.latest_telemetry.get("roundabout", {}),
                 "t_junction": self.latest_telemetry.get("t_junction", {}),
+                "intersection_4way": self.latest_telemetry.get("intersection_4way", {}),
                 "vehicles": self.latest_telemetry.get("vehicles", [])
             }
 
@@ -261,6 +262,35 @@ def control_flush_corridor(corridor_id: Optional[int] = Form(None)):
 def control_scale(scale: float = Form(...)):
     sim_manager.set_demand_scale(scale)
     return {"status": "scale_updated", "scale": sim_manager.traffic_scale}
+
+@app.post("/api/simulation/scenario")
+def set_simulation_scenario(scenario: str = Form(...)):
+    if sim_manager.city_runner:
+        res = sim_manager.city_runner.set_scenario(scenario)
+        if scenario == "SURGE_NORTH":
+            sim_manager.adaptive_controller.last_explanation = "⚡ EXPERIMENT: Initiated Heavy Traffic Surge on North Approach (10 vehicles entering naturally)."
+        elif scenario == "UNEVEN":
+            sim_manager.adaptive_controller.last_explanation = "⚡ EXPERIMENT: Set Uneven Traffic Distribution (North: High, South: Moderate, East/West: Sparse)."
+        else:
+            sim_manager.adaptive_controller.last_explanation = "⚡ EXPERIMENT: Restored Normal Balanced Traffic Flow across all 4 approaches."
+        return {"status": "scenario_updated", "scenario": res}
+    return {"status": "error", "message": "Simulation runner not active"}
+
+@app.post("/api/simulation/surge")
+def create_simulation_surge(approach: str = Form("north"), count: int = Form(8)):
+    if sim_manager.city_runner:
+        cnt = sim_manager.city_runner.create_traffic_surge(approach=approach, count=count)
+        sim_manager.adaptive_controller.last_explanation = f"⚡ TRAFFIC SURGE INJECTED: Dispatched {cnt} vehicles onto {approach.upper()} Approach!"
+        return {"status": "surge_created", "approach": approach, "count": cnt}
+    return {"status": "error", "message": "Simulation runner not active"}
+
+@app.post("/api/simulation/reset_scenario")
+def reset_simulation_scenario():
+    if sim_manager.city_runner:
+        res = sim_manager.city_runner.reset_scenario()
+        sim_manager.adaptive_controller.last_explanation = "⚡ SCENARIO RESET: Normalized traffic demands across all 4 approaches."
+        return {"status": "scenario_reset", "scenario": res}
+    return {"status": "error", "message": "Simulation runner not active"}
 
 @app.post("/api/control/emergency")
 def control_emergency():

@@ -311,57 +311,46 @@ def build_city_network():
     <route id="r_west_commuter" edges="gateNW_to_nw nw_to_sw sw_to_gateSW"/>
     <route id="r_sw_to_nw_commuter" edges="gateSW_to_sw sw_to_nw nw_to_gateNW"/>
 
+    <!-- 10. Direct 4-Approach Routes for Controlled Experiment & Surges -->
+    <route id="r_surge_north" edges="gateTop_to_midN midN_to_central central_to_midS midS_to_gateBot"/>
+    <route id="r_surge_south" edges="gateBot_to_midS midS_to_central central_to_midN midN_to_gateTop"/>
+    <route id="r_surge_east"  edges="gateE_to_tjunc tjunc_to_central central_to_rb rb_to_gateW"/>
+    <route id="r_surge_west"  edges="gateW_to_rb rb_to_central central_to_tjunc tjunc_to_gateE"/>
+
     <!-- ============================================== -->
-    <!-- CONTINUOUS VEHICLE FLOWS (Normal City Traffic Demand) -->
+    <!-- CONTINUOUS VEHICLE FLOWS (Calibrated for Clear, Readable 25-40 Vehicle Fleet) -->
     <!-- ============================================== -->
     <!-- West-East Trunk Flows -->
-    <flow id="f_car_WE" type="car" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="280" departLane="best" departSpeed="max"/>
-    <flow id="f_moto_WE" type="motorcycle" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="80" departLane="best" departSpeed="max"/>
-    <flow id="f_bus_WE" type="bus" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="30" departLane="1" departSpeed="max"/>
-    <flow id="f_truck_WE" type="truck" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="24" departLane="1" departSpeed="max"/>
+    <flow id="f_car_WE" type="car" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="60" departLane="best" departSpeed="max"/>
+    <flow id="f_moto_WE" type="motorcycle" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="14" departLane="best" departSpeed="max"/>
+    <flow id="f_bus_WE" type="bus" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="6" departLane="1" departSpeed="max"/>
+    <flow id="f_truck_WE" type="truck" route="r_W_to_E_arterial" begin="0" end="3600" vehsPerHour="5" departLane="1" departSpeed="max"/>
 
     <!-- East-West Trunk Flows -->
-    <flow id="f_car_EW" type="car" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="260" departLane="best" departSpeed="max"/>
-    <flow id="f_moto_EW" type="motorcycle" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="70" departLane="best" departSpeed="max"/>
-    <flow id="f_bus_EW" type="bus" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="25" departLane="1" departSpeed="max"/>
-    <flow id="f_truck_EW" type="truck" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="20" departLane="1" departSpeed="max"/>
+    <flow id="f_car_EW" type="car" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="55" departLane="best" departSpeed="max"/>
+    <flow id="f_moto_EW" type="motorcycle" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="14" departLane="best" departSpeed="max"/>
+    <flow id="f_bus_EW" type="bus" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="5" departLane="1" departSpeed="max"/>
+    <flow id="f_truck_EW" type="truck" route="r_E_to_W_arterial" begin="0" end="3600" vehsPerHour="5" departLane="1" departSpeed="max"/>
 
     <!-- North-South Grand Spine Flows -->
-    <flow id="f_car_NS_spine" type="car" route="r_N_to_S_spine" begin="0" end="3600" vehsPerHour="240" departLane="best" departSpeed="max"/>
-    <flow id="f_bus_NS_spine" type="bus" route="r_N_to_S_spine" begin="0" end="3600" vehsPerHour="25" departLane="1" departSpeed="max"/>
-    <flow id="f_moto_NS_spine" type="motorcycle" route="r_N_to_S_spine" begin="0" end="3600" vehsPerHour="60" departLane="best" departSpeed="max"/>
+    <flow id="f_car_NS_spine" type="car" route="r_N_to_S_spine" begin="0" end="3600" vehsPerHour="60" departLane="best" departSpeed="max"/>
+    <flow id="f_bus_NS_spine" type="bus" route="r_N_to_S_spine" begin="0" end="3600" vehsPerHour="6" departLane="1" departSpeed="max"/>
+    <flow id="f_moto_NS_spine" type="motorcycle" route="r_N_to_S_spine" begin="0" end="3600" vehsPerHour="12" departLane="best" departSpeed="max"/>
 
-    <flow id="f_car_SN_spine" type="car" route="r_S_to_N_spine" begin="0" end="3600" vehsPerHour="230" departLane="best" departSpeed="max"/>
-    <flow id="f_truck_SN_spine" type="truck" route="r_S_to_N_spine" begin="0" end="3600" vehsPerHour="22" departLane="1" departSpeed="max"/>
-    <flow id="f_moto_SN_spine" type="motorcycle" route="r_S_to_N_spine" begin="0" end="3600" vehsPerHour="55" departLane="best" departSpeed="max"/>
+    <!-- South-North Grand Spine Flows -->
+    <flow id="f_car_SN_spine" type="car" route="r_S_to_N_spine" begin="0" end="3600" vehsPerHour="55" departLane="best" departSpeed="max"/>
+    <flow id="f_truck_SN_spine" type="truck" route="r_S_to_N_spine" begin="0" end="3600" vehsPerHour="5" departLane="1" departSpeed="max"/>
+    <flow id="f_moto_SN_spine" type="motorcycle" route="r_S_to_N_spine" begin="0" end="3600" vehsPerHour="12" departLane="best" departSpeed="max"/>
 
-    <!-- Grid Cross-Town Arterial Flows -->
-    <flow id="f_car_NW_SE" type="car" route="r_NW_to_SE" begin="0" end="3600" vehsPerHour="200" departLane="best" departSpeed="max"/>
-    <flow id="f_moto_NW_SE" type="motorcycle" route="r_NW_to_SE" begin="0" end="3600" vehsPerHour="50" departLane="best" departSpeed="max"/>
-    <flow id="f_bus_NW_SE" type="bus" route="r_NW_to_SE" begin="0" end="3600" vehsPerHour="20" departLane="0" departSpeed="max"/>
+    <!-- Grid Cross-Town Turning Flows -->
+    <flow id="f_car_NW_SE" type="car" route="r_NW_to_SE" begin="0" end="3600" vehsPerHour="20" departLane="best" departSpeed="max"/>
+    <flow id="f_car_SE_NW" type="car" route="r_SE_to_NW" begin="0" end="3600" vehsPerHour="20" departLane="best" departSpeed="max"/>
+    <flow id="f_car_NE_SW" type="car" route="r_NE_to_SW" begin="0" end="3600" vehsPerHour="20" departLane="best" departSpeed="max"/>
+    <flow id="f_car_SW_NE" type="car" route="r_SW_to_NE" begin="0" end="3600" vehsPerHour="20" departLane="best" departSpeed="max"/>
 
-    <flow id="f_car_SE_NW" type="car" route="r_SE_to_NW" begin="0" end="3600" vehsPerHour="190" departLane="best" departSpeed="max"/>
-    <flow id="f_truck_SE_NW" type="truck" route="r_SE_to_NW" begin="0" end="3600" vehsPerHour="18" departLane="0" departSpeed="max"/>
-
-    <flow id="f_car_NE_SW" type="car" route="r_NE_to_SW" begin="0" end="3600" vehsPerHour="180" departLane="best" departSpeed="max"/>
-    <flow id="f_moto_NE_SW" type="motorcycle" route="r_NE_to_SW" begin="0" end="3600" vehsPerHour="45" departLane="best" departSpeed="max"/>
-
-    <flow id="f_car_SW_NE" type="car" route="r_SW_to_NE" begin="0" end="3600" vehsPerHour="180" departLane="best" departSpeed="max"/>
-    <flow id="f_truck_SW_NE" type="truck" route="r_SW_to_NE" begin="0" end="3600" vehsPerHour="18" departLane="0" departSpeed="max"/>
-
-    <!-- Roundabout & Arterial Circulator Flows -->
-    <flow id="f_car_rb_loop" type="car" route="r_rb_loop" begin="0" end="3600" vehsPerHour="130" departLane="best" departSpeed="max"/>
-    <flow id="f_moto_rb_loop" type="motorcycle" route="r_rb_loop" begin="0" end="3600" vehsPerHour="40" departLane="best" departSpeed="max"/>
-
-    <flow id="f_car_W_NE" type="car" route="r_W_to_NE" begin="0" end="3600" vehsPerHour="120" departLane="best" departSpeed="max"/>
-    <flow id="f_car_NE_W" type="car" route="r_NE_to_W" begin="0" end="3600" vehsPerHour="110" departLane="best" departSpeed="max"/>
-    <flow id="f_car_W_SE" type="car" route="r_W_to_SE" begin="0" end="3600" vehsPerHour="110" departLane="best" departSpeed="max"/>
-
-    <flow id="f_car_E_circ" type="car" route="r_east_loop" begin="0" end="3600" vehsPerHour="100" departLane="best" departSpeed="max"/>
-    <flow id="f_car_SE_circ" type="car" route="r_southeast_loop" begin="0" end="3600" vehsPerHour="95" departLane="best" departSpeed="max"/>
-
-    <flow id="f_car_commuter_W" type="car" route="r_west_commuter" begin="0" end="3600" vehsPerHour="110" departLane="best" departSpeed="max"/>
-    <flow id="f_car_commuter_SW" type="car" route="r_sw_to_nw_commuter" begin="0" end="3600" vehsPerHour="100" departLane="best" departSpeed="max"/>
+    <!-- Outer Circulators -->
+    <flow id="f_car_rb_loop" type="car" route="r_rb_loop" begin="0" end="3600" vehsPerHour="15" departLane="best" departSpeed="max"/>
+    <flow id="f_car_commuter_W" type="car" route="r_west_commuter" begin="0" end="3600" vehsPerHour="15" departLane="best" departSpeed="max"/>
 </routes>
 """
     with open(CITY_ROU_FILE, "w", encoding="utf-8") as f:

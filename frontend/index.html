@@ -1128,6 +1128,72 @@
             border-bottom: 1px solid #f1f5f9;
             font-family: 'JetBrains Mono', monospace;
         }
+
+        /* Approach Overlay HUD Tags */
+        .approach-tag {
+            position: absolute;
+            padding: 6px 14px;
+            background: rgba(15, 23, 42, 0.90);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            backdrop-filter: blur(6px);
+            color: white;
+            font-size: 11px;
+            pointer-events: none;
+            z-index: 50;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .approach-north { top: 12px; left: 50%; transform: translateX(-50%); }
+        .approach-south { bottom: 12px; left: 50%; transform: translateX(-50%); }
+        .approach-east  { right: 12px; top: 50%; transform: translateY(-50%); }
+        .approach-west  { left: 12px; top: 50%; transform: translateY(-50%); }
+        .approach-tag-title { font-weight: 700; color: #38bdf8; }
+        .approach-tag-val { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #f1f5f9; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; }
+
+        .scenario-banner {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            background: rgba(2, 132, 199, 0.92);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+
+        .approach-matrix-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .approach-dir { font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .approach-sig-pill {
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .sig-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .sig-yellow { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .sig-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .toolbar-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -1196,144 +1262,120 @@
 
             <div class="workspace-grid">
                 
-                <!-- Left 70%: 3D WebGL Three.js Viewport -->
+                <!-- Left 70%: Primary Simulation Viewport -->
                 <div>
                     <div class="card" style="padding: 14px;">
                         <div class="card-header" style="margin-bottom: 10px; padding-bottom: 8px;">
                             <div class="card-title">
-                                <span id="camera-title-text">3D Surveillance: Master City Overview</span>
-                                <span class="card-badge" id="sim-fps-chip">Three.js 60 FPS</span>
+                                <span id="camera-title-text">🚦 Primary View: Focused 4-Way Overhead Intersection</span>
+                                <span class="card-badge" id="sim-fps-chip">2D Overhead 25 FPS</span>
                             </div>
                             <div class="toolbar-group">
-                                <button class="btn btn-primary" id="btn-toggle-view" onclick="toggle3D2DView()">
-                                    <span id="view-mode-icon">📐</span> <span id="view-mode-text">Switch to 2D View</span>
+                                <button class="btn btn-primary" id="btn-view-focused" onclick="setViewMode('FOCUSED_4WAY')" title="Focused 4-Way Intersection Demonstration">
+                                    <span>🎯</span> Primary: 4-Way Intersection
+                                </button>
+                                <button class="btn" id="btn-view-city" onclick="setViewMode('CITY_OVERVIEW')" title="Secondary: Full Connected City Network">
+                                    <span>🗺️</span> City Overview
                                 </button>
                             </div>
                         </div>
 
                         <!-- 3D / 2D Viewport Container -->
                         <div class="viewport-wrapper" id="sim-viewport-box">
-                            <!-- Three.js 3D Container -->
-                            <div id="sim-3d-container"></div>
-                            
-                            <!-- 2D Canvas Fallback -->
-                            <canvas id="sim-canvas"></canvas>
+                            <!-- 2D Canvas (PRIMARY VIEW - VISIBLE BY DEFAULT) -->
+                            <canvas id="sim-canvas" style="display: block; width: 100%; height: 580px;"></canvas>
 
-                            <!-- 3D Camera Interactive Navigation Dock -->
-                            <div class="camera-dock" id="camera-dock">
-                                <button class="cam-dock-btn" onclick="zoomCamera(0.75)" title="Zoom In (+)">➕</button>
-                                <button class="cam-dock-btn" onclick="zoomCamera(1.25)" title="Zoom Out (-)">➖</button>
-                                <div class="cam-dock-sep"></div>
-                                <button class="cam-dock-btn" onclick="rotateCamera(Math.PI/4)" title="Rotate Left 45°">↺</button>
-                                <button class="cam-dock-btn" onclick="rotateCamera(-Math.PI/4)" title="Rotate Right 45°">↻</button>
-                                <div class="cam-dock-sep"></div>
-                                <button class="cam-dock-btn" id="btn-cam-top" onclick="setCameraAngle('TOP_DOWN')" title="Overhead Top-Down View">📐</button>
-                                <button class="cam-dock-btn active" id="btn-cam-iso" onclick="setCameraAngle('ISOMETRIC')" title="3D Isometric View">🏙️</button>
-                                <button class="cam-dock-btn" id="btn-cam-street" onclick="setCameraAngle('STREET')" title="Street Level View">🚗</button>
-                                <div class="cam-dock-sep"></div>
-                                <button class="cam-dock-btn" id="btn-chase-cam" onclick="toggleFollowRandomVehicle()" title="Follow / Chase Vehicle Cam">🎯</button>
+                            <!-- Three.js 3D Container (SECONDARY VIEW - HIDDEN BY DEFAULT) -->
+                            <div id="sim-3d-container" style="display: none;"></div>
+
+                            <!-- Active Scenario Banner -->
+                            <div class="scenario-banner" id="scenario-banner">
+                                <span>📊</span> <strong id="scenario-banner-text">Scenario A: Normal Balanced Traffic</strong>
                             </div>
 
-                            <!-- Atmosphere Day/Sunset/Night Mode Dock -->
-                            <div class="atmosphere-dock">
-                                <span class="atmo-label">Atmosphere:</span>
-                                <button class="atmo-btn active" id="atmo-day-btn" onclick="setAtmosphere('DAY')">☀️ Day</button>
-                                <button class="atmo-btn" id="atmo-sunset-btn" onclick="setAtmosphere('SUNSET')">🌅 Sunset</button>
-                                <button class="atmo-btn" id="atmo-night-btn" onclick="setAtmosphere('NIGHT')">🌙 Cyber Night</button>
+                            <!-- 4 Directional Approach Overlays (Always Visible on 4-Way Intersection) -->
+                            <div class="approach-tag approach-north" id="tag-north">
+                                <span class="approach-tag-title">⬆️ NORTH APPROACH</span>
+                                <span class="approach-tag-val" id="val-north">Queue: 0 | Flow: 0 km/h</span>
                             </div>
-
-                            <!-- Live Follow Vehicle Telemetry HUD -->
-                            <div class="follow-vehicle-hud" id="follow-vehicle-hud" style="display: none;">
-                                <div class="follow-hud-title">
-                                    <span>🚗 CHASE CAM: <strong id="follow-vid">#CAR_1</strong></span>
-                                    <button class="follow-close-btn" onclick="stopFollowingVehicle()">✕ Exit Chase</button>
-                                </div>
-                                <div class="follow-hud-row"><span>Speed:</span><strong id="follow-vspeed">45.0 km/h</strong></div>
-                                <div class="follow-hud-row"><span>Current Road:</span><strong id="follow-vedge">Central Avenue</strong></div>
-                                <div class="follow-hud-row"><span>Motion Status:</span><strong id="follow-vstatus" style="color: #10b981;">CRUISING</strong></div>
+                            <div class="approach-tag approach-south" id="tag-south">
+                                <span class="approach-tag-title">⬇️ SOUTH APPROACH</span>
+                                <span class="approach-tag-val" id="val-south">Queue: 0 | Flow: 0 km/h</span>
+                            </div>
+                            <div class="approach-tag approach-east" id="tag-east">
+                                <span class="approach-tag-title">➡️ EAST APPROACH</span>
+                                <span class="approach-tag-val" id="val-east">Queue: 0 | Flow: 0 km/h</span>
+                            </div>
+                            <div class="approach-tag approach-west" id="tag-west">
+                                <span class="approach-tag-title">⬅️ WEST APPROACH</span>
+                                <span class="approach-tag-val" id="val-west">Queue: 0 | Flow: 0 km/h</span>
                             </div>
 
                             <!-- Top Canvas Autonomous Traffic Intel Ribbon -->
-                            <div class="canvas-top-intel-bar">
+                            <div class="canvas-top-intel-bar" style="top: auto; bottom: 12px; left: 14px; right: 14px;">
                                 <div class="intel-item">
                                     <span class="intel-dot" id="intel-cong-dot"></span>
-                                    <span>CONGESTION:</span>
-                                    <strong id="intel-cong-val">SMOOTH (14%)</strong>
+                                    <span>INTERSECTION STATUS:</span>
+                                    <strong id="intel-cong-val">SMOOTH FLOW</strong>
                                 </div>
                                 <div class="intel-item">
                                     <span>🧠</span>
-                                    <span>SMART AI ACTION:</span>
+                                    <span>CONTROLLER DECISION:</span>
                                     <strong id="intel-ai-action">OPTIMAL ADAPTIVE FLOW</strong>
                                 </div>
                                 <div class="intel-item">
                                     <span>⏱️</span>
-                                    <span>DELAY SAVED:</span>
-                                    <strong id="intel-delay-saved">+38.5% VS FIXED</strong>
+                                    <span>ACTIVE PHASE:</span>
+                                    <strong id="intel-phase-display">NORTH-SOUTH GREEN</strong>
                                 </div>
                                 <div class="intel-item">
-                                    <span>🌊</span>
-                                    <span>DISCHARGE RATE:</span>
-                                    <strong id="intel-discharge-rate">1.8 VEH/S</strong>
+                                    <span>⚡</span>
+                                    <span>TOTAL QUEUED:</span>
+                                    <strong id="intel-total-queued">0 VEHICLES</strong>
                                 </div>
-                            </div>
-
-                            <!-- Floating 3D Sector Surveillance HUD Card -->
-                            <div class="sector-surveillance-hud" id="sector-hud-card">
-                                <div class="sector-hud-header">
-                                    <span id="sector-hud-title">Central Plaza Crossroads</span>
-                                    <span class="card-badge" id="sector-hud-badge" style="background: rgba(2, 132, 199, 0.2); color: #38bdf8;">SECTOR INSPECTOR</span>
-                                </div>
-                                <div class="sector-hud-row"><span>Control System:</span><strong id="sector-hud-ctrl">AI Adaptive (DQN)</strong></div>
-                                <div class="sector-hud-row"><span>Active Phase:</span><strong id="sector-hud-phase">East-West Arterial</strong></div>
-                                <div class="sector-hud-row"><span>Corridor Queue:</span><strong id="sector-hud-queue" style="color: #ef4444;">0 vehicles</strong></div>
-                                <div class="sector-hud-row"><span>Sector Speed:</span><strong id="sector-hud-speed">38 km/h</strong></div>
-                                <div class="sector-hud-row"><span>Traffic Status:</span><strong id="sector-hud-status" style="color: #10b981;">OPTIMAL FLOW</strong></div>
-                                <button class="btn-flush-sector" onclick="triggerSmartFlush()">
-                                    <span>⚡</span> Force Smart Signal Priority Flush
-                                </button>
-                            </div>
-
-                            <!-- 3D Controls Legend (Bottom-Right) -->
-                            <div class="controls-legend">
-                                <span>🖱️ <strong>Left-Drag:</strong> Rotate | <strong>Right-Drag:</strong> Pan | <strong>Scroll:</strong> Zoom | <strong>Click Road:</strong> Center Target | <strong>Click Car:</strong> Chase Cam</span>
                             </div>
                         </div>
 
                         <!-- Simulation Interactive Controls Toolbar -->
-                        <div class="sim-toolbar">
+                        <div class="sim-toolbar" style="flex-wrap: wrap; gap: 10px;">
                             <div class="toolbar-group">
                                 <button class="btn btn-primary" id="sim-play-pause-btn" onclick="toggleSimPause()">
                                     <span id="sim-play-icon">⏸</span> <span id="sim-play-text">Pause</span>
                                 </button>
                                 <button class="btn" onclick="resetSimNetwork()" title="Reset Network">
-                                    <span>↺</span> Reset
+                                    <span>↺</span> Reset Sim
                                 </button>
                             </div>
 
                             <div class="toolbar-group">
-                                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Automation:</span>
+                                <span class="toolbar-label">Signal Controller:</span>
                                 <button class="btn btn-success" id="mode-adaptive-btn" onclick="setControllerMode('AI_ADAPTIVE')">
                                     <span>🧠</span> AI Adaptive (DQN)
                                 </button>
-                                <button class="btn" id="mode-wave-btn" onclick="setControllerMode('GREEN_WAVE')">
-                                    <span>🌊</span> Green Wave
-                                </button>
                                 <button class="btn" id="mode-fixed-btn" onclick="setControllerMode('FIXED_TIME')">
-                                    <span>⏱️</span> Fixed
+                                    <span>⏱️</span> Fixed-Time Baseline
                                 </button>
                             </div>
 
                             <div class="toolbar-group">
-                                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Traffic Demand:</span>
-                                <button class="btn" id="demand-05-btn" onclick="setTrafficDemand(0.5)">Light (0.5x)</button>
-                                <button class="btn btn-primary" id="demand-10-btn" onclick="setTrafficDemand(1.0)">Normal (1.0x)</button>
-                                <button class="btn" id="demand-20-btn" onclick="setTrafficDemand(2.0)">Rush Hour (2.0x)</button>
-                                <button class="btn" id="demand-35-btn" onclick="setTrafficDemand(3.5)">Gridlock (3.5x)</button>
+                                <span class="toolbar-label">Traffic Scenarios:</span>
+                                <button class="btn btn-primary" id="scen-normal-btn" onclick="setExperimentScenario('NORMAL')">
+                                    Scenario A (Normal)
+                                </button>
+                                <button class="btn" id="scen-north-btn" onclick="setExperimentScenario('SURGE_NORTH')">
+                                    Scenario B (North Surge)
+                                </button>
+                                <button class="btn" id="scen-uneven-btn" onclick="setExperimentScenario('UNEVEN')">
+                                    Scenario C (Uneven)
+                                </button>
                             </div>
 
                             <div class="toolbar-group">
-                                <button class="btn btn-emergency" onclick="dispatchEmergencyVehicle()" title="Dispatch Police / Ambulance with Siren Priority">
-                                    <span>🚨</span> Dispatch Emergency
+                                <button class="btn btn-danger" id="btn-surge-action" onclick="triggerTrafficSurge('north')" title="Inject a burst of 8 real SUMO vehicles onto North Approach">
+                                    <span>⚡</span> Create Traffic Surge
+                                </button>
+                                <button class="btn" onclick="resetScenario()" title="Reset Scenario to standard flow">
+                                    <span>↺</span> Reset Scenario
                                 </button>
                             </div>
                         </div>
@@ -1343,18 +1385,70 @@
                 <!-- Right 30%: Live Telemetry & Explainable AI Sidebar -->
                 <div class="sidebar">
                     
+                    <!-- 4-Way Approach Live Queues Card (PRIMARY) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">4-Way Approach Live Queues</div>
+                            <span class="card-badge">TL_CENTRAL</span>
+                        </div>
+
+                        <div class="approach-matrix-row">
+                            <div class="approach-dir">
+                                <span>⬆️</span> <strong>North Approach</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span id="card-q-north" style="font-weight:700; color:#ef4444;">0 queued</span>
+                                <span id="card-sig-north" class="approach-sig-pill sig-green">GREEN</span>
+                            </div>
+                        </div>
+                        <div class="progress-track" style="margin-bottom:8px;"><div class="progress-bar" id="bar-q-north" style="width: 0%; background:#ef4444;"></div></div>
+
+                        <div class="approach-matrix-row">
+                            <div class="approach-dir">
+                                <span>⬇️</span> <strong>South Approach</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span id="card-q-south" style="font-weight:700; color:#ef4444;">0 queued</span>
+                                <span id="card-sig-south" class="approach-sig-pill sig-green">GREEN</span>
+                            </div>
+                        </div>
+                        <div class="progress-track" style="margin-bottom:8px;"><div class="progress-bar" id="bar-q-south" style="width: 0%; background:#ef4444;"></div></div>
+
+                        <div class="approach-matrix-row">
+                            <div class="approach-dir">
+                                <span>➡️</span> <strong>East Approach</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span id="card-q-east" style="font-weight:700; color:#ef4444;">0 queued</span>
+                                <span id="card-sig-east" class="approach-sig-pill sig-red">RED</span>
+                            </div>
+                        </div>
+                        <div class="progress-track" style="margin-bottom:8px;"><div class="progress-bar" id="bar-q-east" style="width: 0%; background:#ef4444;"></div></div>
+
+                        <div class="approach-matrix-row">
+                            <div class="approach-dir">
+                                <span>⬅️</span> <strong>West Approach</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span id="card-q-west" style="font-weight:700; color:#ef4444;">0 queued</span>
+                                <span id="card-sig-west" class="approach-sig-pill sig-red">RED</span>
+                            </div>
+                        </div>
+                        <div class="progress-track"><div class="progress-bar" id="bar-q-west" style="width: 0%; background:#ef4444;"></div></div>
+                    </div>
+
                     <!-- Explainable AI (XAI) Decision Reasoning Card -->
                     <div class="card ai-card">
                         <div class="ai-header">
                             <div class="card-title" style="color: var(--primary);">
-                                <span>🧠</span> Adaptive AI Decision Engine
+                                <span id="ctrl-icon">🧠</span> <span id="ctrl-title">Adaptive AI Decision Engine</span>
                             </div>
                             <span class="ai-status-pill" id="ai-model-status">DQN ONLINE</span>
                         </div>
 
                         <div class="ai-corridor-box">
-                            <div class="ai-corridor-title">Central Plaza Active Corridor</div>
-                            <div class="ai-corridor-name" id="ai-active-corridor">East-West Arterial</div>
+                            <div class="ai-corridor-title">Central Crossroads Active Signal</div>
+                            <div class="ai-corridor-name" id="ai-active-corridor">North-South Grand Boulevard</div>
                             <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between;">
                                 <span>Stage Elapsed: <strong id="ai-green-elapsed">0.0s</strong></span>
                                 <span id="ai-transition-state" style="color: #10b981; font-weight: 700;">GREEN DISCHARGE</span>
@@ -1363,43 +1457,43 @@
 
                         <div class="card-title" style="font-size: 11px; margin-bottom: 6px;">Live Explainable Reasoning (XAI):</div>
                         <div class="ai-explanation-box" id="ai-explanation-text">
-                            Monitoring network queues. DQN evaluating optimal corridor discharge.
+                            DQN evaluating real-time 4-way approach queues and waiting delays.
                         </div>
                     </div>
 
-                    <!-- Network KPIs Card -->
+                    <!-- Intersection KPIs Card -->
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">Connected City Network KPIs</div>
+                            <div class="card-title">Intersection Performance KPIs</div>
                             <span class="card-badge">LIVE SUMO DATA</span>
                         </div>
 
                         <div class="kpi-grid">
                             <div class="kpi-box">
-                                <div class="kpi-label">Active in City</div>
+                                <div class="kpi-label">Active at Crossroads</div>
                                 <div class="kpi-val" id="kpi-active-count">0</div>
-                                <div class="kpi-sub">Vehicles moving</div>
+                                <div class="kpi-sub">Vehicles in sector</div>
                             </div>
                             <div class="kpi-box">
-                                <div class="kpi-label">Network Queue</div>
+                                <div class="kpi-label">Intersection Queue</div>
                                 <div class="kpi-val" style="color: #ef4444;" id="kpi-queued-count">0</div>
-                                <div class="kpi-sub" id="kpi-queue-pct">0% of network</div>
+                                <div class="kpi-sub" id="kpi-queue-pct">Waiting at red</div>
                             </div>
                             <div class="kpi-box">
-                                <div class="kpi-label">Average Speed</div>
+                                <div class="kpi-label">Approach Speed</div>
                                 <div class="kpi-val" style="color: #0284c7;" id="kpi-avg-speed">0.0</div>
-                                <div class="kpi-sub">km/h network-wide</div>
+                                <div class="kpi-sub">km/h average</div>
                             </div>
                             <div class="kpi-box">
-                                <div class="kpi-label">Completed Trips</div>
+                                <div class="kpi-label">Total Completed</div>
                                 <div class="kpi-val" style="color: #10b981;" id="kpi-throughput">0</div>
-                                <div class="kpi-sub">Vehicles arrived</div>
+                                <div class="kpi-sub">Trips cleared</div>
                             </div>
                         </div>
 
                         <div style="margin-top: 14px;">
                             <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
-                                <span>Network Congestion Ratio</span>
+                                <span>Traffic Congestion Ratio</span>
                                 <span id="kpi-congestion-pct">0%</span>
                             </div>
                             <div class="progress-track">
@@ -1722,7 +1816,8 @@
         // GLOBAL STATE & MODULE SWITCHER
         // ========================================================
         let activeModule = 'sim'; // 'sim' or 'video'
-        let viewMode3D = true;    // true = 3D Three.js, false = 2D Canvas
+        let viewMode3D = false;   // DEFAULT: 2D Overhead Intersection View for crystal-clear readability
+        let activeViewMode = 'FOCUSED_4WAY'; // 'FOCUSED_4WAY' (Primary) or 'CITY_OVERVIEW' (Secondary)
 
         function switchMainModule(mod) {
             activeModule = mod;
@@ -1732,11 +1827,61 @@
             if (mod === 'sim') {
                 document.getElementById('tab-sim').classList.add('active');
                 document.getElementById('module-sim').classList.add('active');
-                onWindowResize3D();
+                if (viewMode3D) {
+                    onWindowResize3D();
+                } else {
+                    resizeSimCanvas();
+                }
             } else {
                 document.getElementById('tab-video').classList.add('active');
                 document.getElementById('module-video').classList.add('active');
                 resizeVideoCanvas();
+            }
+        }
+
+        function setViewMode(mode) {
+            activeViewMode = mode;
+            const container3D = document.getElementById('sim-3d-container');
+            const canvas2D = document.getElementById('sim-canvas');
+            const btnFocused = document.getElementById('btn-view-focused');
+            const btnCity = document.getElementById('btn-view-city');
+            const titleEl = document.getElementById('camera-title-text');
+            const fpsEl = document.getElementById('sim-fps-chip');
+            const approachTags = [
+                document.getElementById('tag-north'),
+                document.getElementById('tag-south'),
+                document.getElementById('tag-east'),
+                document.getElementById('tag-west')
+            ];
+
+            if (mode === 'FOCUSED_4WAY') {
+                viewMode3D = false;
+                if (container3D) container3D.style.display = 'none';
+                if (canvas2D) canvas2D.style.display = 'block';
+                if (btnFocused) { btnFocused.className = 'btn btn-primary'; }
+                if (btnCity) { btnCity.className = 'btn'; }
+                if (titleEl) titleEl.textContent = '🚦 Primary View: Focused 4-Way Overhead Intersection';
+                if (fpsEl) fpsEl.textContent = '2D Overhead 25 FPS';
+                approachTags.forEach(t => { if (t) t.style.display = 'flex'; });
+
+                // Camera locks directly onto Central 4-Way Crossroads (SUMO coords: 760, 440)
+                camera.targetX = 760;
+                camera.targetY = 440;
+                camera.targetZoom = 2.40;
+                resizeSimCanvas();
+            } else {
+                // Secondary City Overview
+                if (btnFocused) { btnFocused.className = 'btn'; }
+                if (btnCity) { btnCity.className = 'btn btn-primary'; }
+                if (titleEl) titleEl.textContent = '🗺️ Secondary View: Connected City Network Overview';
+                if (fpsEl) fpsEl.textContent = '2D City Overview 25 FPS';
+                approachTags.forEach(t => { if (t) t.style.display = 'none'; });
+
+                // Pull camera back to view entire 1440m x 760m city network
+                camera.targetX = 760;
+                camera.targetY = 440;
+                camera.targetZoom = 0.88;
+                resizeSimCanvas();
             }
         }
 
@@ -1750,16 +1895,16 @@
             if (viewMode3D) {
                 container3D.style.display = 'block';
                 canvas2D.style.display = 'none';
-                icon.textContent = '📐';
-                text.textContent = 'Switch to 2D View';
+                if (icon) icon.textContent = '📐';
+                if (text) text.textContent = 'Switch to 2D Overhead';
                 document.getElementById('sim-fps-chip').textContent = 'Three.js 60 FPS';
                 onWindowResize3D();
             } else {
                 container3D.style.display = 'none';
                 canvas2D.style.display = 'block';
-                icon.textContent = '🏙️';
-                text.textContent = 'Switch to 3D View';
-                document.getElementById('sim-fps-chip').textContent = '2D Canvas 25 FPS';
+                if (icon) icon.textContent = '🏙️';
+                if (text) text.textContent = 'Switch to 3D View';
+                document.getElementById('sim-fps-chip').textContent = '2D Overhead 25 FPS';
                 resizeSimCanvas();
             }
         }
@@ -2767,16 +2912,18 @@
         let simHUDEnabled = true;
         let simPaused = false;
 
-        let camera = { x: 760, y: 440, zoom: 0.90, targetX: 760, targetY: 440, targetZoom: 0.90 };
+        // Camera State: Default centered on 4-Way Crossroads TL_CENTRAL (760, 440) at Zoom 2.40
+        let camera = { x: 760, y: 440, zoom: 2.40, targetX: 760, targetY: 440, targetZoom: 2.40 };
         const PRESET_COORDS = {
-            'CITY_OVERVIEW':       { x: 760, y: 440, zoom: 0.90 },
-            'CENTRAL_PLAZA':       { x: 760, y: 440, zoom: 2.20 },
-            'GARDEN_ROUNDABOUT':   { x: 220, y: 440, zoom: 2.20 },
-            'EASTERN_TJUNC':       { x: 1240, y: 440, zoom: 2.20 },
-            'NORTHWEST_JUNCTION':  { x: 440, y: 680, zoom: 2.20 },
-            'NORTHEAST_JUNCTION':  { x: 1080, y: 680, zoom: 2.20 },
-            'SOUTHWEST_JUNCTION':  { x: 440, y: 200, zoom: 2.20 },
-            'SOUTHEAST_JUNCTION':  { x: 1080, y: 200, zoom: 2.20 }
+            'FOCUSED_4WAY':        { x: 760, y: 440, zoom: 2.40 },
+            'CITY_OVERVIEW':       { x: 760, y: 440, zoom: 0.88 },
+            'CENTRAL_PLAZA':       { x: 760, y: 440, zoom: 2.40 },
+            'GARDEN_ROUNDABOUT':   { x: 220, y: 440, zoom: 2.00 },
+            'EASTERN_TJUNC':       { x: 1240, y: 440, zoom: 2.00 },
+            'NORTHWEST_JUNCTION':  { x: 440, y: 680, zoom: 2.00 },
+            'NORTHEAST_JUNCTION':  { x: 1080, y: 680, zoom: 2.00 },
+            'SOUTHWEST_JUNCTION':  { x: 440, y: 200, zoom: 2.00 },
+            'SOUTHEAST_JUNCTION':  { x: 1080, y: 200, zoom: 2.00 }
         };
 
         function resizeSimCanvas() {
@@ -2787,6 +2934,34 @@
             }
         }
         window.addEventListener('resize', resizeSimCanvas);
+
+        // 2D Canvas Interactive Pan and Zoom
+        let isCanvasDragging = false;
+        let dragStartX = 0, dragStartY = 0;
+        simCanvas.addEventListener('mousedown', (e) => {
+            isCanvasDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            simCanvas.style.cursor = 'grabbing';
+        });
+        window.addEventListener('mouseup', () => {
+            isCanvasDragging = false;
+            simCanvas.style.cursor = 'grab';
+        });
+        simCanvas.addEventListener('mousemove', (e) => {
+            if (!isCanvasDragging) return;
+            const dx = (e.clientX - dragStartX) / camera.zoom;
+            const dy = (e.clientY - dragStartY) / camera.zoom;
+            camera.targetX -= dx;
+            camera.targetY += dy; // Inverted Y for SUMO Cartesian coordinates
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+        });
+        simCanvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.15 : 0.87;
+            camera.targetZoom = Math.max(0.4, Math.min(4.5, camera.targetZoom * factor));
+        }, { passive: false });
 
         function toggleSimHUD(enabled) { simHUDEnabled = enabled; }
 
@@ -2801,7 +2976,8 @@
 
         function resetSimNetwork() {
             fetch('/api/control/reset', { method: 'POST' }).then(() => {
-                setCameraSector('CITY_OVERVIEW');
+                setViewMode('FOCUSED_4WAY');
+                showToast('↺ Simulation reset to initial state');
             });
         }
 
@@ -2809,7 +2985,7 @@
             const form = new FormData();
             form.append('mode', mode);
             fetch('/api/control/mode', { method: 'POST', body: form }).then(() => {
-                ['mode-adaptive-btn', 'mode-wave-btn', 'mode-fixed-btn'].forEach(id => {
+                ['mode-adaptive-btn', 'mode-fixed-btn'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
                         el.classList.remove('btn-success', 'btn-primary');
@@ -2818,39 +2994,73 @@
                 });
                 if (mode === 'AI_ADAPTIVE') {
                     document.getElementById('mode-adaptive-btn')?.classList?.replace('btn', 'btn-success');
-                } else if (mode === 'GREEN_WAVE') {
-                    document.getElementById('mode-wave-btn')?.classList?.replace('btn', 'btn-primary');
+                    showToast('🧠 AI Adaptive (DQN) Controller Engaged');
                 } else {
                     document.getElementById('mode-fixed-btn')?.classList?.replace('btn', 'btn-primary');
+                    showToast('⏱️ Fixed-Time Baseline Controller Engaged (Static 25s phases)');
                 }
             });
         }
 
-        function setTrafficDemand(scale) {
+        // ========================================================
+        // CONTROLLED EXPERIMENT SCENARIOS & SURGE INJECTION
+        // ========================================================
+        function setExperimentScenario(scenario) {
             const form = new FormData();
-            form.append('scale', scale);
-            fetch('/api/control/scale', { method: 'POST', body: form }).then(r => r.json()).then(res => {
-                ['demand-05-btn', 'demand-10-btn', 'demand-20-btn', 'demand-35-btn'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        el.classList.remove('btn-primary', 'btn-danger', 'btn-warning');
-                        el.classList.add('btn');
+            form.append('scenario', scenario);
+            fetch('/api/simulation/scenario', { method: 'POST', body: form })
+                .then(r => r.json())
+                .then(data => {
+                    ['scen-normal-btn', 'scen-north-btn', 'scen-uneven-btn'].forEach(id => {
+                        const b = document.getElementById(id);
+                        if (b) { b.classList.remove('btn-primary'); b.classList.add('btn'); }
+                    });
+                    const banner = document.getElementById('scenario-banner-text');
+                    if (scenario === 'NORMAL') {
+                        document.getElementById('scen-normal-btn')?.classList.add('btn-primary');
+                        if (banner) banner.textContent = 'Scenario A: Normal Balanced Traffic (Light/Moderate Flow, ~25 Vehicles)';
+                        showToast('📊 Scenario A: Normal Balanced Traffic Activated');
+                    } else if (scenario === 'SURGE_NORTH') {
+                        document.getElementById('scen-north-btn')?.classList.add('btn-primary');
+                        if (banner) banner.textContent = 'Scenario B: North Corridor Surge (Queuing Detected - Autonomous AI Adapts Phase)';
+                        showToast('⚡ Scenario B: North Surge Activated - 8 vehicles queuing on North');
+                    } else if (scenario === 'UNEVEN') {
+                        document.getElementById('scen-uneven-btn')?.classList.add('btn-primary');
+                        if (banner) banner.textContent = 'Scenario C: Uneven Demand (Heavy North-South, Sparse East-West)';
+                        showToast('📊 Scenario C: Uneven Demand Distribution Activated');
                     }
-                });
-                const btnId = scale === 0.5 ? 'demand-05-btn' : (scale === 1.0 ? 'demand-10-btn' : (scale === 2.0 ? 'demand-20-btn' : 'demand-35-btn'));
-                const activeClass = scale >= 2.0 ? 'btn-danger' : 'btn-primary';
-                document.getElementById(btnId)?.classList?.replace('btn', activeClass);
-            });
+                })
+                .catch(e => console.error('Error setting scenario:', e));
         }
 
-        function dispatchEmergencyVehicle() {
-            fetch('/api/control/emergency', { method: 'POST' }).then(r => r.json()).then(res => {
-                const toast = document.createElement('div');
-                toast.style.cssText = 'position:fixed; top:20px; right:20px; background:#ef4444; color:white; padding:12px 20px; border-radius:8px; font-weight:700; z-index:99999; box-shadow:0 10px 25px rgba(239,68,68,0.5);';
-                toast.innerHTML = '🚨 EMERGENCY PREEMPTION DISPATCHED: Priority Siren Active across Grand Arterials!';
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-            });
+        function triggerTrafficSurge(approach = 'north') {
+            const form = new FormData();
+            form.append('approach', approach);
+            form.append('count', '8');
+            fetch('/api/simulation/surge', { method: 'POST', body: form })
+                .then(r => r.json())
+                .then(data => {
+                    showToast(`⚡ Traffic surge injected: 8 vehicles dispatched to ${approach.toUpperCase()} approach!`);
+                })
+                .catch(e => console.error('Error triggering surge:', e));
+        }
+
+        function resetScenario() {
+            fetch('/api/simulation/reset_scenario', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    setExperimentScenario('NORMAL');
+                    showToast('↺ Experiment scenario reset to standard traffic.');
+                })
+                .catch(e => console.error('Error resetting scenario:', e));
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed; top:24px; right:24px; background:#0f172a; color:#38bdf8; border:1px solid #38bdf8; padding:12px 20px; border-radius:8px; font-weight:700; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); font-family:"JetBrains Mono", monospace; font-size:12px;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
         }
 
         function overrideSignalPhase(tlId, phaseIdx) {
@@ -2866,6 +3076,7 @@
                 const res = await fetch('/api/network/geometry');
                 roadGeometry = await res.json();
                 build3DRoadNetwork(roadGeometry);
+                resizeSimCanvas();
             } catch (err) {
                 console.error('Failed to load SUMO network geometry:', err);
             }
@@ -2893,14 +3104,429 @@
         }
         initSSEStream();
 
-        // Update Right Sidebar Telemetry & AI Cards
+        // ========================================================
+        // 2D OVERHEAD INTERSECTION RENDER LOOP (PRIMARY VIEW)
+        // High Readability, Distinguishable Vehicles, Large Signals, No 3D Distractions
+        // ========================================================
+        function renderSimFrame() {
+            if (activeModule === 'sim' && !viewMode3D) {
+                const w = simCanvas.width;
+                const h = simCanvas.height;
+
+                // Smooth Camera Interpolation
+                camera.x += (camera.targetX - camera.x) * 0.15;
+                camera.y += (camera.targetY - camera.y) * 0.15;
+                camera.zoom += (camera.targetZoom - camera.zoom) * 0.15;
+
+                // 1. Clean, High-Contrast Cartographic Background
+                simCtx.fillStyle = '#f8fafc';
+                simCtx.fillRect(0, 0, w, h);
+
+                // Setup Cartesian Transform (SUMO coords: 0,0 bottom-left; Central junction at 760, 440)
+                simCtx.save();
+                simCtx.translate(w / 2, h / 2);
+                simCtx.scale(camera.zoom, camera.zoom);
+                simCtx.translate(-camera.x, camera.y); // Invert Y for canvas Cartesian plane
+
+                // 2. Subtle Urban District Parcels and Park Foliage
+                renderCityBackgroundFeatures();
+
+                // 3. Crisp Asphalt Roads, Lane Markings, Curbs & Turning Pockets
+                if (roadGeometry) {
+                    renderSumoRoadNetwork(roadGeometry);
+                }
+
+                // 4. Live SUMO Traffic Signals with Stop Bars & Illuminations
+                if (latestTelemetry && latestTelemetry.traffic_lights) {
+                    renderTrafficLightSignals(latestTelemetry.traffic_lights, latestTelemetry.intersection_4way);
+                }
+
+                // 5. Authentic SUMO Moving Vehicles with Distinct Shapes, Colors & Brake Lights
+                if (latestTelemetry && latestTelemetry.vehicles) {
+                    renderSumoMovingVehicles(latestTelemetry.vehicles);
+                }
+
+                simCtx.restore();
+            }
+
+            requestAnimationFrame(renderSimFrame);
+        }
+        requestAnimationFrame(renderSimFrame);
+
+        // Background Cartographic Grid & Green Spaces
+        function renderCityBackgroundFeatures() {
+            // Subtle 100m City Grid
+            simCtx.strokeStyle = '#e2e8f0';
+            simCtx.lineWidth = 1.0 / camera.zoom;
+            simCtx.beginPath();
+            for (let x = 0; x <= 1600; x += 100) {
+                simCtx.moveTo(x, -900);
+                simCtx.lineTo(x, 100);
+            }
+            for (let y = -900; y <= 100; y += 100) {
+                simCtx.moveTo(0, y);
+                simCtx.lineTo(1600, y);
+            }
+            simCtx.stroke();
+
+            // Garden Roundabout Park Zone (SUMO: 220, 440)
+            simCtx.fillStyle = '#dcfce7'; // Soft park green
+            simCtx.beginPath();
+            simCtx.arc(220, -440, 72, 0, Math.PI * 2);
+            simCtx.fill();
+            simCtx.strokeStyle = '#86efac';
+            simCtx.lineWidth = 2.0;
+            simCtx.stroke();
+
+            // Central Plaza Pedestrian Islands
+            if (activeViewMode === 'FOCUSED_4WAY' || camera.zoom > 1.8) {
+                simCtx.fillStyle = '#f1f5f9';
+                simCtx.strokeStyle = '#cbd5e1';
+                simCtx.lineWidth = 1.5;
+                // Corner sidewalk buffers around Central 4-Way Crossroads (760, 440)
+                const corners = [
+                    [710, -490], [810, -490], [710, -390], [810, -390]
+                ];
+                corners.forEach(([cx, cy]) => {
+                    simCtx.beginPath();
+                    simCtx.arc(cx, cy, 14, 0, Math.PI * 2);
+                    simCtx.fill();
+                    simCtx.stroke();
+                });
+            }
+        }
+
+        // Render SUMO Road Network with Real Geometry, Lane Markings & Crosswalks
+        function renderSumoRoadNetwork(geo) {
+            const edges = geo.roads || geo.edges || [];
+            simCtx.lineCap = 'round';
+            simCtx.lineJoin = 'round';
+
+            // LAYER 1: Concrete Curbs & Road Bedding
+            for (const edge of edges) {
+                for (const lane of edge.lanes || []) {
+                    const pts = lane.shape || [];
+                    if (pts.length < 2) continue;
+                    const lw = Math.max(20, (lane.width || 3.2) * 5.2);
+
+                    simCtx.lineWidth = lw + 7.0;
+                    simCtx.strokeStyle = '#94a3b8'; // Curb slate
+                    simCtx.beginPath();
+                    simCtx.moveTo(pts[0][0], -pts[0][1]);
+                    for (let i = 1; i < pts.length; i++) {
+                        simCtx.lineTo(pts[i][0], -pts[i][1]);
+                    }
+                    simCtx.stroke();
+                }
+            }
+
+            // LAYER 2: High-Contrast Dark Asphalt Roadway
+            for (const edge of edges) {
+                for (const lane of edge.lanes || []) {
+                    const pts = lane.shape || [];
+                    if (pts.length < 2) continue;
+                    const lw = Math.max(18, (lane.width || 3.2) * 5.0);
+
+                    simCtx.lineWidth = lw;
+                    simCtx.strokeStyle = '#1e293b'; // Charcoal asphalt
+                    simCtx.beginPath();
+                    simCtx.moveTo(pts[0][0], -pts[0][1]);
+                    for (let i = 1; i < pts.length; i++) {
+                        simCtx.lineTo(pts[i][0], -pts[i][1]);
+                    }
+                    simCtx.stroke();
+                }
+            }
+
+            // LAYER 3: Painted Lane Centerlines & Medians
+            for (const edge of edges) {
+                for (const lane of edge.lanes || []) {
+                    const pts = lane.shape || [];
+                    if (pts.length < 2) continue;
+
+                    // Dashed White Lane Divider Lines
+                    simCtx.setLineDash([12, 10]);
+                    simCtx.lineWidth = 1.8;
+                    simCtx.strokeStyle = '#f8fafc';
+                    simCtx.beginPath();
+                    simCtx.moveTo(pts[0][0], -pts[0][1]);
+                    for (let i = 1; i < pts.length; i++) {
+                        simCtx.lineTo(pts[i][0], -pts[i][1]);
+                    }
+                    simCtx.stroke();
+                    simCtx.setLineDash([]);
+                }
+            }
+
+            // LAYER 4: Focused 4-Way Intersection Details (Stop Bars, Crosswalks, Yellow Medians)
+            if (activeViewMode === 'FOCUSED_4WAY' || camera.zoom > 1.6) {
+                const cx = 760.0, cy = -440.0;
+
+                // Stop Lines across each approach (Yellow bold stop line at junction entrance)
+                simCtx.strokeStyle = '#facc15';
+                simCtx.lineWidth = 4.5;
+                // North Stop Line (midN_to_central entering from top)
+                simCtx.beginPath(); simCtx.moveTo(cx - 24, cy - 35); simCtx.lineTo(cx + 24, cy - 35); simCtx.stroke();
+                // South Stop Line (midS_to_central entering from bottom)
+                simCtx.beginPath(); simCtx.moveTo(cx - 24, cy + 35); simCtx.lineTo(cx + 24, cy + 35); simCtx.stroke();
+                // East Stop Line (tjunc_to_central entering from right)
+                simCtx.beginPath(); simCtx.moveTo(cx + 35, cy - 24); simCtx.lineTo(cx + 35, cy + 24); simCtx.stroke();
+                // West Stop Line (rb_to_central entering from left)
+                simCtx.beginPath(); simCtx.moveTo(cx - 35, cy - 24); simCtx.lineTo(cx - 35, cy + 24); simCtx.stroke();
+
+                // Pedestrian Zebra Crosswalks (Crisp White Striped Bars)
+                simCtx.strokeStyle = '#ffffff';
+                simCtx.lineWidth = 2.4;
+                // North Crosswalk
+                for (let ox = -20; ox <= 20; ox += 6) {
+                    simCtx.beginPath(); simCtx.moveTo(cx + ox, cy - 42); simCtx.lineTo(cx + ox, cy - 49); simCtx.stroke();
+                }
+                // South Crosswalk
+                for (let ox = -20; ox <= 20; ox += 6) {
+                    simCtx.beginPath(); simCtx.moveTo(cx + ox, cy + 42); simCtx.lineTo(cx + ox, cy + 49); simCtx.stroke();
+                }
+                // East Crosswalk
+                for (let oy = -20; oy <= 20; oy += 6) {
+                    simCtx.beginPath(); simCtx.moveTo(cx + 42, cy + oy); simCtx.lineTo(cx + 49, cy + oy); simCtx.stroke();
+                }
+                // West Crosswalk
+                for (let oy = -20; oy <= 20; oy += 6) {
+                    simCtx.beginPath(); simCtx.moveTo(cx - 42, cy + oy); simCtx.lineTo(cx - 49, cy + oy); simCtx.stroke();
+                }
+
+                // Intersection Core Center Dot / Hatch
+                simCtx.strokeStyle = 'rgba(250, 204, 21, 0.4)';
+                simCtx.lineWidth = 2.0;
+                simCtx.strokeRect(cx - 30, cy - 30, 60, 60);
+            }
+        }
+
+        // Render Distinct 3-Aspect Traffic Signals Matching TraCI Phase
+        function renderTrafficLightSignals(tlsMap, int4way) {
+            const cx = 760.0, cy = -440.0;
+            const app = (int4way && int4way.approaches) || {};
+            const northSig = app.north?.signal_color || 'RED';
+            const southSig = app.south?.signal_color || 'RED';
+            const eastSig  = app.east?.signal_color  || 'RED';
+            const westSig  = app.west?.signal_color  || 'RED';
+
+            // 4 Distinct Signal Heads placed at the four approaches of TL_CENTRAL
+            const SIGNAL_HEADS = [
+                { dir: 'NORTH', x: cx + 28, y: cy - 40, sig: northSig, rot: 0 },
+                { dir: 'SOUTH', x: cx - 28, y: cy + 40, sig: southSig, rot: Math.PI },
+                { dir: 'EAST',  x: cx + 40, y: cy + 28, sig: eastSig,  rot: Math.PI / 2 },
+                { dir: 'WEST',  x: cx - 40, y: cy - 28, sig: westSig,  rot: -Math.PI / 2 }
+            ];
+
+            for (const h of SIGNAL_HEADS) {
+                simCtx.save();
+                simCtx.translate(h.x, h.y);
+                simCtx.rotate(h.rot);
+
+                // Signal Housing Mast / Arm Box
+                simCtx.fillStyle = '#0f172a';
+                simCtx.strokeStyle = '#475569';
+                simCtx.lineWidth = 1.5;
+                simCtx.beginPath();
+                simCtx.roundRect(-10, -22, 20, 44, 4);
+                simCtx.fill();
+                simCtx.stroke();
+
+                // Red Lamp
+                const isRed = h.sig === 'RED';
+                simCtx.fillStyle = isRed ? '#ef4444' : '#450a0a';
+                simCtx.beginPath(); simCtx.arc(0, -14, 5, 0, Math.PI * 2); simCtx.fill();
+                if (isRed) {
+                    simCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+                    simCtx.beginPath(); simCtx.arc(0, -14, 11, 0, Math.PI * 2); simCtx.fill();
+                }
+
+                // Yellow Lamp
+                const isYellow = h.sig === 'YELLOW';
+                simCtx.fillStyle = isYellow ? '#f59e0b' : '#451a03';
+                simCtx.beginPath(); simCtx.arc(0, 0, 5, 0, Math.PI * 2); simCtx.fill();
+                if (isYellow) {
+                    simCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+                    simCtx.beginPath(); simCtx.arc(0, 0, 11, 0, Math.PI * 2); simCtx.fill();
+                }
+
+                // Green Lamp
+                const isGreen = h.sig === 'GREEN';
+                simCtx.fillStyle = isGreen ? '#10b981' : '#022c22';
+                simCtx.beginPath(); simCtx.arc(0, 14, 5, 0, Math.PI * 2); simCtx.fill();
+                if (isGreen) {
+                    simCtx.fillStyle = 'rgba(16, 185, 129, 0.4)';
+                    simCtx.beginPath(); simCtx.arc(0, 14, 11, 0, Math.PI * 2); simCtx.fill();
+                }
+
+                simCtx.restore();
+            }
+
+            // Draw active stop bar color on asphalt
+            const drawActiveStopBar = (x1, y1, x2, y2, sig) => {
+                simCtx.strokeStyle = sig === 'GREEN' ? '#10b981' : (sig === 'YELLOW' ? '#f59e0b' : '#ef4444');
+                simCtx.lineWidth = 4.0;
+                simCtx.beginPath();
+                simCtx.moveTo(x1, y1);
+                simCtx.lineTo(x2, y2);
+                simCtx.stroke();
+            };
+            drawActiveStopBar(cx - 24, cy - 35, cx + 24, cy - 35, northSig);
+            drawActiveStopBar(cx - 24, cy + 35, cx + 24, cy + 35, southSig);
+            drawActiveStopBar(cx + 35, cy - 24, cx + 35, cy + 24, eastSig);
+            drawActiveStopBar(cx - 35, cy - 24, cx - 35, cy + 24, westSig);
+        }
+
+        // Render SUMO Moving Vehicles with True Realistic Geometry, Distinguishable Types & Brake Lights
+        function renderSumoMovingVehicles(vehicles) {
+            for (const v of vehicles) {
+                const x = v.x;
+                const y = -v.y; // Invert Y for canvas Cartesian plane
+                const angleRad = (v.angle * Math.PI) / 180.0;
+                const cls = (v.class || 'car').toLowerCase();
+                const isStopped = v.is_queued || (v.speed_kmh < 2.5);
+
+                // Physical base dimensions in meters
+                let len = 4.8, wid = 2.1;
+                let bodyColor = '#2563eb'; // Royal blue sedan default
+                let roofColor = '#1d4ed8';
+
+                if (cls === 'bus') {
+                    len = 12.0; wid = 2.8;
+                    bodyColor = '#f59e0b'; // Transit amber
+                    roofColor = '#d97706';
+                } else if (cls === 'truck') {
+                    len = 9.5; wid = 2.6;
+                    bodyColor = '#64748b'; // Industrial slate
+                    roofColor = '#475569';
+                } else if (cls === 'motorcycle') {
+                    len = 2.2; wid = 1.0;
+                    bodyColor = '#06b6d4'; // Cyan
+                    roofColor = '#0891b2';
+                } else {
+                    // Varied car color based on vehicle ID hash
+                    const hash = (v.id || 0) * 17;
+                    const carColors = ['#0284c7', '#3b82f6', '#10b981', '#64748b', '#e11d48'];
+                    bodyColor = carColors[hash % carColors.length];
+                    roofColor = '#0f172a';
+                }
+
+                // Generous screen pixel sizes so vehicles are clearly distinguishable and identifiable
+                const minLen = cls === 'bus' ? 48 : (cls === 'truck' ? 42 : (cls === 'motorcycle' ? 18 : 28));
+                const minWid = cls === 'bus' ? 15 : (cls === 'truck' ? 14 : (cls === 'motorcycle' ? 8 : 12));
+                len = Math.max(len, minLen / camera.zoom);
+                wid = Math.max(wid, minWid / camera.zoom);
+
+                simCtx.save();
+                simCtx.translate(x, y);
+                simCtx.rotate(angleRad); // Rotate to SUMO heading
+
+                // ----------------------------------------------------
+                // Forward Headlights (Casts Light Beam on Asphalt)
+                // ----------------------------------------------------
+                simCtx.fillStyle = 'rgba(254, 240, 138, 0.22)';
+                simCtx.beginPath();
+                simCtx.moveTo(-wid * 0.4, -len / 2);
+                simCtx.lineTo(-wid * 0.9, -len / 2 - 14);
+                simCtx.lineTo(-wid * 0.1, -len / 2 - 14);
+                simCtx.closePath();
+                simCtx.fill();
+
+                simCtx.beginPath();
+                simCtx.moveTo(wid * 0.4, -len / 2);
+                simCtx.lineTo(wid * 0.9, -len / 2 - 14);
+                simCtx.lineTo(wid * 0.1, -len / 2 - 14);
+                simCtx.closePath();
+                simCtx.fill();
+
+                // ----------------------------------------------------
+                // Vehicle Body Silhouette
+                // ----------------------------------------------------
+                simCtx.fillStyle = bodyColor;
+                simCtx.strokeStyle = '#0f172a';
+                simCtx.lineWidth = 1.2;
+                simCtx.beginPath();
+                simCtx.roundRect(-wid / 2, -len / 2, wid, len, 3);
+                simCtx.fill();
+                simCtx.stroke();
+
+                // Roof / Cabin Glass
+                simCtx.fillStyle = '#0f172a'; // Tinted windshield/cabin
+                if (cls === 'bus') {
+                    // Coach passenger windows strip
+                    simCtx.beginPath();
+                    simCtx.roundRect(-wid * 0.42, -len * 0.42, wid * 0.84, len * 0.84, 2);
+                    simCtx.fill();
+                } else if (cls === 'truck') {
+                    // Truck cab + cargo bed
+                    simCtx.beginPath();
+                    simCtx.roundRect(-wid * 0.44, -len * 0.44, wid * 0.88, len * 0.32, 2);
+                    simCtx.fill();
+                    simCtx.fillStyle = '#cbd5e1';
+                    simCtx.fillRect(-wid * 0.42, -len * 0.05, wid * 0.84, len * 0.48);
+                } else if (cls === 'motorcycle') {
+                    // Rider helmet
+                    simCtx.fillStyle = '#f8fafc';
+                    simCtx.beginPath();
+                    simCtx.arc(0, 0, wid * 0.4, 0, Math.PI * 2);
+                    simCtx.fill();
+                } else {
+                    // Car cabin & windshield
+                    simCtx.beginPath();
+                    simCtx.roundRect(-wid * 0.38, -len * 0.28, wid * 0.76, len * 0.52, 2);
+                    simCtx.fill();
+                }
+
+                // ----------------------------------------------------
+                // Rear Brake Lights (GLOWING RED WHEN STOPPED OR QUEUED)
+                // ----------------------------------------------------
+                if (isStopped) {
+                    // Active glowing red brake lamps
+                    simCtx.fillStyle = '#ef4444';
+                    simCtx.shadowColor = '#ef4444';
+                    simCtx.shadowBlur = 8;
+                    simCtx.fillRect(-wid * 0.48, len / 2 - 2, wid * 0.28, 2.5);
+                    simCtx.fillRect(wid * 0.20, len / 2 - 2, wid * 0.28, 2.5);
+                    simCtx.shadowBlur = 0; // reset
+                } else {
+                    // Normal subtle taillights
+                    simCtx.fillStyle = '#991b1b';
+                    simCtx.fillRect(-wid * 0.45, len / 2 - 1.5, wid * 0.24, 1.8);
+                    simCtx.fillRect(wid * 0.21, len / 2 - 1.5, wid * 0.24, 1.8);
+                }
+
+                simCtx.restore();
+
+                // Vehicle ID & Speed Badge when zoomed into 4-way intersection
+                if (camera.zoom > 2.0) {
+                    simCtx.save();
+                    simCtx.translate(x, y - len / 2 - 8);
+                    simCtx.fillStyle = isStopped ? 'rgba(239, 68, 68, 0.9)' : 'rgba(15, 23, 42, 0.85)';
+                    simCtx.beginPath();
+                    simCtx.roundRect(-22, -8, 44, 14, 3);
+                    simCtx.fill();
+                    simCtx.fillStyle = '#ffffff';
+                    simCtx.font = 'bold 9px "JetBrains Mono", monospace';
+                    simCtx.textAlign = 'center';
+                    simCtx.textBaseline = 'middle';
+                    simCtx.fillText(`${v.speed_kmh.toFixed(0)} km/h`, 0, 0);
+                    simCtx.restore();
+                }
+            }
+        }
+
+        // ========================================================
+        // LIVE TELEMETRY SYNC (Sumo TraCI -> Dashboard UI)
+        // ========================================================
         function updateSimTelemetryUI(payload) {
             if (!payload) return;
             const m = payload.metrics || {};
             const ctrl = payload.controller_info || {};
             const vehs = payload.vehicles || [];
+            const int4 = payload.intersection_4way || (payload.telemetry && payload.telemetry.intersection_4way) || {};
+            const app = int4.approaches || {};
 
-            // KPIs
+            // 1. Top KPIs
             document.getElementById('kpi-active-count').textContent = m.total_active || vehs.length;
             document.getElementById('kpi-queued-count').textContent = m.total_queued || 0;
             document.getElementById('kpi-queue-pct').textContent = `${m.queue_ratio_pct || 0}% queued`;
@@ -2912,79 +3538,84 @@
             document.getElementById('kpi-congestion-bar').style.width = `${congPct}%`;
             document.getElementById('kpi-congestion-bar').style.background = congPct > 50 ? '#ef4444' : (congPct > 25 ? '#f59e0b' : '#10b981');
 
-            // Top Canvas Autonomous Traffic Intel Ribbon
+            // 2. Directional Approach Overlays on Canvas
+            const updateApproachOverlay = (tagId, valId, data, dirName) => {
+                const el = document.getElementById(valId);
+                if (el && data) {
+                    el.textContent = `Queue: ${data.queued_count} | Flow: ${data.avg_speed_kmh} km/h`;
+                    el.style.color = data.queued_count > 0 ? '#ef4444' : '#10b981';
+                }
+            };
+            updateApproachOverlay('tag-north', 'val-north', app.north, 'North');
+            updateApproachOverlay('tag-south', 'val-south', app.south, 'South');
+            updateApproachOverlay('tag-east',  'val-east',  app.east,  'East');
+            updateApproachOverlay('tag-west',  'val-west',  app.west,  'West');
+
+            // 3. Sidebar 4-Way Approach Live Queues Card
+            const updateSidebarApproach = (qId, sigId, barId, data) => {
+                if (!data) return;
+                const qEl = document.getElementById(qId);
+                const sigEl = document.getElementById(sigId);
+                const barEl = document.getElementById(barId);
+
+                if (qEl) qEl.textContent = `${data.queued_count} queued (${data.approaching_count} active)`;
+                if (sigEl) {
+                    sigEl.textContent = data.signal_color;
+                    sigEl.className = `approach-sig-pill ${data.signal_color === 'GREEN' ? 'sig-green' : (data.signal_color === 'YELLOW' ? 'sig-yellow' : 'sig-red')}`;
+                }
+                if (barEl) {
+                    barEl.style.width = `${Math.min(100, data.queued_count * 12)}%`;
+                    barEl.style.background = data.queued_count > 4 ? '#ef4444' : '#0284c7';
+                }
+            };
+            updateSidebarApproach('card-q-north', 'card-sig-north', 'bar-q-north', app.north);
+            updateSidebarApproach('card-q-south', 'card-sig-south', 'bar-q-south', app.south);
+            updateSidebarApproach('card-q-east',  'card-sig-east',  'bar-q-east',  app.east);
+            updateSidebarApproach('card-q-west',  'card-sig-west',  'bar-q-west',  app.west);
+
+            // 4. Autonomous Intel Ribbon
             const intelDot = document.getElementById('intel-cong-dot');
             const intelVal = document.getElementById('intel-cong-val');
             const intelAction = document.getElementById('intel-ai-action');
-            const intelSaved = document.getElementById('intel-delay-saved');
+            const intelPhase = document.getElementById('intel-phase-display');
+            const intelTotQ = document.getElementById('intel-total-queued');
 
-            if (congPct > 50) {
-                intelDot.style.background = '#ef4444';
-                intelDot.style.boxShadow = '0 0 10px #ef4444';
-                intelVal.textContent = `HEAVY QUEUE (${congPct}%)`;
-                intelVal.style.color = '#ef4444';
-            } else if (congPct > 25) {
-                intelDot.style.background = '#f59e0b';
-                intelDot.style.boxShadow = '0 0 10px #f59e0b';
-                intelVal.textContent = `MODERATE (${congPct}%)`;
-                intelVal.style.color = '#f59e0b';
+            const totQ = int4.total_intersection_queue !== undefined ? int4.total_intersection_queue : (m.total_queued || 0);
+            if (intelTotQ) intelTotQ.textContent = `${totQ} VEHICLES`;
+
+            if (totQ > 6) {
+                if (intelDot) { intelDot.style.background = '#ef4444'; intelDot.style.boxShadow = '0 0 10px #ef4444'; }
+                if (intelVal) { intelVal.textContent = `SURGE CONGESTION (${totQ} QUEUED)`; intelVal.style.color = '#ef4444'; }
+            } else if (totQ > 2) {
+                if (intelDot) { intelDot.style.background = '#f59e0b'; intelDot.style.boxShadow = '0 0 10px #f59e0b'; }
+                if (intelVal) { intelVal.textContent = `MODERATE TRAFFIC (${totQ} QUEUED)`; intelVal.style.color = '#f59e0b'; }
             } else {
-                intelDot.style.background = '#10b981';
-                intelDot.style.boxShadow = '0 0 10px #10b981';
-                intelVal.textContent = `FREE FLOW (${congPct}%)`;
-                intelVal.style.color = '#10b981';
+                if (intelDot) { intelDot.style.background = '#10b981'; intelDot.style.boxShadow = '0 0 10px #10b981'; }
+                if (intelVal) { intelVal.textContent = `FREE FLOW`; intelVal.style.color = '#10b981'; }
             }
 
-            if (ctrl.explanation) {
+            if (intelPhase) {
+                intelPhase.textContent = int4.phase_description ? int4.phase_description.toUpperCase() : 'NORTH-SOUTH GREEN';
+            }
+            if (intelAction && ctrl.explanation) {
                 intelAction.textContent = ctrl.phase_description ? `FLUSHING ${ctrl.phase_description.toUpperCase()}` : 'OPTIMAL ADAPTIVE FLOW';
             }
-            intelSaved.textContent = congPct > 40 ? '+42.8% VS FIXED' : '+38.5% VS FIXED';
 
-            // Explainable AI Engine Card
+            // 5. Explainable AI Engine Card
             if (ctrl.explanation) {
                 document.getElementById('ai-explanation-text').textContent = ctrl.explanation;
-                document.getElementById('ai-active-corridor').textContent = ctrl.phase_description || 'Active Green';
-                document.getElementById('ai-green-elapsed').textContent = `${ctrl.green_elapsed_sec || ctrl.stage_elapsed_sec || 0.0}s`;
+                document.getElementById('ai-active-corridor').textContent = ctrl.phase_description || 'North-South Boulevard';
+                document.getElementById('ai-green-elapsed').textContent = `${(ctrl.green_elapsed_sec || ctrl.stage_elapsed_sec || 0.0).toFixed(1)}s`;
                 document.getElementById('ai-transition-state').textContent = ctrl.is_transitioning ? 'CLEARANCE / TRANSITION' : 'ACTIVE DISCHARGE';
                 document.getElementById('ai-transition-state').style.color = ctrl.is_transitioning ? '#f59e0b' : '#10b981';
             }
 
-            // Junction Congestion Matrix
-            const tls = payload.traffic_lights || {};
-            const qCentral = tls.TL_CENTRAL?.queued_vehicles || 0;
-            const qNW = tls.TL_NW?.queued_vehicles || 0;
-            const qNE = tls.TL_NE?.queued_vehicles || 0;
-            const qSW = tls.TL_SW?.queued_vehicles || 0;
-            const qSE = tls.TL_SE?.queued_vehicles || 0;
-            const qRB = payload.roundabout?.entry_queue_count || 0;
-            const qTJ = payload.t_junction?.queue_count || 0;
-
-            document.getElementById('junc-q-central').textContent = `${qCentral} queued`;
-            document.getElementById('junc-bar-central').style.width = `${Math.min(100, (qCentral / 40) * 100)}%`;
-            document.getElementById('junc-bar-central').style.background = qCentral > 15 ? '#ef4444' : '#0284c7';
-
-            document.getElementById('junc-q-roundabout').textContent = `${qRB} queued`;
-            document.getElementById('junc-bar-roundabout').style.width = `${Math.min(100, (qRB / 10) * 100)}%`;
-
-            document.getElementById('junc-q-tjunc').textContent = `${qTJ} queued`;
-            document.getElementById('junc-bar-tjunc').style.width = `${Math.min(100, (qTJ / 15) * 100)}%`;
-
-            document.getElementById('junc-q-ne').textContent = `${qNE} queued`;
-            document.getElementById('junc-bar-ne').style.width = `${Math.min(100, (qNE / 25) * 100)}%`;
-
-            document.getElementById('junc-q-nw').textContent = `${qNW} queued`;
-            document.getElementById('junc-bar-nw').style.width = `${Math.min(100, (qNW / 25) * 100)}%`;
-
-            // Vehicle Classes
+            // 6. Vehicle Class Counts
             const counts = m.class_counts || {};
             document.getElementById('class-cnt-car').textContent = counts.car || 0;
             document.getElementById('class-cnt-motorcycle').textContent = counts.motorcycle || 0;
             document.getElementById('class-cnt-bus').textContent = counts.bus || 0;
             document.getElementById('class-cnt-truck').textContent = counts.truck || 0;
-
-            // Live Sector HUD update
-            const p = SECTOR_3D_PRESETS[activeSectorKey] || SECTOR_3D_PRESETS['CITY_OVERVIEW'];
-            updateSectorHUD(activeSectorKey, p);
         }
 
 

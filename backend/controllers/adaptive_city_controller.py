@@ -15,12 +15,10 @@ from backend.config import DQN_MODEL_PATH, SIMULATION_STEP_LENGTH
 from backend.rlagent.city_dqn_agent import CityDQNAgent
 from backend.controllers.multi_junction_fixed import MultiJunctionFixedController
 
-# 4 Central Plaza Corridors exactly matching city.net.xml (20 total phases)
+# 2 Primary Corridors for 4-Way TL_CENTRAL matching city.net.xml (4 phases)
 CENTRAL_CORRIDORS = {
     0: {"green": 0, "yellow": 1, "desc": "North-South Grand Boulevard"},
-    1: {"green": 2, "yellow": 3, "desc": "East-West Grand Arterial"},
-    2: {"green": 0, "yellow": 1, "desc": "North Spine Express Corridor"},
-    3: {"green": 2, "yellow": 3, "desc": "West Highway Express Inflow"}
+    1: {"green": 2, "yellow": 3, "desc": "East-West Grand Arterial"}
 }
 
 CLASS_WEIGHTS = {"car": 1.0, "motorcycle": 0.6, "bus": 2.5, "truck": 1.8}
@@ -88,54 +86,69 @@ class AdaptiveCityController:
                 city_runner.set_tl_phase(sat_tl, sat_phases[sat_tl])
                 target_phases[sat_tl] = sat_phases[sat_tl]
 
-        # 2. Extract Corridor Queues for Central Plaza
-        q0 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("midn" in v.get("edge","").lower() or "mids" in v.get("edge","").lower()))
-        q1 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("tjunc" in v.get("edge","").lower() or "rb_to_central" in v.get("edge","").lower()))
-        q2 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and "midn_to_central" in v.get("edge","").lower())
-        q3 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and "rb_to_central" in v.get("edge","").lower())
-        corridor_queues = {0: q0, 1: q1, 2: q2, 3: q3}
+        # 2. Extract 4-Way Approach Queues & Inflow for TL_CENTRAL
+        q_north = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and v.get("edge") == "midN_to_central")
+        q_south = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and v.get("edge") == "midS_to_central")
+        q_east  = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and v.get("edge") == "tjunc_to_central")
+        q_west  = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and v.get("edge") == "rb_to_central")
+
+        app_north = sum(1 for v in vehs if v.get("edge") == "midN_to_central")
+        app_south = sum(1 for v in vehs if v.get("edge") == "midS_to_central")
+        app_east  = sum(1 for v in vehs if v.get("edge") == "tjunc_to_central")
+        app_west  = sum(1 for v in vehs if v.get("edge") == "rb_to_central")
+
+        q_ns = q_north + q_south
+        q_ew = q_east + q_west
+        app_ns = app_north + app_south
+        app_ew = app_east + app_west
+
+        corridor_queues = {0: q_ns, 1: q_ew}
         self.last_corridor_queues = corridor_queues
 
         self.stage_timer += self.step_length
         grp = CENTRAL_CORRIDORS[self.current_corridor]
+        other_corridor = 1 if self.current_corridor == 0 else 0
+        cur_q = corridor_queues[self.current_corridor]
+        other_q = corridor_queues[other_corridor]
+        cur_app = app_ns if self.current_corridor == 0 else app_ew
+        other_app = app_ew if self.current_corridor == 0 else app_ns
 
-        # 3. Central Plaza Signal State Machine
+        # 3. Central Plaza Signal State Machine (Safe NEMA 4-Phase Logic)
         if self.stage == "MAIN_GREEN":
-            # Query DQN agent
             action = self.agent.select_action(state, eval_mode=True)
             self.last_action = action
 
-            min_g = 5.0
-            cur_q = corridor_queues[self.current_corridor]
-            max_g = 26.0 if cur_q >= 5.0 else 14.0
-
-            max_other_q = max(corridor_queues[g] for g in corridor_queues if g != self.current_corridor)
-            heaviest_other = max([g for g in [0, 1, 2, 3] if g != self.current_corridor], key=lambda g: corridor_queues[g])
-
+            min_g = 6.0   # Minimum green for safe driver reaction
+            max_g = 35.0  # Maximum green to prevent indefinite starvation
             should_switch = False
-            # Check smart queue relief: if opposing corridor has heavy traffic, switch immediately once min_g met
-            if self.stage_timer >= min_g and corridor_queues[heaviest_other] >= 5.0 and cur_q < 3.0:
+
+            # Check 1: Surge / Heavy Congestion on opposing corridor
+            if self.stage_timer >= min_g and other_q >= 4.0 and cur_q < 3.0:
                 should_switch = True
-                self.target_corridor = heaviest_other
+                self.target_corridor = other_corridor
                 self.last_explanation = (
-                    f"⚡ SMART AUTO-CORRECTION: Heavy traffic detected on {CENTRAL_CORRIDORS[heaviest_other]['desc']} "
-                    f"({corridor_queues[heaviest_other]:.0f} queued) → Switching signal to GREEN to clear congestion!"
+                    f"⚡ AI SURGE RESPONSE: Heavy traffic detected on {CENTRAL_CORRIDORS[other_corridor]['desc']} "
+                    f"({other_q:.0f} queued) → Switching signal to GREEN to clear congestion!"
                 )
-            # Check maximum green constraint
+            # Check 2: Dynamic Queue Depletion (current green is empty, cross street waiting)
+            elif self.stage_timer >= min_g and cur_q == 0 and cur_app <= 1 and other_q > 0:
+                should_switch = True
+                self.target_corridor = other_corridor
+                saved_s = max(0.0, round(25.0 - self.stage_timer, 1))
+                self.last_explanation = (
+                    f"🧠 AI Adaptive (DQN): {grp['desc']} is clear (0 queued). "
+                    f"Cutting green short (saved {saved_s}s wasted time) → Transitioning to {CENTRAL_CORRIDORS[other_corridor]['desc']} ({other_q:.0f} queued)."
+                )
+            # Check 3: Maximum Green Safety Constraint
             elif self.stage_timer >= max_g:
                 should_switch = True
-                self.target_corridor = heaviest_other
+                self.target_corridor = other_corridor
                 self.last_explanation = f"DQN Max-Green Gate: {grp['desc']} reached {max_g}s limit. Transitioning to clear cross queues."
-            # Check dynamic queue relief (approach cleared)
-            elif self.stage_timer >= min_g and cur_q == 0 and max_other_q > 0:
+            # Check 4: Explicit DQN Recommendation
+            elif self.stage_timer >= min_g and action == other_corridor and other_q >= 2.0:
                 should_switch = True
-                self.target_corridor = heaviest_other
-                self.last_explanation = f"DQN Queue Depletion: {grp['desc']} queue cleared; transitioning early to relieve waiting traffic."
-            # Check explicit DQN recommendation
-            elif self.stage_timer >= min_g and action != self.current_corridor and corridor_queues[action] >= 2.0:
-                should_switch = True
-                self.target_corridor = action
-                self.last_explanation = f"DQN Decision: Priority switch selected for {CENTRAL_CORRIDORS[action]['desc']} ({corridor_queues[action]:.0f} waiting)."
+                self.target_corridor = other_corridor
+                self.last_explanation = f"DQN Decision: Priority switch selected for {CENTRAL_CORRIDORS[other_corridor]['desc']} ({other_q:.0f} waiting)."
 
             if should_switch:
                 self.stage = "MAIN_YELLOW"
@@ -146,22 +159,16 @@ class AdaptiveCityController:
                 self.extensions_count += 1
                 city_runner.set_tl_phase("TL_CENTRAL", grp["green"])
                 target_phases["TL_CENTRAL"] = grp["green"]
-                if not "Max-Green" in self.last_explanation and not "Queue" in self.last_explanation:
+                if "SURGE" not in self.last_explanation and "Cutting" not in self.last_explanation and "Max-Green" not in self.last_explanation:
                     self.last_explanation = (
-                        f"DQN Decision: Holding green on {grp['desc']} (active {round(self.stage_timer, 1)}s). "
-                        f"Discharging active traffic stream; {tot_q} vehicles queued across network."
+                        f"DQN Decision: Holding green on {grp['desc']} ({round(self.stage_timer, 1)}s elapsed). "
+                        f"Discharging active traffic stream ({cur_q:.0f} queued); {tot_q} vehicles queued across network."
                     )
 
         elif self.stage == "MAIN_YELLOW":
+            # Strict 3.0s Yellow Clearance
             if self.stage_timer >= 3.0:
-                best_corridor = max([0, 1, 2, 3], key=lambda g: corridor_queues[g])
-                if corridor_queues[best_corridor] >= 3.0 and best_corridor != self.current_corridor:
-                    self.current_corridor = best_corridor
-                elif hasattr(self, 'target_corridor') and self.target_corridor != self.current_corridor:
-                    self.current_corridor = self.target_corridor
-                else:
-                    self.current_corridor = 1 if self.current_corridor in [0, 2] else 0
-
+                self.current_corridor = 1 if self.current_corridor == 0 else 0
                 self.stage = "MAIN_GREEN"
                 self.stage_timer = 0.0
                 self.switches_count += 1
@@ -182,10 +189,10 @@ class AdaptiveCityController:
         tj = telemetry.get("t_junction", {})
         metrics = telemetry.get("metrics", {})
 
-        q0 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and ("midn" in v.get("edge","").lower() or "mids" in v.get("edge","").lower()))
-        q1 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and ("tjunc" in v.get("edge","").lower() or "rb_to_central" in v.get("edge","").lower()))
-        q2 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and ("nw_to_central" in v.get("edge","").lower() or "se_to_central" in v.get("edge","").lower()))
-        q3 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and ("ne_to_central" in v.get("edge","").lower() or "sw_to_central" in v.get("edge","").lower()))
+        q0 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and v.get("edge") == "midN_to_central")
+        q1 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and v.get("edge") == "midS_to_central")
+        q2 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and v.get("edge") == "tjunc_to_central")
+        q3 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued", False) and v.get("edge") == "rb_to_central")
 
         state = [
             min(1.0, q0 / 35.0),

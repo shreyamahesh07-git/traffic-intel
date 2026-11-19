@@ -105,7 +105,7 @@ class CitySimulationRunner:
         self.is_running = False
         self.step_count = 0
         self.current_time = 0.0
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
 
         # Traffic light IDs (7 Signalized Junctions across the Connected City)
         self.tl_ids = ["TL_CENTRAL", "TL_NW", "TL_NE", "TL_SW", "TL_SE", "GATE_MID_N", "GATE_MID_S"]
@@ -115,6 +115,11 @@ class CitySimulationRunner:
         self.next_vid_num = 1
         self.total_departed = 0
         self.total_arrived = 0
+
+        # Scenario & Surge State
+        self.active_scenario = "NORMAL"
+        self.pending_surge: List[Dict[str, Any]] = []
+        self.surge_counter = 0
 
         # Geometry cache
         self._cached_geometry: Optional[Dict[str, Any]] = None
@@ -244,6 +249,22 @@ class CitySimulationRunner:
             traci.simulationStep()
             self.step_count += 1
             self.current_time = round(self.step_count * self.step_length, 2)
+
+            # Smoothly inject pending surge vehicles (1 vehicle every 3 steps = 1.5s)
+            if self.pending_surge and (self.step_count % 3 == 0):
+                item = self.pending_surge.pop(0)
+                try:
+                    traci.vehicle.add(
+                        veh_id=item["vid"],
+                        routeID=item["route"],
+                        typeID=item["type"],
+                        departLane="best",
+                        departSpeed="max"
+                    )
+                    self.vehicle_id_map[item["vid"]] = self.next_vid_num
+                    self.next_vid_num += 1
+                except Exception as e:
+                    pass
 
             self.total_departed += traci.simulation.getDepartedNumber()
             self.total_arrived += traci.simulation.getArrivedNumber()
@@ -375,6 +396,53 @@ class CitySimulationRunner:
         congestion_pct = min(100.0, round(queue_ratio * 1.5 + min(30.0, total_waiting * 0.1), 1))
         congestion_status = "SMOOTH" if congestion_pct < 25 else ("MODERATE" if congestion_pct < 60 else "CONGESTED")
 
+        # -------------------------------------------------------------
+        # 4-WAY FOCUSED INTERSECTION TELEMETRY (TL_CENTRAL Focus)
+        # -------------------------------------------------------------
+        central_phase = tl_states.get("TL_CENTRAL", {}).get("phase_index", 0)
+        
+        # Approaches leading directly into TL_CENTRAL
+        north_vehs = [v for v in vehicles if v["edge"] == "midN_to_central"]
+        south_vehs = [v for v in vehicles if v["edge"] == "midS_to_central"]
+        east_vehs  = [v for v in vehicles if v["edge"] == "tjunc_to_central"]
+        west_vehs  = [v for v in vehicles if v["edge"] == "rb_to_central"]
+
+        def _calc_approach(v_list, is_ns: bool):
+            q_cnt = sum(1 for v in v_list if v["is_queued"])
+            avg_s = round(sum(v["speed_kmh"] for v in v_list) / len(v_list), 1) if v_list else 0.0
+            avg_w = round(sum(v["waiting_time"] for v in v_list) / len(v_list), 1) if v_list else 0.0
+            if is_ns:
+                sig = "GREEN" if central_phase == 0 else ("YELLOW" if central_phase == 1 else "RED")
+            else:
+                sig = "GREEN" if central_phase == 2 else ("YELLOW" if central_phase == 3 else "RED")
+            return {
+                "queued_count": q_cnt,
+                "approaching_count": len(v_list),
+                "avg_speed_kmh": avg_s,
+                "avg_waiting_sec": avg_w,
+                "signal_color": sig,
+                "vehicles": v_list
+            }
+
+        intersection_4way = {
+            "id": "TL_CENTRAL",
+            "name": "Central 4-Way Crossroads",
+            "center": [760.0, 440.0],
+            "active_phase": central_phase,
+            "phase_description": "North-South Grand Boulevard" if central_phase in (0, 1) else "East-West Grand Arterial",
+            "signal_state": "GREEN_NS" if central_phase == 0 else ("YELLOW_NS" if central_phase == 1 else ("GREEN_EW" if central_phase == 2 else "YELLOW_EW")),
+            "active_scenario": self.active_scenario,
+            "pending_surge_count": len(self.pending_surge),
+            "approaches": {
+                "north": _calc_approach(north_vehs, is_ns=True),
+                "south": _calc_approach(south_vehs, is_ns=True),
+                "east":  _calc_approach(east_vehs,  is_ns=False),
+                "west":  _calc_approach(west_vehs,  is_ns=False)
+            },
+            "total_intersection_queue": sum(1 for v in north_vehs + south_vehs + east_vehs + west_vehs if v["is_queued"]),
+            "total_intersection_active": len(north_vehs + south_vehs + east_vehs + west_vehs)
+        }
+
         return {
             "simulation_time": self.current_time,
             "step_count": self.step_count,
@@ -383,6 +451,7 @@ class CitySimulationRunner:
             "total_arrived": self.total_arrived,
             "vehicles": vehicles,
             "traffic_lights": tl_states,
+            "intersection_4way": intersection_4way,
             "roundabout": {
                 "name": "Garden Parkway Roundabout",
                 "center": [220.0, 440.0],
@@ -446,6 +515,63 @@ class CitySimulationRunner:
             except Exception as e:
                 print(f"Error spawning emergency vehicle: {e}")
                 return ""
+
+    def create_traffic_surge(self, approach: str = "north", count: int = 8) -> int:
+        """
+        Injects a surge of real SUMO vehicles on the selected 4-way approach.
+        Vehicles enter naturally, follow routes, stop at red, and form a queue.
+        """
+        route_map = {
+            "north": "r_surge_north",
+            "south": "r_surge_south",
+            "east":  "r_surge_east",
+            "west":  "r_surge_west"
+        }
+        route_id = route_map.get(approach.lower(), "r_surge_north")
+        classes = ["car", "car", "car", "motorcycle", "car", "truck", "car", "bus", "car", "car"]
+        
+        with self.lock:
+            for i in range(count):
+                self.surge_counter += 1
+                vid = f"surge_{approach.lower()}_{self.surge_counter}_{i}"
+                vtype = classes[i % len(classes)]
+                self.pending_surge.append({
+                    "vid": vid,
+                    "route": route_id,
+                    "type": vtype,
+                    "approach": approach.lower()
+                })
+            print(f"CitySimulationRunner: Queued surge of {count} vehicles on {approach.upper()} approach")
+            return count
+
+    def set_scenario(self, scenario_name: str) -> str:
+        """
+        Configures experimental traffic scenarios:
+        - NORMAL: Balanced moderate traffic (~25-35 vehicles)
+        - SURGE_NORTH: Concentrated heavy demand surge on North approach
+        - UNEVEN: North heavy, South moderate, East/West sparse
+        """
+        scenario = scenario_name.upper()
+        with self.lock:
+            self.active_scenario = scenario
+            self.pending_surge.clear()
+            if scenario == "SURGE_NORTH":
+                self.create_traffic_surge(approach="north", count=10)
+            elif scenario == "UNEVEN":
+                self.create_traffic_surge(approach="north", count=8)
+                self.create_traffic_surge(approach="south", count=3)
+            elif scenario == "NORMAL":
+                pass
+            print(f"CitySimulationRunner: Switched scenario to {scenario}")
+            return scenario
+
+    def reset_scenario(self) -> str:
+        """Resets simulation scenario back to balanced Normal state."""
+        with self.lock:
+            self.active_scenario = "NORMAL"
+            self.pending_surge.clear()
+            print("CitySimulationRunner: Scenario reset to NORMAL")
+            return "NORMAL"
 
     def restart(self):
         """Restarts the simulation."""

@@ -361,3 +361,4 @@ closeup_path = os.path.join(ARTIFACT_DIR, "new_central_plaza_closeup.png")
 plt.savefig(closeup_path, dpi=200, bbox_inches="tight", facecolor="#0f172a")
 plt.close()
 print(f"Saved closeup verification figure to: {closeup_path}")
+
