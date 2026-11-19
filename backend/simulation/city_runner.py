@@ -30,8 +30,8 @@ CAMERA_ZONES = {
     "CITY_OVERVIEW": {
         "id": "CITY_OVERVIEW",
         "name": "City Overview (Full Grid)",
-        "center": [740.0, 380.0],
-        "zoom": 1.0,
+        "center": [720.0, 380.0],
+        "zoom": 0.65,
         "description": "Full connected urban network with 5 junctions, roundabout, and expressways."
     },
     "CITY_SQUARE": {
@@ -167,6 +167,8 @@ class CitySimulationRunner:
                 cy = sum(c[1] for c in coords) / len(coords)
                 roundabouts.append({
                     "center": [round(cx, 2), round(cy, 2)],
+                    "center_x": round(cx, 2),
+                    "center_y": round(cy, 2),
                     "radius": 50.0,
                     "nodes": list(rb_nodes),
                     "edges": list(rb.getEdges())
@@ -182,8 +184,17 @@ class CitySimulationRunner:
                 "height": round(max_y - min_y, 2)
             },
             "roads": roads,
+            "edges": roads,
             "junctions": junctions,
+            "nodes": junctions,
             "roundabouts": roundabouts,
+            "roundabout": roundabouts[0] if roundabouts else {
+                "center": [220.0, 380.0],
+                "center_x": 220.0,
+                "center_y": 380.0,
+                "radius": 50.0,
+                "nodes": ["RB_W", "RB_E", "RB_N", "RB_S"]
+            },
             "camera_zones": CAMERA_ZONES
         }
         return self._cached_geometry

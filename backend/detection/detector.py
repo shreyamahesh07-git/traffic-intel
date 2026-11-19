@@ -49,7 +49,7 @@ def calc_box_iou(b1, b2):
     contain = inter / min(a1, a2) if min(a1, a2) > 0 else 0.0
     return iou, contain
 
-def apply_nms(detections, iou_thresh=0.32, contain_thresh=0.55):
+def apply_nms(detections, iou_thresh=0.30, contain_thresh=0.45):
     """Suppresses duplicate and overlapping candidate boxes for the same vehicle."""
     if not detections or len(detections) <= 1:
         return detections
