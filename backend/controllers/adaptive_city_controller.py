@@ -93,6 +93,7 @@ class AdaptiveCityController:
         q2 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("nw_to_central" in v.get("edge","").lower() or "se_to_central" in v.get("edge","").lower()))
         q3 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("ne_to_central" in v.get("edge","").lower() or "sw_to_central" in v.get("edge","").lower()))
         corridor_queues = {0: q0, 1: q1, 2: q2, 3: q3}
+        self.last_corridor_queues = corridor_queues
 
         self.stage_timer += self.step_length
         grp = CENTRAL_CORRIDORS[self.current_corridor]
@@ -103,20 +104,32 @@ class AdaptiveCityController:
             action = self.agent.select_action(state, eval_mode=True)
             self.last_action = action
 
-            min_g = 5.0 if self.current_corridor in [0, 2] else 7.0
-            max_g = 12.0 if self.current_corridor in [0, 2] else 20.0
-            
+            # Dynamic Green Duration: if current corridor has heavy queue, allow extended green to flush it
+            min_g = 5.0 if self.current_corridor in [0, 2] else 6.0
             cur_q = corridor_queues[self.current_corridor]
+            max_g = 26.0 if cur_q >= 6.0 else (12.0 if self.current_corridor in [0, 2] else 18.0)
+            
             max_other_q = max(corridor_queues[g] for g in corridor_queues if g != self.current_corridor)
+            heaviest_other = max([g for g in [0, 1, 2, 3] if g != self.current_corridor], key=lambda g: corridor_queues[g])
 
             should_switch = False
-            # Check maximum green constraint
-            if self.stage_timer >= max_g:
+            # Check smart queue relief: if opposing corridor has heavy traffic, switch immediately once min_g met
+            if self.stage_timer >= min_g and corridor_queues[heaviest_other] >= 6.0 and cur_q < 4.0:
                 should_switch = True
+                self.target_corridor = heaviest_other
+                self.last_explanation = (
+                    f"⚡ SMART AUTO-CORRECTION: Heavy traffic detected on {CENTRAL_CORRIDORS[heaviest_other]['desc']} "
+                    f"({corridor_queues[heaviest_other]:.0f} queued) → Switching signal to GREEN to clear congestion!"
+                )
+            # Check maximum green constraint
+            elif self.stage_timer >= max_g:
+                should_switch = True
+                self.target_corridor = heaviest_other
                 self.last_explanation = f"DQN Max-Green Gate: {grp['desc']} reached {max_g}s limit. Transitioning to clear cross queues."
             # Check dynamic queue relief (approach cleared)
             elif self.stage_timer >= min_g and cur_q == 0 and max_other_q > 0:
                 should_switch = True
+                self.target_corridor = heaviest_other
                 self.last_explanation = f"DQN Queue Depletion: {grp['desc']} queue cleared; transitioning early to relieve waiting traffic."
             # Check explicit DQN recommendation
             elif self.stage_timer >= min_g and action != self.current_corridor and corridor_queues[action] >= 2.0:
@@ -171,13 +184,14 @@ class AdaptiveCityController:
 
         elif self.stage == "ALL_RED":
             if self.stage_timer >= 1.0:
-                # Select target corridor: prioritize highest queue or sequential rotation
-                next_seq = (self.current_corridor + 1) % 4
+                # Select target corridor: prioritize highest queue or explicit target corridor
                 best_corridor = max([0, 1, 2, 3], key=lambda g: corridor_queues[g])
                 if corridor_queues[best_corridor] >= 3.0 and best_corridor != self.current_corridor:
                     self.current_corridor = best_corridor
+                elif hasattr(self, 'target_corridor') and self.target_corridor != self.current_corridor:
+                    self.current_corridor = self.target_corridor
                 else:
-                    self.current_corridor = next_seq
+                    self.current_corridor = (self.current_corridor + 1) % 4
 
                 self.stage = "MAIN_GREEN"
                 self.stage_timer = 0.0
@@ -185,7 +199,7 @@ class AdaptiveCityController:
                 new_grp = CENTRAL_CORRIDORS[self.current_corridor]
                 city_runner.set_tl_phase("TL_CENTRAL", new_grp["main_green"])
                 target_phases["TL_CENTRAL"] = new_grp["main_green"]
-                self.last_explanation = f"DQN Actuation: Green granted to {new_grp['desc']} (Queue: {corridor_queues[self.current_corridor]:.0f})."
+                self.last_explanation = f"⚡ SMART SIGNAL ACTUATION: Priority green granted to {new_grp['desc']} ({corridor_queues[self.current_corridor]:.0f} waiting) to flush congestion."
             else:
                 city_runner.set_tl_phase("TL_CENTRAL", grp["all_red"])
                 target_phases["TL_CENTRAL"] = grp["all_red"]
@@ -257,3 +271,9 @@ class AdaptiveCityController:
             "total_green_extensions": self.extensions_count,
             "explanation": self.last_explanation
         }
+
+    def get_heaviest_corridor(self) -> int:
+        """Returns the corridor ID with the largest waiting queue at Central Plaza."""
+        if hasattr(self, 'last_corridor_queues') and self.last_corridor_queues:
+            return max(self.last_corridor_queues.keys(), key=lambda k: self.last_corridor_queues[k])
+        return 0

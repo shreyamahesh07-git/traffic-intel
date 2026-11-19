@@ -225,6 +225,20 @@ def control_mode(mode: str = Form(...)):
     sim_manager.set_controller_mode(mode)
     return {"status": "mode_updated", "mode": sim_manager.controller_mode}
 
+@app.post("/api/control/flush_corridor")
+def control_flush_corridor(corridor_id: Optional[int] = Form(None)):
+    from backend.controllers.adaptive_city_controller import CENTRAL_CORRIDORS
+    if corridor_id is None:
+        corridor_id = sim_manager.adaptive_controller.get_heaviest_corridor()
+    sim_manager.adaptive_controller.current_corridor = corridor_id
+    sim_manager.adaptive_controller.stage = "MAIN_GREEN"
+    sim_manager.adaptive_controller.stage_timer = 0.0
+    grp = CENTRAL_CORRIDORS.get(corridor_id, CENTRAL_CORRIDORS[0])
+    if sim_manager.city_runner:
+        sim_manager.city_runner.set_tl_phase("TL_CENTRAL", grp["main_green"])
+    sim_manager.adaptive_controller.last_explanation = f"⚡ SMART SIGNAL OVERRIDE: Actuated priority GREEN for {grp['desc']} to flush waiting queue!"
+    return {"status": "corridor_flushed", "corridor": corridor_id, "desc": grp["desc"]}
+
 @app.get("/api/video/sample_data")
 def get_sample_video_data():
     """Return cached YOLOv8 detections and tracking data for the default real traffic video."""
