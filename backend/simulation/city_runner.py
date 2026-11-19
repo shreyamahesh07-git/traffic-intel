@@ -30,49 +30,63 @@ CAMERA_ZONES = {
     "CITY_OVERVIEW": {
         "id": "CITY_OVERVIEW",
         "name": "City Overview (Full Grid)",
-        "center": [720.0, 380.0],
+        "center": [740.0, 440.0],
         "zoom": 0.65,
-        "description": "Full connected urban network with 5 junctions, roundabout, and expressways."
+        "description": "Full connected urban network with 7 signalized junctions, roundabout, and expressways."
     },
     "CITY_SQUARE": {
         "id": "CITY_SQUARE",
         "name": "City Square (Central Plaza)",
-        "center": [740.0, 380.0],
+        "center": [760.0, 440.0],
         "zoom": 2.8,
-        "description": "High-density 4-way central intersection TL_CENTRAL with 12 approaching lanes."
+        "description": "Realistic 4-way central crossroads TL_CENTRAL with dedicated turning bays."
     },
     "GARDEN_PARKWAY": {
         "id": "GARDEN_PARKWAY",
         "name": "Garden Parkway (Roundabout)",
-        "center": [220.0, 380.0],
+        "center": [220.0, 440.0],
         "zoom": 2.8,
         "description": "Continuous priority circular roundabout circulating between expressway and inner grid."
     },
     "HIGHWAY_CORRIDOR": {
         "id": "HIGHWAY_CORRIDOR",
         "name": "West Expressway Corridor",
-        "center": [120.0, 380.0],
+        "center": [100.0, 440.0],
         "zoom": 2.4,
         "description": "60 km/h perimeter expressway gateway entering the western city sector."
     },
     "EASTERN_BLVD": {
         "id": "EASTERN_BLVD",
         "name": "Eastern Boulevard (T-Junction)",
-        "center": [1220.0, 380.0],
+        "center": [1240.0, 440.0],
         "zoom": 2.8,
         "description": "3-way priority T-junction TJUNC_EAST linking central boulevard and eastern highway."
     },
     "NORTHWEST_DISTRICT": {
         "id": "NORTHWEST_DISTRICT",
         "name": "Northwest Commercial (TL_NW)",
-        "center": [480.0, 580.0],
+        "center": [440.0, 680.0],
         "zoom": 2.8,
         "description": "Signalized crossroads connecting North Gate and Western Boulevard."
+    },
+    "NORTHEAST_DISTRICT": {
+        "id": "NORTHEAST_DISTRICT",
+        "name": "Northeast Corporate Crossing (TL_NE)",
+        "center": [1080.0, 680.0],
+        "zoom": 2.8,
+        "description": "Corporate district 4-way intersection connecting North Gate and East Highway."
+    },
+    "SOUTHWEST_DISTRICT": {
+        "id": "SOUTHWEST_DISTRICT",
+        "name": "Southwest Arterial Hub (TL_SW)",
+        "center": [440.0, 200.0],
+        "zoom": 2.8,
+        "description": "Industrial arterial junction linking South Gate and Western Parkway."
     },
     "SOUTHEAST_DISTRICT": {
         "id": "SOUTHEAST_DISTRICT",
         "name": "Southeast Logistics Hub (TL_SE)",
-        "center": [1000.0, 180.0],
+        "center": [1080.0, 200.0],
         "zoom": 2.8,
         "description": "Signalized crossroads directing heavy freight and arterial flows to South Gate."
     }
@@ -93,8 +107,8 @@ class CitySimulationRunner:
         self.current_time = 0.0
         self.lock = threading.Lock()
 
-        # Traffic light IDs
-        self.tl_ids = ["TL_CENTRAL", "TL_NW", "TL_NE", "TL_SW", "TL_SE"]
+        # Traffic light IDs (7 Signalized Junctions across the Connected City)
+        self.tl_ids = ["TL_CENTRAL", "TL_NW", "TL_NE", "TL_SW", "TL_SE", "GATE_MID_N", "GATE_MID_S"]
 
         # Vehicle ID mapping for clean integer identification
         self.vehicle_id_map: Dict[str, int] = {}
@@ -189,9 +203,9 @@ class CitySimulationRunner:
             "nodes": junctions,
             "roundabouts": roundabouts,
             "roundabout": roundabouts[0] if roundabouts else {
-                "center": [220.0, 380.0],
+                "center": [220.0, 440.0],
                 "center_x": 220.0,
-                "center_y": 380.0,
+                "center_y": 440.0,
                 "radius": 50.0,
                 "nodes": ["RB_W", "RB_E", "RB_N", "RB_S"]
             },
@@ -371,14 +385,14 @@ class CitySimulationRunner:
             "traffic_lights": tl_states,
             "roundabout": {
                 "name": "Garden Parkway Roundabout",
-                "center": [220.0, 380.0],
+                "center": [220.0, 440.0],
                 "circulating_count": len(rb_vehicles),
                 "avg_speed_kmh": round((rb_speed_sum / len(rb_vehicles)) * 3.6, 1) if rb_vehicles else 0.0,
                 "entry_queue_count": rb_entry_queues
             },
             "t_junction": {
                 "name": "Eastern Boulevard T-Junction",
-                "center": [1220.0, 380.0],
+                "center": [1240.0, 440.0],
                 "active_count": sum(1 for v in vehicles if "tjunc" in v["edge"]),
                 "queue_count": sum(1 for v in vehicles if "tjunc" in v["edge"] and v["is_queued"])
             },
@@ -403,6 +417,35 @@ class CitySimulationRunner:
                 traci.trafficlight.setPhase(tl_id, phase_index)
             except traci.TraCIException as e:
                 print(f"CitySimulationRunner set_tl_phase error on {tl_id}: {e}")
+
+    def set_traffic_scale(self, scale: float) -> bool:
+        """Dynamically scale traffic insertion demand (e.g. 0.5x, 1.0x, 2.0x, 3.5x)."""
+        with self.lock:
+            if self.is_running:
+                try:
+                    traci.simulation.setScale(float(scale))
+                    print(f"CitySimulationRunner: Traffic demand scaled to {scale}x")
+                    return True
+                except Exception as e:
+                    print(f"Error setting traffic scale: {e}")
+            return False
+
+    def spawn_emergency_vehicle(self, route_id: str = "r_W_to_E_arterial") -> str:
+        """Dynamically inject an emergency vehicle (Ambulance/Police) with siren priority."""
+        with self.lock:
+            if not self.is_running:
+                return ""
+            try:
+                vid = f"emergency_{int(time.time()*1000)%100000}"
+                traci.vehicle.add(vid, routeID=route_id, typeID="emergency", departLane="best", departSpeed="max")
+                traci.vehicle.setColor(vid, (255, 30, 30, 255))
+                traci.vehicle.setSpeedMode(vid, 31)
+                self.vehicle_id_map[vid] = 999
+                print(f"CitySimulationRunner: Dispatched Emergency Vehicle {vid} on route {route_id}")
+                return vid
+            except Exception as e:
+                print(f"Error spawning emergency vehicle: {e}")
+                return ""
 
     def restart(self):
         """Restarts the simulation."""

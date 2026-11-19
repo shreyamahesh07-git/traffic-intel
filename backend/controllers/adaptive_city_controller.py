@@ -17,10 +17,10 @@ from backend.controllers.multi_junction_fixed import MultiJunctionFixedControlle
 
 # 4 Central Plaza Corridors exactly matching city.net.xml (20 total phases)
 CENTRAL_CORRIDORS = {
-    0: {"main_green": 0,  "yellow": 1,  "left_green": 2,  "left_yellow": 3,  "all_red": 4,  "desc": "North-South Corridor"},
-    1: {"main_green": 5,  "yellow": 6,  "left_green": 7,  "left_yellow": 8,  "all_red": 9,  "desc": "East-West Arterial"},
-    2: {"main_green": 10, "yellow": 11, "left_green": 12, "left_yellow": 13, "all_red": 14, "desc": "NW-SE Diagonal Avenue"},
-    3: {"main_green": 15, "yellow": 16, "left_green": 17, "left_yellow": 18, "all_red": 19, "desc": "NE-SW Diagonal Avenue"}
+    0: {"green": 0, "yellow": 1, "desc": "North-South Grand Boulevard"},
+    1: {"green": 2, "yellow": 3, "desc": "East-West Grand Arterial"},
+    2: {"green": 0, "yellow": 1, "desc": "North Spine Express Corridor"},
+    3: {"green": 2, "yellow": 3, "desc": "West Highway Express Inflow"}
 }
 
 CLASS_WEIGHTS = {"car": 1.0, "motorcycle": 0.6, "bus": 2.5, "truck": 1.8}
@@ -83,15 +83,16 @@ class AdaptiveCityController:
 
         # 1. Advance Satellite Crossroads via coordinated cycle
         sat_phases = self.satellite_controller.step()
-        for sat_tl in ["TL_NW", "TL_NE", "TL_SW", "TL_SE"]:
-            city_runner.set_tl_phase(sat_tl, sat_phases[sat_tl])
-            target_phases[sat_tl] = sat_phases[sat_tl]
+        for sat_tl in ["TL_NW", "TL_NE", "TL_SW", "TL_SE", "GATE_MID_N", "GATE_MID_S"]:
+            if sat_tl in sat_phases:
+                city_runner.set_tl_phase(sat_tl, sat_phases[sat_tl])
+                target_phases[sat_tl] = sat_phases[sat_tl]
 
         # 2. Extract Corridor Queues for Central Plaza
         q0 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("midn" in v.get("edge","").lower() or "mids" in v.get("edge","").lower()))
         q1 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("tjunc" in v.get("edge","").lower() or "rb_to_central" in v.get("edge","").lower()))
-        q2 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("nw_to_central" in v.get("edge","").lower() or "se_to_central" in v.get("edge","").lower()))
-        q3 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and ("ne_to_central" in v.get("edge","").lower() or "sw_to_central" in v.get("edge","").lower()))
+        q2 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and "midn_to_central" in v.get("edge","").lower())
+        q3 = sum(CLASS_WEIGHTS.get(v.get("class","car"), 1.0) for v in vehs if v.get("is_queued") and "rb_to_central" in v.get("edge","").lower())
         corridor_queues = {0: q0, 1: q1, 2: q2, 3: q3}
         self.last_corridor_queues = corridor_queues
 
@@ -104,17 +105,16 @@ class AdaptiveCityController:
             action = self.agent.select_action(state, eval_mode=True)
             self.last_action = action
 
-            # Dynamic Green Duration: if current corridor has heavy queue, allow extended green to flush it
-            min_g = 5.0 if self.current_corridor in [0, 2] else 6.0
+            min_g = 5.0
             cur_q = corridor_queues[self.current_corridor]
-            max_g = 26.0 if cur_q >= 6.0 else (12.0 if self.current_corridor in [0, 2] else 18.0)
-            
+            max_g = 26.0 if cur_q >= 5.0 else 14.0
+
             max_other_q = max(corridor_queues[g] for g in corridor_queues if g != self.current_corridor)
             heaviest_other = max([g for g in [0, 1, 2, 3] if g != self.current_corridor], key=lambda g: corridor_queues[g])
 
             should_switch = False
             # Check smart queue relief: if opposing corridor has heavy traffic, switch immediately once min_g met
-            if self.stage_timer >= min_g and corridor_queues[heaviest_other] >= 6.0 and cur_q < 4.0:
+            if self.stage_timer >= min_g and corridor_queues[heaviest_other] >= 5.0 and cur_q < 3.0:
                 should_switch = True
                 self.target_corridor = heaviest_other
                 self.last_explanation = (
@@ -144,8 +144,8 @@ class AdaptiveCityController:
                 target_phases["TL_CENTRAL"] = grp["yellow"]
             else:
                 self.extensions_count += 1
-                city_runner.set_tl_phase("TL_CENTRAL", grp["main_green"])
-                target_phases["TL_CENTRAL"] = grp["main_green"]
+                city_runner.set_tl_phase("TL_CENTRAL", grp["green"])
+                target_phases["TL_CENTRAL"] = grp["green"]
                 if not "Max-Green" in self.last_explanation and not "Queue" in self.last_explanation:
                     self.last_explanation = (
                         f"DQN Decision: Holding green on {grp['desc']} (active {round(self.stage_timer, 1)}s). "
@@ -153,56 +153,25 @@ class AdaptiveCityController:
                     )
 
         elif self.stage == "MAIN_YELLOW":
-            if self.stage_timer >= 2.5:
-                self.stage = "LEFT_GREEN"
-                self.stage_timer = 0.0
-                city_runner.set_tl_phase("TL_CENTRAL", grp["left_green"])
-                target_phases["TL_CENTRAL"] = grp["left_green"]
-            else:
-                city_runner.set_tl_phase("TL_CENTRAL", grp["yellow"])
-                target_phases["TL_CENTRAL"] = grp["yellow"]
-
-        elif self.stage == "LEFT_GREEN":
-            if self.stage_timer >= 3.5:
-                self.stage = "LEFT_YELLOW"
-                self.stage_timer = 0.0
-                city_runner.set_tl_phase("TL_CENTRAL", grp["left_yellow"])
-                target_phases["TL_CENTRAL"] = grp["left_yellow"]
-            else:
-                city_runner.set_tl_phase("TL_CENTRAL", grp["left_green"])
-                target_phases["TL_CENTRAL"] = grp["left_green"]
-
-        elif self.stage == "LEFT_YELLOW":
-            if self.stage_timer >= 2.0:
-                self.stage = "ALL_RED"
-                self.stage_timer = 0.0
-                city_runner.set_tl_phase("TL_CENTRAL", grp["all_red"])
-                target_phases["TL_CENTRAL"] = grp["all_red"]
-            else:
-                city_runner.set_tl_phase("TL_CENTRAL", grp["left_yellow"])
-                target_phases["TL_CENTRAL"] = grp["left_yellow"]
-
-        elif self.stage == "ALL_RED":
-            if self.stage_timer >= 1.0:
-                # Select target corridor: prioritize highest queue or explicit target corridor
+            if self.stage_timer >= 3.0:
                 best_corridor = max([0, 1, 2, 3], key=lambda g: corridor_queues[g])
                 if corridor_queues[best_corridor] >= 3.0 and best_corridor != self.current_corridor:
                     self.current_corridor = best_corridor
                 elif hasattr(self, 'target_corridor') and self.target_corridor != self.current_corridor:
                     self.current_corridor = self.target_corridor
                 else:
-                    self.current_corridor = (self.current_corridor + 1) % 4
+                    self.current_corridor = 1 if self.current_corridor in [0, 2] else 0
 
                 self.stage = "MAIN_GREEN"
                 self.stage_timer = 0.0
                 self.switches_count += 1
                 new_grp = CENTRAL_CORRIDORS[self.current_corridor]
-                city_runner.set_tl_phase("TL_CENTRAL", new_grp["main_green"])
-                target_phases["TL_CENTRAL"] = new_grp["main_green"]
+                city_runner.set_tl_phase("TL_CENTRAL", new_grp["green"])
+                target_phases["TL_CENTRAL"] = new_grp["green"]
                 self.last_explanation = f"⚡ SMART SIGNAL ACTUATION: Priority green granted to {new_grp['desc']} ({corridor_queues[self.current_corridor]:.0f} waiting) to flush congestion."
             else:
-                city_runner.set_tl_phase("TL_CENTRAL", grp["all_red"])
-                target_phases["TL_CENTRAL"] = grp["all_red"]
+                city_runner.set_tl_phase("TL_CENTRAL", grp["yellow"])
+                target_phases["TL_CENTRAL"] = grp["yellow"]
 
         return target_phases
 

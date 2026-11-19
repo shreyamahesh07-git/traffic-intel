@@ -445,6 +445,158 @@
             transform: translateY(-1px);
         }
 
+        /* Camera Navigation Dock */
+        .camera-dock {
+            position: absolute;
+            top: 70px;
+            left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 10px;
+            padding: 8px 6px;
+            z-index: 20;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .cam-dock-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .cam-dock-btn:hover {
+            background: #0284c7;
+            border-color: #38bdf8;
+            transform: scale(1.08);
+        }
+
+        .cam-dock-btn.active {
+            background: #0284c7;
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+        }
+
+        .cam-dock-sep {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 2px 2px;
+        }
+
+        /* Atmosphere Dock */
+        .atmosphere-dock {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 9999px;
+            padding: 4px 10px;
+            z-index: 20;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .atmo-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .atmo-btn {
+            background: transparent;
+            border: none;
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .atmo-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .atmo-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(2, 132, 199, 0.6);
+        }
+
+        /* Follow Vehicle HUD */
+        .follow-vehicle-hud {
+            position: absolute;
+            top: 70px;
+            left: 72px;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(12px);
+            border: 1px solid #10b981;
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #f8fafc;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 20;
+            min-width: 250px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .follow-hud-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #10b981;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .follow-close-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 2px 6px;
+            cursor: pointer;
+        }
+
+        .btn-emergency {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        .btn-emergency:hover {
+            background: #991b1b;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        }
+
         /* 3D Navigation Controls Legend (Bottom-Right) */
         .controls-legend {
             position: absolute;
@@ -1067,6 +1219,40 @@
                             <!-- 2D Canvas Fallback -->
                             <canvas id="sim-canvas"></canvas>
 
+                            <!-- 3D Camera Interactive Navigation Dock -->
+                            <div class="camera-dock" id="camera-dock">
+                                <button class="cam-dock-btn" onclick="zoomCamera(0.75)" title="Zoom In (+)">➕</button>
+                                <button class="cam-dock-btn" onclick="zoomCamera(1.25)" title="Zoom Out (-)">➖</button>
+                                <div class="cam-dock-sep"></div>
+                                <button class="cam-dock-btn" onclick="rotateCamera(Math.PI/4)" title="Rotate Left 45°">↺</button>
+                                <button class="cam-dock-btn" onclick="rotateCamera(-Math.PI/4)" title="Rotate Right 45°">↻</button>
+                                <div class="cam-dock-sep"></div>
+                                <button class="cam-dock-btn" id="btn-cam-top" onclick="setCameraAngle('TOP_DOWN')" title="Overhead Top-Down View">📐</button>
+                                <button class="cam-dock-btn active" id="btn-cam-iso" onclick="setCameraAngle('ISOMETRIC')" title="3D Isometric View">🏙️</button>
+                                <button class="cam-dock-btn" id="btn-cam-street" onclick="setCameraAngle('STREET')" title="Street Level View">🚗</button>
+                                <div class="cam-dock-sep"></div>
+                                <button class="cam-dock-btn" id="btn-chase-cam" onclick="toggleFollowRandomVehicle()" title="Follow / Chase Vehicle Cam">🎯</button>
+                            </div>
+
+                            <!-- Atmosphere Day/Sunset/Night Mode Dock -->
+                            <div class="atmosphere-dock">
+                                <span class="atmo-label">Atmosphere:</span>
+                                <button class="atmo-btn active" id="atmo-day-btn" onclick="setAtmosphere('DAY')">☀️ Day</button>
+                                <button class="atmo-btn" id="atmo-sunset-btn" onclick="setAtmosphere('SUNSET')">🌅 Sunset</button>
+                                <button class="atmo-btn" id="atmo-night-btn" onclick="setAtmosphere('NIGHT')">🌙 Cyber Night</button>
+                            </div>
+
+                            <!-- Live Follow Vehicle Telemetry HUD -->
+                            <div class="follow-vehicle-hud" id="follow-vehicle-hud" style="display: none;">
+                                <div class="follow-hud-title">
+                                    <span>🚗 CHASE CAM: <strong id="follow-vid">#CAR_1</strong></span>
+                                    <button class="follow-close-btn" onclick="stopFollowingVehicle()">✕ Exit Chase</button>
+                                </div>
+                                <div class="follow-hud-row"><span>Speed:</span><strong id="follow-vspeed">45.0 km/h</strong></div>
+                                <div class="follow-hud-row"><span>Current Road:</span><strong id="follow-vedge">Central Avenue</strong></div>
+                                <div class="follow-hud-row"><span>Motion Status:</span><strong id="follow-vstatus" style="color: #10b981;">CRUISING</strong></div>
+                            </div>
+
                             <!-- Top Canvas Autonomous Traffic Intel Ribbon -->
                             <div class="canvas-top-intel-bar">
                                 <div class="intel-item">
@@ -1109,7 +1295,7 @@
 
                             <!-- 3D Controls Legend (Bottom-Right) -->
                             <div class="controls-legend">
-                                <span>🖱️ <strong>Left-Drag:</strong> Rotate 360° | <strong>Right-Drag:</strong> Pan | <strong>Scroll:</strong> Zoom | <strong>Click Sector:</strong> Inspect</span>
+                                <span>🖱️ <strong>Left-Drag:</strong> Rotate | <strong>Right-Drag:</strong> Pan | <strong>Scroll:</strong> Zoom | <strong>Click Road:</strong> Center Target | <strong>Click Car:</strong> Chase Cam</span>
                             </div>
                         </div>
 
@@ -1117,26 +1303,37 @@
                         <div class="sim-toolbar">
                             <div class="toolbar-group">
                                 <button class="btn btn-primary" id="sim-play-pause-btn" onclick="toggleSimPause()">
-                                    <span id="sim-play-icon">⏸</span> <span id="sim-play-text">Pause Simulation</span>
+                                    <span id="sim-play-icon">⏸</span> <span id="sim-play-text">Pause</span>
                                 </button>
-                                <button class="btn" onclick="resetSimNetwork()">
-                                    <span>↺</span> Reset Simulation
+                                <button class="btn" onclick="resetSimNetwork()" title="Reset Network">
+                                    <span>↺</span> Reset
                                 </button>
                             </div>
 
                             <div class="toolbar-group">
-                                <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Signal Policy:</span>
+                                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Automation:</span>
                                 <button class="btn btn-success" id="mode-adaptive-btn" onclick="setControllerMode('AI_ADAPTIVE')">
                                     <span>🧠</span> AI Adaptive (DQN)
                                 </button>
+                                <button class="btn" id="mode-wave-btn" onclick="setControllerMode('GREEN_WAVE')">
+                                    <span>🌊</span> Green Wave
+                                </button>
                                 <button class="btn" id="mode-fixed-btn" onclick="setControllerMode('FIXED_TIME')">
-                                    <span>⏱️</span> Fixed-Time Baseline
+                                    <span>⏱️</span> Fixed
                                 </button>
                             </div>
 
                             <div class="toolbar-group">
-                                <button class="btn" onclick="setCameraSector('CITY_OVERVIEW')">
-                                    <span>🔍</span> Reset 3D View
+                                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Traffic Demand:</span>
+                                <button class="btn" id="demand-05-btn" onclick="setTrafficDemand(0.5)">Light (0.5x)</button>
+                                <button class="btn btn-primary" id="demand-10-btn" onclick="setTrafficDemand(1.0)">Normal (1.0x)</button>
+                                <button class="btn" id="demand-20-btn" onclick="setTrafficDemand(2.0)">Rush Hour (2.0x)</button>
+                                <button class="btn" id="demand-35-btn" onclick="setTrafficDemand(3.5)">Gridlock (3.5x)</button>
+                            </div>
+
+                            <div class="toolbar-group">
+                                <button class="btn btn-emergency" onclick="dispatchEmergencyVehicle()" title="Dispatch Police / Ambulance with Siren Priority">
+                                    <span>🚨</span> Dispatch Emergency
                                 </button>
                             </div>
                         </div>
@@ -1569,6 +1766,7 @@
 
         // ========================================================
         // 3D SIMULATION ENGINE (THREE.JS + ORBITCONTROLS + TWEEN)
+        // Realism Game Fidelity, Smooth Camera Dock, Chase Cam, & Atmosphere Modes
         // ========================================================
         const container3D = document.getElementById('sim-3d-container');
         let scene3D, camera3D, renderer3D, controls3D;
@@ -1583,54 +1781,68 @@
         // Heatmap Ribbon Meshes: edgeId -> THREE.Mesh
         const heatmap3DRibbons = new Map();
 
+        // Raycasting & Click-to-Target Objects
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const clickableGroundObjects = [];
+
+        // Atmosphere Engine Variables
+        let currentAtmosphere = 'DAY';
+        let sceneLights = {};
+        let buildingWindowMats = [];
+        let streetlightPoints = [];
+
+        // Follow / Chase Cam State
+        let followedVehicleId = null;
+
         // 3D Sector Surveillance Camera Presets (Position & LookAt Targets)
         const SECTOR_3D_PRESETS = {
             'CITY_OVERVIEW': {
                 name: 'Master City Overview',
-                camPos: { x: 740, y: 720, z: 260 },
-                target: { x: 740, y: 0, z: -380 },
+                camPos: { x: 760, y: 780, z: 260 },
+                target: { x: 760, y: 0, z: -440 },
                 title: 'Master City Drone Surveillance'
             },
             'CENTRAL_PLAZA': {
                 name: 'Central Plaza Crossroads',
-                camPos: { x: 740, y: 140, z: -250 },
-                target: { x: 740, y: 0, z: -380 },
-                title: 'Central Plaza Crossroads (Grand Square - AI DQN)'
+                camPos: { x: 760, y: 150, z: -300 },
+                target: { x: 760, y: 0, z: -440 },
+                title: 'Central Plaza Crossroads (4-Way AI DQN)'
             },
             'GARDEN_ROUNDABOUT': {
                 name: 'Garden Parkway Roundabout',
-                camPos: { x: 220, y: 130, z: -250 },
-                target: { x: 220, y: 0, z: -380 },
+                camPos: { x: 220, y: 140, z: -300 },
+                target: { x: 220, y: 0, z: -440 },
                 title: 'Garden Parkway Roundabout (Continuous Priority Ring)'
             },
             'EASTERN_TJUNC': {
                 name: 'Eastern Boulevard T-Junction',
-                camPos: { x: 1220, y: 130, z: -250 },
-                target: { x: 1220, y: 0, z: -380 },
+                camPos: { x: 1240, y: 140, z: -300 },
+                target: { x: 1240, y: 0, z: -440 },
                 title: 'Eastern Boulevard T-Junction (High-Speed Arterial)'
             },
             'NORTHWEST_JUNCTION': {
                 name: 'North-West Commercial Square',
-                camPos: { x: 480, y: 130, z: -450 },
-                target: { x: 480, y: 0, z: -580 },
+                camPos: { x: 440, y: 140, z: -540 },
+                target: { x: 440, y: 0, z: -680 },
                 title: 'North-West Commercial Square (TL_NW)'
             },
             'NORTHEAST_JUNCTION': {
                 name: 'North-East Corporate Crossing',
-                camPos: { x: 1000, y: 130, z: -450 },
-                target: { x: 1000, y: 0, z: -580 },
+                camPos: { x: 1080, y: 140, z: -540 },
+                target: { x: 1080, y: 0, z: -680 },
                 title: 'North-East Corporate Crossing (TL_NE)'
             },
             'SOUTHWEST_JUNCTION': {
                 name: 'South-West Arterial Junction',
-                camPos: { x: 480, y: 130, z: -50 },
-                target: { x: 480, y: 0, z: -180 },
+                camPos: { x: 440, y: 140, z: -60 },
+                target: { x: 440, y: 0, z: -200 },
                 title: 'South-West Arterial Junction (TL_SW)'
             },
             'SOUTHEAST_JUNCTION': {
                 name: 'South-East Logistics Depot',
-                camPos: { x: 1000, y: 130, z: -50 },
-                target: { x: 1000, y: 0, z: -180 },
+                camPos: { x: 1080, y: 140, z: -60 },
+                target: { x: 1080, y: 0, z: -200 },
                 title: 'South-East Logistics Depot (TL_SE)'
             }
         };
@@ -1642,12 +1854,12 @@
 
             // 1. Scene & Horizon Atmosphere
             scene3D = new THREE.Scene();
-            scene3D.background = new THREE.Color('#cbd5e1'); // Soft atmospheric blue-grey
-            scene3D.fog = new THREE.FogExp2('#cbd5e1', 0.00065);
+            scene3D.background = new THREE.Color('#cbd5e1');
+            scene3D.fog = new THREE.FogExp2('#cbd5e1', 0.00060);
 
             // 2. Camera
             camera3D = new THREE.PerspectiveCamera(45, width / height, 2, 4000);
-            camera3D.position.set(740, 720, 260);
+            camera3D.position.set(760, 780, 260);
 
             // 3. Renderer
             renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -1657,56 +1869,66 @@
             renderer3D.shadowMap.type = THREE.PCFSoftShadowMap;
             container3D.appendChild(renderer3D.domElement);
 
-            // 4. Orbit Controls
+            // 4. Smooth Calibrated Orbit Controls
             controls3D = new THREE.OrbitControls(camera3D, renderer3D.domElement);
             controls3D.enableDamping = true;
-            controls3D.dampingFactor = 0.08;
-            controls3D.maxPolarAngle = Math.PI / 2.05; // Prevent flipping below ground
-            controls3D.minDistance = 25;
-            controls3D.maxDistance = 1800;
-            controls3D.target.set(740, 0, -380);
+            controls3D.dampingFactor = 0.05;
+            controls3D.screenSpacePanning = true; // Enables natural pan parallel to screen
+            controls3D.rotateSpeed = 0.75;
+            controls3D.zoomSpeed = 1.0;
+            controls3D.panSpeed = 0.85;
+            controls3D.maxPolarAngle = Math.PI / 2.05;
+            controls3D.minDistance = 10;
+            controls3D.maxDistance = 1600;
+            controls3D.target.set(760, 0, -440);
             controls3D.update();
 
-            // 5. Environmental Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+            // 5. Environmental Lighting System
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
             scene3D.add(ambientLight);
 
-            const sunLight = new THREE.DirectionalLight(0xfffbeb, 0.85);
-            sunLight.position.set(740, 700, 450);
+            const sunLight = new THREE.DirectionalLight(0xfffbeb, 0.95);
+            sunLight.position.set(760, 700, 450);
             sunLight.castShadow = true;
             sunLight.shadow.mapSize.width = 2048;
             sunLight.shadow.mapSize.height = 2048;
             sunLight.shadow.camera.near = 50;
             sunLight.shadow.camera.far = 1600;
-            const d = 800;
+            const d = 900;
             sunLight.shadow.camera.left = -d;
             sunLight.shadow.camera.right = d;
             sunLight.shadow.camera.top = d;
             sunLight.shadow.camera.bottom = -d;
             scene3D.add(sunLight);
 
+            sceneLights = { ambient: ambientLight, sun: sunLight };
+
             // 6. Base Ground Plane (Metropolitan Terrain)
-            const groundGeo = new THREE.PlaneGeometry(2800, 2000);
+            const groundGeo = new THREE.PlaneGeometry(3200, 2200);
             const groundMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.85 });
             const ground = new THREE.Mesh(groundGeo, groundMat);
             ground.rotation.x = -Math.PI / 2;
-            ground.position.set(740, -0.1, -380);
+            ground.position.set(760, -0.1, -440);
             ground.receiveShadow = true;
             scene3D.add(ground);
+            clickableGroundObjects.push(ground);
 
             // 7. Garden Parkway Park Greenery Belt in 3D
             const parkGeo = new THREE.CircleGeometry(110, 48);
             const parkMat = new THREE.MeshStandardMaterial({ color: 0xdcfce7, roughness: 0.9 });
             const parkMesh = new THREE.Mesh(parkGeo, parkMat);
             parkMesh.rotation.x = -Math.PI / 2;
-            parkMesh.position.set(220, 0.05, -380);
+            parkMesh.position.set(220, 0.05, -440);
             parkMesh.receiveShadow = true;
             scene3D.add(parkMesh);
+            clickableGroundObjects.push(parkMesh);
 
-            // 3D Trees in Garden Parkway
+            // 3D Trees in Garden Parkway & Boulevards
             const treePositions = [
-                [150, -320], [170, -450], [290, -330], [270, -440],
-                [130, -390], [310, -390], [220, -290], [220, -470]
+                [150, -380], [170, -510], [290, -390], [270, -500],
+                [130, -450], [310, -450], [220, -350], [220, -530],
+                [730, -300], [790, -300], [730, -580], [790, -580],
+                [420, -440], [1100, -440]
             ];
             for (const [tx, tz] of treePositions) {
                 create3DTree(tx, tz);
@@ -1715,10 +1937,13 @@
             // 8. 3D Urban City Buildings & Skyline
             create3DCitySkyline();
 
-            // 9. Window Resize
+            // 9. Interactive Pointer Click / Raycast Handling
+            renderer3D.domElement.addEventListener('pointerdown', handleScenePointerClick);
+
+            // 10. Window Resize
             window.addEventListener('resize', onWindowResize3D);
 
-            // 10. Start Animation Loop
+            // 11. Start Animation Loop
             animate3D();
         }
 
@@ -1731,11 +1956,181 @@
             renderer3D.setSize(width, height);
         }
 
-        // Procedural 3D Modern Tree Model
+        // Click-to-Target & Vehicle Click Handling
+        function handleScenePointerClick(e) {
+            // Ignore if dragging
+            const startX = e.clientX;
+            const startY = e.clientY;
+
+            const onPointerUp = (upEvt) => {
+                renderer3D.domElement.removeEventListener('pointerup', onPointerUp);
+                const dist = Math.hypot(upEvt.clientX - startX, upEvt.clientY - startY);
+                if (dist > 4) return; // Drag occurred, not a click
+
+                const rect = renderer3D.domElement.getBoundingClientRect();
+                mouse.x = ((upEvt.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((upEvt.clientY - rect.top) / rect.height) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera3D);
+
+                // 1. Check if vehicle was clicked
+                const vehicleMeshes = Array.from(vehicle3DMeshes.values());
+                const intersectsVeh = raycaster.intersectObjects(vehicleMeshes, true);
+                if (intersectsVeh.length > 0) {
+                    let topMesh = intersectsVeh[0].object;
+                    while (topMesh.parent && topMesh.parent !== scene3D) {
+                        topMesh = topMesh.parent;
+                    }
+                    for (const [vid, m] of vehicle3DMeshes.entries()) {
+                        if (m === topMesh) {
+                            followVehicle(vid);
+                            return;
+                        }
+                    }
+                }
+
+                // 2. Check if ground/road was clicked -> smooth pivot center
+                const intersectsGround = raycaster.intersectObjects(clickableGroundObjects, false);
+                if (intersectsGround.length > 0) {
+                    stopFollowingVehicle();
+                    const pt = intersectsGround[0].point;
+                    new TWEEN.Tween(controls3D.target)
+                        .to({ x: pt.x, y: 0, z: pt.z }, 450)
+                        .easing(TWEEN.Easing.Cubic.Out)
+                        .start();
+                }
+            };
+
+            renderer3D.domElement.addEventListener('pointerup', onPointerUp);
+        }
+
+        // Camera Navigation Helpers (On-Screen Dock)
+        function zoomCamera(factor) {
+            if (!camera3D || !controls3D) return;
+            const dir = new THREE.Vector3().subVectors(camera3D.position, controls3D.target);
+            dir.multiplyScalar(factor);
+            camera3D.position.copy(controls3D.target).add(dir);
+            controls3D.update();
+        }
+
+        function rotateCamera(angleRad) {
+            if (!camera3D || !controls3D) return;
+            const offset = new THREE.Vector3().subVectors(camera3D.position, controls3D.target);
+            const radius = Math.hypot(offset.x, offset.z);
+            let theta = Math.atan2(offset.x, offset.z) + angleRad;
+            offset.x = radius * Math.sin(theta);
+            offset.z = radius * Math.cos(theta);
+            camera3D.position.copy(controls3D.target).add(offset);
+            controls3D.update();
+        }
+
+        function setCameraAngle(mode) {
+            stopFollowingVehicle();
+            const target = controls3D.target;
+            document.querySelectorAll('.cam-dock-btn').forEach(b => b.classList.remove('active'));
+            if (mode === 'TOP_DOWN') {
+                document.getElementById('btn-cam-top')?.classList.add('active');
+                new TWEEN.Tween(camera3D.position)
+                    .to({ x: target.x, y: 550, z: target.z + 0.1 }, 700)
+                    .easing(TWEEN.Easing.Cubic.Out)
+                    .start();
+            } else if (mode === 'ISOMETRIC') {
+                document.getElementById('btn-cam-iso')?.classList.add('active');
+                new TWEEN.Tween(camera3D.position)
+                    .to({ x: target.x, y: 220, z: target.z + 240 }, 700)
+                    .easing(TWEEN.Easing.Cubic.Out)
+                    .start();
+            } else if (mode === 'STREET') {
+                document.getElementById('btn-cam-street')?.classList.add('active');
+                new TWEEN.Tween(camera3D.position)
+                    .to({ x: target.x - 30, y: 14, z: target.z + 45 }, 700)
+                    .easing(TWEEN.Easing.Cubic.Out)
+                    .start();
+            }
+        }
+
+        // Vehicle Chase Cam Controls
+        function followVehicle(vid) {
+            followedVehicleId = vid;
+            document.getElementById('follow-vehicle-hud').style.display = 'block';
+            document.getElementById('follow-vid').textContent = `#${vid}`;
+            document.getElementById('btn-chase-cam')?.classList.add('active');
+        }
+
+        function stopFollowingVehicle() {
+            followedVehicleId = null;
+            document.getElementById('follow-vehicle-hud').style.display = 'none';
+            document.getElementById('btn-chase-cam')?.classList.remove('active');
+        }
+
+        function toggleFollowRandomVehicle() {
+            if (followedVehicleId) {
+                stopFollowingVehicle();
+            } else if (latestTelemetry && latestTelemetry.vehicles && latestTelemetry.vehicles.length > 0) {
+                const randV = latestTelemetry.vehicles[Math.floor(Math.random() * latestTelemetry.vehicles.length)];
+                followVehicle(randV.id);
+            }
+        }
+
+        // Atmosphere Engine (Day, Sunset, Cyber Night)
+        function setAtmosphere(mode) {
+            currentAtmosphere = mode;
+            document.querySelectorAll('.atmo-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`atmo-${mode.toLowerCase()}-btn`)?.classList.add('active');
+
+            if (!scene3D || !sceneLights.ambient || !sceneLights.sun) return;
+
+            if (mode === 'DAY') {
+                scene3D.background.set('#cbd5e1');
+                scene3D.fog.color.set('#cbd5e1');
+                sceneLights.ambient.color.set(0xffffff);
+                sceneLights.ambient.intensity = 0.85;
+                sceneLights.sun.color.set(0xfffbeb);
+                sceneLights.sun.intensity = 0.95;
+                sceneLights.sun.position.set(760, 700, 450);
+                for (const mat of buildingWindowMats) {
+                    mat.emissive.set(0x000000);
+                    mat.emissiveIntensity = 0.0;
+                }
+                for (const sl of streetlightPoints) {
+                    sl.intensity = 0.0;
+                }
+            } else if (mode === 'SUNSET') {
+                scene3D.background.set('#9a3412');
+                scene3D.fog.color.set('#7c2d12');
+                sceneLights.ambient.color.set(0xfdba74);
+                sceneLights.ambient.intensity = 0.55;
+                sceneLights.sun.color.set(0xf97316);
+                sceneLights.sun.intensity = 1.1;
+                sceneLights.sun.position.set(200, 220, 250);
+                for (const mat of buildingWindowMats) {
+                    mat.emissive.set(0xfbbf24);
+                    mat.emissiveIntensity = 0.5;
+                }
+                for (const sl of streetlightPoints) {
+                    sl.intensity = 1.4;
+                }
+            } else if (mode === 'NIGHT') {
+                scene3D.background.set('#030712');
+                scene3D.fog.color.set('#0b0f19');
+                sceneLights.ambient.color.set(0x1e293b);
+                sceneLights.ambient.intensity = 0.22;
+                sceneLights.sun.color.set(0x38bdf8);
+                sceneLights.sun.intensity = 0.18;
+                sceneLights.sun.position.set(760, 400, -200);
+                for (const mat of buildingWindowMats) {
+                    mat.emissive.set(0x38bdf8);
+                    mat.emissiveIntensity = 1.4;
+                }
+                for (const sl of streetlightPoints) {
+                    sl.intensity = 3.0;
+                }
+            }
+        }
+
+        // Procedural 3D Tree Model
         function create3DTree(x, z) {
             const treeGroup = new THREE.Group();
             
-            // Trunk
             const trunkGeo = new THREE.CylinderGeometry(1.2, 1.6, 6, 8);
             const trunkMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 });
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
@@ -1743,7 +2138,6 @@
             trunk.castShadow = true;
             treeGroup.add(trunk);
 
-            // Foliage
             const foliageGeo = new THREE.ConeGeometry(7, 14, 8);
             const foliageMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 });
             const foliage = new THREE.Mesh(foliageGeo, foliageMat);
@@ -1755,58 +2149,87 @@
             scene3D.add(treeGroup);
         }
 
-        // Procedural 3D City Skyline (Glass Towers, Commercial Skyscapers, Residential Blocks)
+        // Procedural 3D Modern City Skyline
         function create3DCitySkyline() {
             const buildingBlocks = [
-                // North-West Block
-                { x: 370, z: -520, w: 120, d: 80, h: 65, color: 0x0284c7 },
-                { x: 370, z: -630, w: 100, d: 70, h: 48, color: 0x334155 },
-                // North-Central Block
-                { x: 610, z: -520, w: 110, d: 90, h: 85, color: 0x1e293b },
-                { x: 610, z: -640, w: 90,  d: 80, h: 55, color: 0x0369a1 },
-                // North-East Block
-                { x: 880, z: -520, w: 130, d: 85, h: 72, color: 0x0284c7 },
-                { x: 1120, z: -520, w: 90, d: 75, h: 50, color: 0x475569 },
-                // South-West Block
-                { x: 370, z: -240, w: 110, d: 80, h: 52, color: 0x334155 },
-                { x: 370, z: -120, w: 90,  d: 70, h: 42, color: 0x64748b },
-                // South-Central Block
-                { x: 610, z: -240, w: 120, d: 85, h: 78, color: 0x0f172a },
-                { x: 610, z: -120, w: 95,  d: 75, h: 60, color: 0x0369a1 },
-                // South-East Block
-                { x: 880, z: -240, w: 125, d: 85, h: 68, color: 0x1e293b },
-                { x: 1120, z: -240, w: 85, d: 70, h: 45, color: 0x334155 }
+                // Northwest Commercial Quadrant
+                { x: 340, z: -580, w: 110, d: 80, h: 75, color: 0x0284c7 },
+                { x: 340, z: -480, w: 90,  d: 70, h: 55, color: 0x334155 },
+                { x: 540, z: -580, w: 100, d: 85, h: 65, color: 0x1e293b },
+                // Northeast Corporate Quadrant
+                { x: 920,  z: -580, w: 120, d: 85, h: 90, color: 0x0284c7 },
+                { x: 1180, z: -580, w: 95,  d: 75, h: 60, color: 0x475569 },
+                { x: 920,  z: -480, w: 110, d: 80, h: 70, color: 0x1e293b },
+                // Southwest Mixed Quadrant
+                { x: 340, z: -320, w: 105, d: 80, h: 58, color: 0x334155 },
+                { x: 340, z: -120, w: 90,  d: 70, h: 45, color: 0x64748b },
+                { x: 540, z: -320, w: 115, d: 85, h: 68, color: 0x0f172a },
+                // Southeast Logistics Quadrant
+                { x: 920,  z: -320, w: 125, d: 90, h: 50, color: 0x1e293b },
+                { x: 1180, z: -320, w: 110, d: 85, h: 42, color: 0x334155 },
+                { x: 920,  z: -120, w: 100, d: 80, h: 52, color: 0x0369a1 },
+                // Downtown Central Plaza Landmark Towers (4 corners of Crossroads)
+                { x: 700, z: -500, w: 75, d: 75, h: 115, color: 0x0284c7, hasSpire: true },
+                { x: 820, z: -500, w: 75, d: 75, h: 100, color: 0x38bdf8 },
+                { x: 700, z: -380, w: 75, d: 75, h: 92,  color: 0x1e293b, hasHelipad: true },
+                { x: 820, z: -380, w: 75, d: 75, h: 105, color: 0xf59e0b }
             ];
 
             for (const b of buildingBlocks) {
                 const bGroup = new THREE.Group();
 
-                // Main Tower Box
                 const bGeo = new THREE.BoxGeometry(b.w, b.h, b.d);
                 const bMat = new THREE.MeshStandardMaterial({
                     color: b.color,
-                    roughness: 0.3,
-                    metalness: 0.7
+                    roughness: 0.25,
+                    metalness: 0.75,
+                    emissive: 0x000000,
+                    emissiveIntensity: 0.0
                 });
+                buildingWindowMats.push(bMat);
+
                 const tower = new THREE.Mesh(bGeo, bMat);
                 tower.position.y = b.h / 2;
                 tower.castShadow = true;
                 tower.receiveShadow = true;
                 bGroup.add(tower);
 
-                // Roof Accent & Parapet
-                const roofGeo = new THREE.BoxGeometry(b.w * 0.7, 4, b.d * 0.7);
-                const roofMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 });
+                // Parapet & Roof Cap
+                const roofGeo = new THREE.BoxGeometry(b.w * 0.8, 3, b.d * 0.8);
+                const roofMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
                 const roof = new THREE.Mesh(roofGeo, roofMat);
-                roof.position.y = b.h + 2;
+                roof.position.y = b.h + 1.5;
                 bGroup.add(roof);
+
+                if (b.hasSpire) {
+                    const spireGeo = new THREE.CylinderGeometry(0.5, 2.0, 28, 8);
+                    const spireMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9 });
+                    const spire = new THREE.Mesh(spireGeo, spireMat);
+                    spire.position.y = b.h + 16;
+                    bGroup.add(spire);
+
+                    const beaconGeo = new THREE.SphereGeometry(1.2, 8, 8);
+                    const beaconMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+                    const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+                    beacon.position.y = b.h + 30;
+                    bGroup.add(beacon);
+                }
+
+                if (b.hasHelipad) {
+                    const heliGeo = new THREE.CircleGeometry(16, 24);
+                    const heliMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 });
+                    const heli = new THREE.Mesh(heliGeo, heliMat);
+                    heli.rotation.x = -Math.PI / 2;
+                    heli.position.y = b.h + 3.1;
+                    bGroup.add(heli);
+                }
 
                 bGroup.position.set(b.x, 0, b.z);
                 scene3D.add(bGroup);
             }
         }
 
-        // Build 3D Road Network from SUMO Geometry
+        // Build 3D Road Network with Realism Game Crosswalks, Stop Bars & Markings
         function build3DRoadNetwork(geo) {
             if (!geo || !scene3D) return;
             const edges = geo.roads || geo.edges || [];
@@ -1817,12 +2240,11 @@
                     if (pts.length < 2) continue;
                     const lw = Math.max(7.5, (lane.width || 3.2) * 2.2);
 
-                    // Build 3D Road Slabs along lane shape
                     for (let i = 0; i < pts.length - 1; i++) {
                         const p1 = pts[i];
                         const p2 = pts[i + 1];
                         const dx = p2[0] - p1[0];
-                        const dz = -(p2[1] - p1[1]); // Invert Y to Z
+                        const dz = -(p2[1] - p1[1]);
                         const segLen = Math.hypot(dx, dz);
                         if (segLen <= 0.1) continue;
 
@@ -1831,7 +2253,7 @@
                         const rotY = Math.atan2(dx, dz);
 
                         // 1. Concrete Sidewalk Curb Slab
-                        const curbGeo = new THREE.BoxGeometry(lw + 2.8, 0.45, segLen);
+                        const curbGeo = new THREE.BoxGeometry(lw + 3.0, 0.45, segLen);
                         const curbMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8 });
                         const curbMesh = new THREE.Mesh(curbGeo, curbMat);
                         curbMesh.position.set(midX, 0.22, midZ);
@@ -1841,12 +2263,13 @@
 
                         // 2. Dark Asphalt Roadway Slab
                         const roadGeo = new THREE.BoxGeometry(lw, 0.5, segLen);
-                        const roadMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85 });
+                        const roadMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.9 });
                         const roadMesh = new THREE.Mesh(roadGeo, roadMat);
                         roadMesh.position.set(midX, 0.25, midZ);
                         roadMesh.rotation.y = rotY;
                         roadMesh.receiveShadow = true;
                         scene3D.add(roadMesh);
+                        clickableGroundObjects.push(roadMesh);
 
                         // 3. Dashed White Lane Divider
                         const lineGeo = new THREE.BoxGeometry(0.35, 0.52, segLen * 0.7);
@@ -1855,10 +2278,33 @@
                         lineMesh.position.set(midX, 0.26, midZ);
                         lineMesh.rotation.y = rotY;
                         scene3D.add(lineMesh);
+
+                        // 4. Zebra Crosswalk at approach terminus (within 14m of junction)
+                        if (i === pts.length - 2 && segLen > 12) {
+                            const stopGeo = new THREE.BoxGeometry(lw, 0.53, 0.7);
+                            const stopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                            const stopMesh = new THREE.Mesh(stopGeo, stopMat);
+                            const stopX = p2[0] - Math.sin(rotY) * 6.0;
+                            const stopZ = -p2[1] - Math.cos(rotY) * 6.0;
+                            stopMesh.position.set(stopX, 0.26, stopZ);
+                            stopMesh.rotation.y = rotY;
+                            scene3D.add(stopMesh);
+
+                            for (let zIdx = -3; zIdx <= 3; zIdx++) {
+                                const zGeo = new THREE.BoxGeometry(0.8, 0.53, 3.5);
+                                const zMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                                const zMesh = new THREE.Mesh(zGeo, zMat);
+                                const zX = p2[0] - Math.sin(rotY) * 2.5 + Math.cos(rotY) * (zIdx * 1.5);
+                                const zZ = -p2[1] - Math.cos(rotY) * 2.5 + Math.sin(rotY) * (zIdx * 1.5);
+                                zMesh.position.set(zX, 0.26, zZ);
+                                zMesh.rotation.y = rotY;
+                                scene3D.add(zMesh);
+                            }
+                        }
                     }
                 }
 
-                // 4. Create Congestion Heatmap Ribbon for this Edge
+                // Congestion Heatmap Ribbon for this Edge
                 if (edge.lanes && edge.lanes.length > 0) {
                     const firstLane = edge.lanes[0];
                     const pts = firstLane.shape || [];
@@ -1883,49 +2329,48 @@
                 }
             }
 
-            // 5. Build European Garden Parkway Roundabout in 3D
-            const rb = geo.roundabout || { center_x: 220, center_y: 380 };
-            const cx = rb.center_x || 220.0;
-            const cz = -(rb.center_y || 380.0);
+            // European Garden Parkway Roundabout in 3D at (220, 0, -440)
+            const cx = 220.0;
+            const cz = -440.0;
 
-            // Circulating Road Ring
-            const ringGeo = new THREE.RingGeometry(29, 44, 48);
-            const ringMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85, side: THREE.DoubleSide });
+            const ringGeo = new THREE.RingGeometry(29, 45, 48);
+            const ringMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.9, side: THREE.DoubleSide });
             const ringMesh = new THREE.Mesh(ringGeo, ringMat);
             ringMesh.rotation.x = -Math.PI / 2;
             ringMesh.position.set(cx, 0.25, cz);
             ringMesh.receiveShadow = true;
             scene3D.add(ringMesh);
+            clickableGroundObjects.push(ringMesh);
 
-            // Cobblestone Truck Apron Step
             const apronGeo = new THREE.CylinderGeometry(29, 29, 0.4, 48);
             const apronMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 });
             const apronMesh = new THREE.Mesh(apronGeo, apronMat);
             apronMesh.position.set(cx, 0.2, cz);
             scene3D.add(apronMesh);
 
-            // Lush Central Island
             const islandGeo = new THREE.CylinderGeometry(23, 23, 1.2, 48);
-            const islandMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.8 });
+            const islandMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 });
             const islandMesh = new THREE.Mesh(islandGeo, islandMat);
             islandMesh.position.set(cx, 0.6, cz);
             islandMesh.castShadow = true;
             scene3D.add(islandMesh);
 
-            // Central Water Fountain Basin
-            const fountGeo = new THREE.CylinderGeometry(8.5, 8.5, 1.8, 32);
+            const fountGeo = new THREE.CylinderGeometry(9.0, 9.0, 1.8, 32);
             const fountMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.8, roughness: 0.2 });
             const fountain = new THREE.Mesh(fountGeo, fountMat);
             fountain.position.set(cx, 0.9, cz);
             scene3D.add(fountain);
+            scene3D.userData.fountain = fountain;
 
-            // 6. Build 3D Traffic Light Gantries at all 5 Intersections
+            // 3D Traffic Light Gantries at all 7 Intersections
             const TL_COORDS_3D = {
-                'TL_CENTRAL': { x: 740, z: -380, label: 'Central Plaza Crossroads' },
-                'TL_NW':      { x: 480, z: -580, label: 'North-West Commercial' },
-                'TL_NE':      { x: 1000, z: -580, label: 'North-East Crossing' },
-                'TL_SW':      { x: 480, z: -180, label: 'South-West Arterial' },
-                'TL_SE':      { x: 1000, z: -180, label: 'South-East Logistics' }
+                'TL_CENTRAL': { x: 760, z: -440, label: 'Central Plaza Crossroads' },
+                'TL_NW':      { x: 440, z: -680, label: 'North-West Commercial' },
+                'TL_NE':      { x: 1080, z: -680, label: 'North-East Crossing' },
+                'TL_SW':      { x: 440, z: -200, label: 'South-West Arterial' },
+                'TL_SE':      { x: 1080, z: -200, label: 'South-East Logistics' },
+                'GATE_MID_N': { x: 760, z: -680, label: 'North Avenue Crossing' },
+                'GATE_MID_S': { x: 760, z: -200, label: 'South Avenue Crossing' }
             };
 
             for (const [tlId, pos] of Object.entries(TL_COORDS_3D)) {
@@ -1937,59 +2382,49 @@
         function create3DTrafficGantry(tlId, x, z, label) {
             const gantryGroup = new THREE.Group();
 
-            // Steel Gantry Overhead Arch
             const gantryMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
             
-            // Post 1
             const post1Geo = new THREE.CylinderGeometry(0.6, 0.6, 16, 12);
             const post1 = new THREE.Mesh(post1Geo, gantryMat);
             post1.position.set(-18, 8, 0);
             post1.castShadow = true;
             gantryGroup.add(post1);
 
-            // Post 2
             const post2Geo = new THREE.CylinderGeometry(0.6, 0.6, 16, 12);
             const post2 = new THREE.Mesh(post2Geo, gantryMat);
             post2.position.set(18, 8, 0);
             post2.castShadow = true;
             gantryGroup.add(post2);
 
-            // Horizontal Beam
             const beamGeo = new THREE.BoxGeometry(37, 0.8, 1.2);
             const beam = new THREE.Mesh(beamGeo, gantryMat);
             beam.position.set(0, 15.5, 0);
             beam.castShadow = true;
             gantryGroup.add(beam);
 
-            // Traffic Light Housing Box
             const boxGeo = new THREE.BoxGeometry(2.4, 5.2, 1.8);
             const boxMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
             const box = new THREE.Mesh(boxGeo, boxMat);
             box.position.set(0, 13.5, 0);
             gantryGroup.add(box);
 
-            // 3 Emissive Signal Bulbs
             const sphereGeo = new THREE.SphereGeometry(0.6, 16, 16);
             
-            // Red Bulb
             const redMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xef4444, emissiveIntensity: 2.2 });
             const redBulb = new THREE.Mesh(sphereGeo, redMat);
             redBulb.position.set(0, 15.0, 1.0);
             gantryGroup.add(redBulb);
 
-            // Yellow Bulb
             const yelMat = new THREE.MeshStandardMaterial({ color: 0x451a03, emissive: 0x451a03, emissiveIntensity: 0.1 });
             const yelBulb = new THREE.Mesh(sphereGeo, yelMat);
             yelBulb.position.set(0, 13.5, 1.0);
             gantryGroup.add(yelBulb);
 
-            // Green Bulb
             const grnMat = new THREE.MeshStandardMaterial({ color: 0x064e3b, emissive: 0x064e3b, emissiveIntensity: 0.1 });
             const grnBulb = new THREE.Mesh(sphereGeo, grnMat);
             grnBulb.position.set(0, 12.0, 1.0);
             gantryGroup.add(grnBulb);
 
-            // Dynamic PointLight casting color on road
             const signalLight = new THREE.PointLight(0xef4444, 1.8, 45);
             signalLight.position.set(0, 13.5, 3.0);
             gantryGroup.add(signalLight);
@@ -1997,7 +2432,6 @@
             gantryGroup.position.set(x, 0, z);
             scene3D.add(gantryGroup);
 
-            // Cache for live signal status updates
             signal3DObjects[tlId] = {
                 red: redBulb,
                 yellow: yelBulb,
@@ -2010,8 +2444,25 @@
         function create3DVehicleMesh(cls) {
             const vGroup = new THREE.Group();
 
-            if (cls === 'bus') {
-                // Coach Body
+            if (cls === 'emergency') {
+                const bodyGeo = new THREE.BoxGeometry(2.6, 1.8, 5.2);
+                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+                const body = new THREE.Mesh(bodyGeo, bodyMat);
+                body.position.y = 1.1;
+                body.castShadow = true;
+                vGroup.add(body);
+
+                const redStrobe = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.35, 0.4), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+                redStrobe.position.set(-0.4, 2.2, 0);
+                vGroup.add(redStrobe);
+
+                const blueStrobe = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.35, 0.4), new THREE.MeshBasicMaterial({ color: 0x3b82f6 }));
+                blueStrobe.position.set(0.4, 2.2, 0);
+                vGroup.add(blueStrobe);
+
+                vGroup.userData = { redStrobe: redStrobe, blueStrobe: blueStrobe, isEmergency: true };
+
+            } else if (cls === 'bus') {
                 const bodyGeo = new THREE.BoxGeometry(3.0, 3.4, 12.0);
                 const bodyMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.4 });
                 const body = new THREE.Mesh(bodyGeo, bodyMat);
@@ -2019,7 +2470,6 @@
                 body.castShadow = true;
                 vGroup.add(body);
 
-                // Windows Band
                 const winGeo = new THREE.BoxGeometry(3.1, 1.2, 11.0);
                 const winMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
                 const win = new THREE.Mesh(winGeo, winMat);
@@ -2027,7 +2477,6 @@
                 vGroup.add(win);
 
             } else if (cls === 'truck') {
-                // Tractor Cabin
                 const cabGeo = new THREE.BoxGeometry(3.0, 3.2, 3.8);
                 const cabMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 });
                 const cab = new THREE.Mesh(cabGeo, cabMat);
@@ -2035,7 +2484,6 @@
                 cab.castShadow = true;
                 vGroup.add(cab);
 
-                // Ribbed Cargo Trailer
                 const trailGeo = new THREE.BoxGeometry(3.1, 3.6, 7.5);
                 const trailMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.6, metalness: 0.4 });
                 const trailer = new THREE.Mesh(trailGeo, trailMat);
@@ -2044,7 +2492,6 @@
                 vGroup.add(trailer);
 
             } else if (cls === 'motorcycle') {
-                // Slender Bike Chassis
                 const bikeGeo = new THREE.BoxGeometry(1.0, 1.4, 2.4);
                 const bikeMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.5 });
                 const bike = new THREE.Mesh(bikeGeo, bikeMat);
@@ -2052,7 +2499,6 @@
                 bike.castShadow = true;
                 vGroup.add(bike);
 
-                // Rider Helmet
                 const helmGeo = new THREE.SphereGeometry(0.55, 12, 12);
                 const helmMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
                 const helm = new THREE.Mesh(helmGeo, helmMat);
@@ -2060,7 +2506,6 @@
                 vGroup.add(helm);
 
             } else {
-                // Aerodynamic Passenger Sedan Car
                 const lowerGeo = new THREE.BoxGeometry(2.3, 1.0, 4.6);
                 const lowerMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3, metalness: 0.6 });
                 const lower = new THREE.Mesh(lowerGeo, lowerMat);
@@ -2068,7 +2513,6 @@
                 lower.castShadow = true;
                 vGroup.add(lower);
 
-                // Glass Cabin Roof
                 const cabGeo = new THREE.BoxGeometry(2.0, 0.9, 2.6);
                 const cabMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
                 const cab = new THREE.Mesh(cabGeo, cabMat);
@@ -2076,15 +2520,15 @@
                 vGroup.add(cab);
             }
 
-            // Dual Forward Headlight Cones (Ambient 3D Light)
-            const headGeo = new THREE.ConeGeometry(0.8, 4.5, 8);
+            // Dual Forward Glowing Headlight Cones
+            const headGeo = new THREE.ConeGeometry(0.8, 5.0, 8);
             headGeo.rotateX(-Math.PI / 2);
-            const headMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.25 });
+            const headMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.28 });
             const headBeam1 = new THREE.Mesh(headGeo, headMat);
-            headBeam1.position.set(-0.8, 0.8, 3.8);
+            headBeam1.position.set(-0.8, 0.8, 4.0);
             vGroup.add(headBeam1);
             const headBeam2 = new THREE.Mesh(headGeo, headMat);
-            headBeam2.position.set(0.8, 0.8, 3.8);
+            headBeam2.position.set(0.8, 0.8, 4.0);
             vGroup.add(headBeam2);
 
             // Dual Glowing Red Rear Brake Lights
@@ -2097,12 +2541,14 @@
             brakeLightR.position.set(0.9, 0.9, -2.3);
             vGroup.add(brakeLightR);
 
-            vGroup.userData = { brakeMat: brakeMat };
+            if (!vGroup.userData) vGroup.userData = {};
+            vGroup.userData.brakeMat = brakeMat;
             return vGroup;
         }
 
-        // 3D Sector Camera Flyover (Smooth Cinematic TWEEN Interpolation)
+        // 3D Sector Camera Flyover
         function setCameraSector(sectorKey) {
+            stopFollowingVehicle();
             activeSectorKey = sectorKey;
             document.querySelectorAll('.camera-btn').forEach(b => b.classList.remove('active'));
             event?.currentTarget?.classList?.add('active');
@@ -2110,21 +2556,18 @@
             const p = SECTOR_3D_PRESETS[sectorKey] || SECTOR_3D_PRESETS['CITY_OVERVIEW'];
             document.getElementById('camera-title-text').textContent = `3D Surveillance: ${p.title}`;
 
-            // Smooth TWEEN Camera Flight
             new TWEEN.Tween(camera3D.position)
-                .to(p.camPos, 1200)
+                .to(p.camPos, 1100)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
 
             new TWEEN.Tween(controls3D.target)
-                .to(p.target, 1200)
+                .to(p.target, 1100)
                 .easing(TWEEN.Easing.Cubic.Out)
                 .start();
 
-            // Update Sector Surveillance Card
             updateSectorHUD(sectorKey, p);
 
-            // Also synchronize 2D camera coordinates
             const p2D = PRESET_COORDS[sectorKey] || PRESET_COORDS['CITY_OVERVIEW'];
             camera.targetX = p2D.x;
             camera.targetY = p2D.y;
@@ -2143,8 +2586,8 @@
                 document.getElementById('sector-hud-phase').textContent = ctrl.phase_description || 'Active Green';
                 document.getElementById('sector-hud-queue').textContent = `${qCentral} vehicles waiting`;
                 document.getElementById('sector-hud-speed').textContent = `${latestTelemetry?.metrics?.average_speed_kmh || 38} km/h`;
-                document.getElementById('sector-hud-status').textContent = qCentral >= 6 ? 'HEAVY TRAFFIC (SMART FLUSH ACTIVE)' : 'OPTIMAL ADAPTIVE FLOW';
-                document.getElementById('sector-hud-status').style.color = qCentral >= 6 ? '#ef4444' : '#10b981';
+                document.getElementById('sector-hud-status').textContent = qCentral >= 5 ? 'HEAVY TRAFFIC (SMART FLUSH ACTIVE)' : 'OPTIMAL ADAPTIVE FLOW';
+                document.getElementById('sector-hud-status').style.color = qCentral >= 5 ? '#ef4444' : '#10b981';
             } else if (sectorKey === 'GARDEN_ROUNDABOUT') {
                 const rb = latestTelemetry?.roundabout || {};
                 document.getElementById('sector-hud-ctrl').textContent = 'Continuous Priority Ring';
@@ -2164,7 +2607,7 @@
             }
         }
 
-        // Trigger Smart Signal Priority Flush (Sends Action to Backend)
+        // Trigger Smart Signal Priority Flush
         function triggerSmartFlush() {
             const form = new FormData();
             fetch('/api/control/flush_corridor', { method: 'POST', body: form })
@@ -2184,9 +2627,16 @@
             TWEEN.update(time);
             controls3D.update();
 
+            // Animate fountain ripples
+            if (scene3D?.userData?.fountain) {
+                const scale = 1.0 + Math.sin(Date.now() / 350) * 0.04;
+                scene3D.userData.fountain.scale.set(scale, 1.0, scale);
+            }
+
             // Synchronize 3D Vehicle Positions with Live SUMO TraCI Telemetry
             if (latestTelemetry && latestTelemetry.vehicles && scene3D) {
                 const activeIds = new Set();
+                const nowSec = Date.now() / 150;
 
                 for (const v of latestTelemetry.vehicles) {
                     activeIds.add(v.id);
@@ -2199,14 +2649,21 @@
                         vehicle3DMeshes.set(v.id, mesh);
                     }
 
-                    // Update Position: map SUMO (x, y) to Three.js (x, y=0, z=-y)
+                    // Map SUMO (x, y) to Three.js (x, y=0.4, z=-y)
                     mesh.position.set(v.x, 0.4, -v.y);
                     mesh.rotation.y = - (v.angle * Math.PI / 180.0);
 
                     // Update Brake Lights
                     const isBraking = v.is_queued || (v.speed_kmh < 4.0);
                     if (mesh.userData && mesh.userData.brakeMat) {
-                        mesh.userData.brakeMat.emissiveIntensity = isBraking ? 2.5 : 0.2;
+                        mesh.userData.brakeMat.emissiveIntensity = isBraking ? 2.8 : 0.2;
+                    }
+
+                    // Emergency Strobe Flash
+                    if (mesh.userData && mesh.userData.isEmergency) {
+                        const isRed = Math.floor(nowSec) % 2 === 0;
+                        mesh.userData.redStrobe.material.color.setHex(isRed ? 0xff0000 : 0x220000);
+                        mesh.userData.blueStrobe.material.color.setHex(!isRed ? 0x0088ff : 0x001133);
                     }
                 }
 
@@ -2216,6 +2673,34 @@
                         scene3D.remove(mesh);
                         vehicle3DMeshes.delete(vid);
                     }
+                }
+
+                // Smooth Vehicle Follow / Chase Cam
+                if (followedVehicleId && vehicle3DMeshes.has(followedVehicleId)) {
+                    const vData = latestTelemetry.vehicles.find(v => v.id === followedVehicleId);
+                    if (vData) {
+                        const angle = - (vData.angle * Math.PI / 180.0);
+                        const distBehind = 24.0;
+                        const heightAbove = 10.0;
+                        const camX = vData.x - Math.sin(angle) * distBehind;
+                        const camZ = -vData.y - Math.cos(angle) * distBehind;
+
+                        camera3D.position.lerp(new THREE.Vector3(camX, heightAbove, camZ), 0.12);
+                        controls3D.target.lerp(new THREE.Vector3(vData.x, 2.0, -vData.y), 0.18);
+
+                        document.getElementById('follow-vspeed').textContent = `${vData.speed_kmh} km/h`;
+                        document.getElementById('follow-vedge').textContent = vData.edge || 'Urban Arterial';
+                        const statEl = document.getElementById('follow-vstatus');
+                        if (vData.is_queued) {
+                            statEl.textContent = 'STOPPED IN SIGNAL QUEUE';
+                            statEl.style.color = '#ef4444';
+                        } else {
+                            statEl.textContent = `CRUISING @ ${vData.speed_kmh} KM/H`;
+                            statEl.style.color = '#10b981';
+                        }
+                    }
+                } else if (followedVehicleId) {
+                    stopFollowingVehicle();
                 }
 
                 // Update 3D Traffic Light Signals
@@ -2229,13 +2714,13 @@
                     const isYel = primary === 'YELLOW';
                     const isGrn = primary === 'GREEN';
 
-                    sigObj.red.material.emissiveIntensity = isRed ? 2.4 : 0.1;
+                    sigObj.red.material.emissiveIntensity = isRed ? 2.5 : 0.1;
                     sigObj.red.material.color.setHex(isRed ? 0xef4444 : 0x450a0a);
                     
-                    sigObj.yellow.material.emissiveIntensity = isYel ? 2.4 : 0.1;
+                    sigObj.yellow.material.emissiveIntensity = isYel ? 2.5 : 0.1;
                     sigObj.yellow.material.color.setHex(isYel ? 0xf59e0b : 0x451a03);
 
-                    sigObj.green.material.emissiveIntensity = isGrn ? 2.4 : 0.1;
+                    sigObj.green.material.emissiveIntensity = isGrn ? 2.5 : 0.1;
                     sigObj.green.material.color.setHex(isGrn ? 0x10b981 : 0x064e3b);
 
                     sigObj.light.color.setHex(isGrn ? 0x10b981 : (isYel ? 0xf59e0b : 0xef4444));
@@ -2252,13 +2737,13 @@
                 for (const [edgeId, ribMesh] of heatmap3DRibbons.entries()) {
                     const q = edgeQueues[edgeId] || 0;
                     if (q >= 4) {
-                        ribMesh.material.color.setHex(0xef4444); // Congested Pulsing Red
+                        ribMesh.material.color.setHex(0xef4444);
                         ribMesh.scale.y = 1.0 + Math.sin(Date.now() / 200) * 0.4;
                     } else if (q >= 1) {
-                        ribMesh.material.color.setHex(0xf59e0b); // Moderate Amber
+                        ribMesh.material.color.setHex(0xf59e0b);
                         ribMesh.scale.y = 1.0;
                     } else {
-                        ribMesh.material.color.setHex(0x10b981); // Free Flow Emerald
+                        ribMesh.material.color.setHex(0x10b981);
                         ribMesh.scale.y = 1.0;
                     }
                 }
@@ -2282,16 +2767,16 @@
         let simHUDEnabled = true;
         let simPaused = false;
 
-        let camera = { x: 740, y: 380, zoom: 0.90, targetX: 740, targetY: 380, targetZoom: 0.90 };
+        let camera = { x: 760, y: 440, zoom: 0.90, targetX: 760, targetY: 440, targetZoom: 0.90 };
         const PRESET_COORDS = {
-            'CITY_OVERVIEW':       { x: 740, y: 380, zoom: 0.90 },
-            'CENTRAL_PLAZA':       { x: 740, y: 380, zoom: 2.20 },
-            'GARDEN_ROUNDABOUT':   { x: 220, y: 380, zoom: 2.20 },
-            'EASTERN_TJUNC':       { x: 1220, y: 380, zoom: 2.20 },
-            'NORTHWEST_JUNCTION':  { x: 480, y: 580, zoom: 2.20 },
-            'NORTHEAST_JUNCTION':  { x: 1000, y: 580, zoom: 2.20 },
-            'SOUTHWEST_JUNCTION':  { x: 480, y: 180, zoom: 2.20 },
-            'SOUTHEAST_JUNCTION':  { x: 1000, y: 180, zoom: 2.20 }
+            'CITY_OVERVIEW':       { x: 760, y: 440, zoom: 0.90 },
+            'CENTRAL_PLAZA':       { x: 760, y: 440, zoom: 2.20 },
+            'GARDEN_ROUNDABOUT':   { x: 220, y: 440, zoom: 2.20 },
+            'EASTERN_TJUNC':       { x: 1240, y: 440, zoom: 2.20 },
+            'NORTHWEST_JUNCTION':  { x: 440, y: 680, zoom: 2.20 },
+            'NORTHEAST_JUNCTION':  { x: 1080, y: 680, zoom: 2.20 },
+            'SOUTHWEST_JUNCTION':  { x: 440, y: 200, zoom: 2.20 },
+            'SOUTHEAST_JUNCTION':  { x: 1080, y: 200, zoom: 2.20 }
         };
 
         function resizeSimCanvas() {
@@ -2324,14 +2809,55 @@
             const form = new FormData();
             form.append('mode', mode);
             fetch('/api/control/mode', { method: 'POST', body: form }).then(() => {
+                ['mode-adaptive-btn', 'mode-wave-btn', 'mode-fixed-btn'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.remove('btn-success', 'btn-primary');
+                        el.classList.add('btn');
+                    }
+                });
                 if (mode === 'AI_ADAPTIVE') {
-                    document.getElementById('mode-adaptive-btn').classList.replace('btn', 'btn-success');
-                    document.getElementById('mode-fixed-btn').classList.replace('btn-primary', 'btn');
+                    document.getElementById('mode-adaptive-btn')?.classList?.replace('btn', 'btn-success');
+                } else if (mode === 'GREEN_WAVE') {
+                    document.getElementById('mode-wave-btn')?.classList?.replace('btn', 'btn-primary');
                 } else {
-                    document.getElementById('mode-fixed-btn').classList.replace('btn', 'btn-primary');
-                    document.getElementById('mode-adaptive-btn').classList.replace('btn-success', 'btn');
+                    document.getElementById('mode-fixed-btn')?.classList?.replace('btn', 'btn-primary');
                 }
             });
+        }
+
+        function setTrafficDemand(scale) {
+            const form = new FormData();
+            form.append('scale', scale);
+            fetch('/api/control/scale', { method: 'POST', body: form }).then(r => r.json()).then(res => {
+                ['demand-05-btn', 'demand-10-btn', 'demand-20-btn', 'demand-35-btn'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.remove('btn-primary', 'btn-danger', 'btn-warning');
+                        el.classList.add('btn');
+                    }
+                });
+                const btnId = scale === 0.5 ? 'demand-05-btn' : (scale === 1.0 ? 'demand-10-btn' : (scale === 2.0 ? 'demand-20-btn' : 'demand-35-btn'));
+                const activeClass = scale >= 2.0 ? 'btn-danger' : 'btn-primary';
+                document.getElementById(btnId)?.classList?.replace('btn', activeClass);
+            });
+        }
+
+        function dispatchEmergencyVehicle() {
+            fetch('/api/control/emergency', { method: 'POST' }).then(r => r.json()).then(res => {
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed; top:20px; right:20px; background:#ef4444; color:white; padding:12px 20px; border-radius:8px; font-weight:700; z-index:99999; box-shadow:0 10px 25px rgba(239,68,68,0.5);';
+                toast.innerHTML = '🚨 EMERGENCY PREEMPTION DISPATCHED: Priority Siren Active across Grand Arterials!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            });
+        }
+
+        function overrideSignalPhase(tlId, phaseIdx) {
+            const form = new FormData();
+            form.append('tl_id', tlId);
+            form.append('phase_index', phaseIdx);
+            fetch('/api/control/signal_override', { method: 'POST', body: form });
         }
 
         // Fetch Static SUMO Road Geometry

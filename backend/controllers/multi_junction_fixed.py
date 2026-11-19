@@ -15,77 +15,23 @@ from backend.config import SIMULATION_STEP_LENGTH
 
 class MultiJunctionFixedController:
     """
-    Conventional Pre-timed Static Signal Controller for all 5 city intersections.
+    Conventional Pre-timed Static Signal Controller for all 7 city intersections.
     Each junction executes its standard static phase schedule independently on fixed timers.
     """
     def __init__(self, step_length: float = SIMULATION_STEP_LENGTH):
         self.step_length = step_length
-        self.tl_ids = ["TL_CENTRAL", "TL_NW", "TL_NE", "TL_SW", "TL_SE"]
+        self.tl_ids = ["TL_CENTRAL", "TL_NW", "TL_NE", "TL_SW", "TL_SE", "GATE_MID_N", "GATE_MID_S"]
         
-        # Standard static phase plans exactly matching city.net.xml tlLogics
+        # Standard 4-phase static schedule exactly matching city.net.xml (phases 0..3)
+        standard_4phase_plan = [
+            (30.0, "North-South Arterial Green"),
+            (3.0,  "North-South Yellow Clearance"),
+            (30.0, "East-West Arterial Green"),
+            (3.0,  "East-West Yellow Clearance")
+        ]
+        
         self.phase_plans = {
-            "TL_CENTRAL": [
-                (8.0, "North-South Main Corridor Green"),
-                (3.0, "North-South Yellow"),
-                (6.0, "North-South Left-Turn Green"),
-                (3.0, "North-South Left-Turn Yellow"),
-                (1.0, "All-Red Clearance"),
-                (10.0, "East-West Main Corridor Green"),
-                (3.0, "East-West Yellow"),
-                (6.0, "East-West Left-Turn Green"),
-                (3.0, "East-West Left-Turn Yellow"),
-                (1.0, "All-Red Clearance"),
-                (10.0, "NW-SE Diagonal Avenue Green"),
-                (3.0, "NW-SE Yellow"),
-                (6.0, "NW-SE Left-Turn Green"),
-                (3.0, "NW-SE Left-Turn Yellow"),
-                (1.0, "All-Red Clearance"),
-                (10.0, "NE-SW Diagonal Avenue Green"),
-                (3.0, "NE-SW Yellow"),
-                (6.0, "NE-SW Left-Turn Green"),
-                (3.0, "NE-SW Left-Turn Yellow"),
-                (1.0, "All-Red Clearance"),
-            ],
-            "TL_NE": [
-                (38.0, "North Gate Approach Green"),
-                (3.0, "North Gate Yellow"),
-                (37.0, "Central Corridor Green"),
-                (3.0, "Central Corridor Yellow"),
-                (6.0, "Left-Turn Movement Green"),
-                (3.0, "Left-Turn Movement Yellow")
-            ],
-            "TL_NW": [
-                (20.0, "North Gate Inbound Green"),
-                (3.0, "North Gate Yellow"),
-                (6.0, "Left Turn Green"),
-                (3.0, "Left Turn Yellow"),
-                (21.0, "West Corridor Inbound Green"),
-                (3.0, "West Corridor Yellow"),
-                (6.0, "Left Turn Green"),
-                (3.0, "Left Turn Yellow"),
-                (21.0, "Central Connector Green"),
-                (3.0, "Central Connector Yellow"),
-                (1.0, "All-Red Clearance")
-            ],
-            "TL_SE": [
-                (42.0, "South Gate Inbound Green"),
-                (3.0, "South Gate Yellow"),
-                (42.0, "Central Boulevard Inbound Green"),
-                (3.0, "Central Boulevard Yellow")
-            ],
-            "TL_SW": [
-                (20.0, "South Gate Inbound Green"),
-                (3.0, "South Gate Yellow"),
-                (6.0, "Left Turn Green"),
-                (3.0, "Left Turn Yellow"),
-                (1.0, "All-Red Clearance"),
-                (21.0, "West Corridor Inbound Green"),
-                (3.0, "West Corridor Yellow"),
-                (6.0, "Left Turn Green"),
-                (3.0, "Left Turn Yellow"),
-                (21.0, "Central Connector Green"),
-                (3.0, "Central Connector Yellow")
-            ]
+            tl: list(standard_4phase_plan) for tl in self.tl_ids
         }
 
         # Dynamic state per junction

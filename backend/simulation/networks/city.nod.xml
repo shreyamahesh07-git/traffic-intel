@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
-    <!-- 5 Major Signalized 4-Way Intersections -->
+    <!-- Major Signalized 4-Way Crossroads (Grand Plaza Center) -->
     <node id="TL_CENTRAL" x="0.0" y="0.0" type="traffic_light"/>
-    <node id="TL_NW"      x="-260.0" y="200.0" type="traffic_light"/>
-    <node id="TL_NE"      x="260.0"  y="200.0" type="traffic_light"/>
-    <node id="TL_SW"      x="-260.0" y="-200.0" type="traffic_light"/>
-    <node id="TL_SE"      x="260.0"  y="-200.0" type="traffic_light"/>
 
-    <!-- 3-Way T-Junction (Eastern Boulevard) -->
+    <!-- 4 District Signalized 4-Way Intersections -->
+    <node id="TL_NW"      x="-320.0" y="240.0"  type="traffic_light"/>
+    <node id="TL_NE"      x="320.0"  y="240.0"  type="traffic_light"/>
+    <node id="TL_SW"      x="-320.0" y="-240.0" type="traffic_light"/>
+    <node id="TL_SE"      x="320.0"  y="-240.0" type="traffic_light"/>
+
+    <!-- Coordinated Mid-Avenue Crossings (Signalized 4-Way) -->
+    <node id="GATE_MID_N" x="0.0" y="240.0"  type="traffic_light"/>
+    <node id="GATE_MID_S" x="0.0" y="-240.0" type="traffic_light"/>
+
+    <!-- 3-Way Priority T-Junction (Eastern Boulevard) -->
     <node id="TJUNC_EAST" x="480.0" y="0.0" type="priority"/>
 
-    <!-- Roundabout Circular Nodes (Radius 50m centered at x=-520, y=0) -->
-    <node id="RB_N" x="-520.0" y="50.0"  type="priority"/>
-    <node id="RB_E" x="-470.0" y="0.0"   type="priority"/>
-    <node id="RB_S" x="-520.0" y="-50.0" type="priority"/>
-    <node id="RB_W" x="-570.0" y="0.0"   type="priority"/>
-
-    <!-- Mid-Corridor Waypoint Nodes -->
-    <node id="GATE_MID_N" x="0.0" y="200.0" type="priority"/>
-    <node id="GATE_MID_S" x="0.0" y="-200.0" type="priority"/>
+    <!-- Roundabout Circular Nodes (Radius 50m centered at x=-540, y=0) -->
+    <node id="RB_N" x="-540.0" y="50.0"  type="priority"/>
+    <node id="RB_E" x="-490.0" y="0.0"   type="priority"/>
+    <node id="RB_S" x="-540.0" y="-50.0" type="priority"/>
+    <node id="RB_W" x="-590.0" y="0.0"   type="priority"/>
 
     <!-- External Arterial Entry / Exit Gates -->
-    <node id="GATE_NW_N"  x="-260.0" y="380.0" type="priority"/>
-    <node id="GATE_NE_N"  x="260.0"  y="380.0" type="priority"/>
-    <node id="GATE_SW_S"  x="-260.0" y="-380.0" type="priority"/>
-    <node id="GATE_SE_S"  x="260.0"  y="-380.0" type="priority"/>
+    <node id="GATE_NW_N"    x="-320.0" y="440.0"  type="priority"/>
+    <node id="GATE_NE_N"    x="320.0"  y="440.0"  type="priority"/>
+    <node id="GATE_MID_TOP" x="0.0"    y="440.0"  type="priority"/>
+    <node id="GATE_SW_S"    x="-320.0" y="-440.0" type="priority"/>
+    <node id="GATE_SE_S"    x="320.0"  y="-440.0" type="priority"/>
+    <node id="GATE_MID_BOT" x="0.0"    y="-440.0" type="priority"/>
 
-    <!-- West Perimeter (Expressway into Roundabout) -->
-    <node id="GATE_WEST_EXP" x="-740.0" y="0.0" type="priority"/>
+    <!-- West Perimeter (Expressway Gateway into Roundabout) -->
+    <node id="GATE_WEST_EXP" x="-760.0" y="0.0" type="priority"/>
 
     <!-- East Perimeter (Highway past T-Junction) -->
-    <node id="GATE_EAST_HWY" x="700.0" y="0.0" type="priority"/>
+    <node id="GATE_EAST_HWY" x="720.0" y="0.0" type="priority"/>
 </nodes>

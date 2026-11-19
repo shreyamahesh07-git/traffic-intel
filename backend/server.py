@@ -56,8 +56,10 @@ class SimulationManager:
         self.lock = threading.Lock()
         self.is_running = False
         self.is_paused = False
-        self.controller_mode = "AI_ADAPTIVE"  # "AI_ADAPTIVE" or "FIXED_TIME"
+        self.controller_mode = "AI_ADAPTIVE"  # "AI_ADAPTIVE", "GREEN_WAVE", "FIXED_TIME", "MANUAL"
         self.active_camera = "CITY_OVERVIEW"
+        self.step_delay = 0.04
+        self.traffic_scale = 1.0
         
         # Modules
         self.city_runner: Optional[CitySimulationRunner] = None
@@ -111,13 +113,24 @@ class SimulationManager:
 
     def set_controller_mode(self, mode: str):
         with self.lock:
-            if mode in ["AI_ADAPTIVE", "FIXED_TIME"]:
+            if mode in ["AI_ADAPTIVE", "GREEN_WAVE", "FIXED_TIME", "MANUAL"]:
                 self.controller_mode = mode
 
     def set_camera_zone(self, zone_id: str):
         with self.lock:
             if zone_id in CAMERA_ZONES:
                 self.active_camera = zone_id
+
+    def set_sim_speed(self, multiplier: float):
+        with self.lock:
+            m = max(0.2, min(5.0, float(multiplier)))
+            self.step_delay = 0.04 / m
+
+    def set_demand_scale(self, scale: float):
+        with self.lock:
+            self.traffic_scale = float(scale)
+            if self.city_runner:
+                self.city_runner.set_traffic_scale(scale)
 
     def _run_loop(self):
         while not self.stop_signal:
@@ -128,6 +141,10 @@ class SimulationManager:
                     # Apply active controller policy
                     if self.controller_mode == "AI_ADAPTIVE":
                         self.adaptive_controller.step(telemetry, self.city_runner)
+                    elif self.controller_mode == "GREEN_WAVE":
+                        # Coordinated arterial green wave along the main East-West corridor
+                        self.city_runner.set_tl_phase("TL_CENTRAL", 2) # EW Green
+                        self.adaptive_controller.last_explanation = "⚡ SMART GREEN WAVE: Coordinated arterial green wave active along West-East Grand Avenue."
                     elif self.controller_mode == "FIXED_TIME":
                         target_phases = self.fixed_controller.step()
                         for tlid, pidx in target_phases.items():
@@ -139,7 +156,7 @@ class SimulationManager:
                     print(f"SimulationManager error in step: {e}")
                     time.sleep(0.5)
 
-            time.sleep(0.04)  # ~25 FPS pacing
+            time.sleep(self.step_delay)
 
     def get_status_payload(self) -> Dict[str, Any]:
         with self.lock:
@@ -234,10 +251,37 @@ def control_flush_corridor(corridor_id: Optional[int] = Form(None)):
     sim_manager.adaptive_controller.stage = "MAIN_GREEN"
     sim_manager.adaptive_controller.stage_timer = 0.0
     grp = CENTRAL_CORRIDORS.get(corridor_id, CENTRAL_CORRIDORS[0])
+    phase_idx = grp.get("green", grp.get("main_green", 0))
     if sim_manager.city_runner:
-        sim_manager.city_runner.set_tl_phase("TL_CENTRAL", grp["main_green"])
+        sim_manager.city_runner.set_tl_phase("TL_CENTRAL", phase_idx)
     sim_manager.adaptive_controller.last_explanation = f"⚡ SMART SIGNAL OVERRIDE: Actuated priority GREEN for {grp['desc']} to flush waiting queue!"
     return {"status": "corridor_flushed", "corridor": corridor_id, "desc": grp["desc"]}
+
+@app.post("/api/control/scale")
+def control_scale(scale: float = Form(...)):
+    sim_manager.set_demand_scale(scale)
+    return {"status": "scale_updated", "scale": sim_manager.traffic_scale}
+
+@app.post("/api/control/emergency")
+def control_emergency():
+    if sim_manager.city_runner:
+        vid = sim_manager.city_runner.spawn_emergency_vehicle()
+        sim_manager.adaptive_controller.last_explanation = f"🚨 EMERGENCY PREEMPTION: Dispatched Emergency Vehicle #{vid}! Clearing arterial corridor signals!"
+        return {"status": "emergency_dispatched", "vehicle_id": vid}
+    return {"status": "error", "message": "Simulation runner not active"}
+
+@app.post("/api/control/signal_override")
+def control_signal_override(tl_id: str = Form(...), phase_index: int = Form(...)):
+    if sim_manager.city_runner:
+        sim_manager.city_runner.set_tl_phase(tl_id, phase_index)
+        sim_manager.adaptive_controller.last_explanation = f"🎮 MANUAL OPERATOR OVERRIDE: Forced Signal {tl_id} to Phase {phase_index}"
+        return {"status": "signal_overridden", "tl_id": tl_id, "phase": phase_index}
+    return {"status": "error", "message": "Simulation runner not active"}
+
+@app.post("/api/control/sim_speed")
+def control_sim_speed(multiplier: float = Form(...)):
+    sim_manager.set_sim_speed(multiplier)
+    return {"status": "speed_updated", "multiplier": multiplier}
 
 @app.get("/api/video/sample_data")
 def get_sample_video_data():
