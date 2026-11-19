@@ -38,3 +38,4 @@ print("\n4. Resetting Scenario back to NORMAL...")
 req_reset = urllib.request.Request(f"{base}/api/simulation/reset_scenario", data=b"")
 with urllib.request.urlopen(req_reset) as resp:
     print("Reset response:", json.loads(resp.read().decode()))
+

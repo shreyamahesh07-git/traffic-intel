@@ -58,7 +58,8 @@ class SimulationManager:
         self.is_paused = False
         self.controller_mode = "AI_ADAPTIVE"  # "AI_ADAPTIVE", "GREEN_WAVE", "FIXED_TIME", "MANUAL"
         self.active_camera = "CITY_OVERVIEW"
-        self.step_delay = 0.04
+        self.base_step_delay = 0.25  # Calm, human-interpretable pace (4 steps/sec = 2.0s sim-time / real-sec)
+        self.step_delay = 0.25
         self.traffic_scale = 1.0
         
         # Modules
@@ -124,7 +125,7 @@ class SimulationManager:
     def set_sim_speed(self, multiplier: float):
         with self.lock:
             m = max(0.2, min(5.0, float(multiplier)))
-            self.step_delay = 0.04 / m
+            self.step_delay = self.base_step_delay / m
 
     def set_demand_scale(self, scale: float):
         with self.lock:

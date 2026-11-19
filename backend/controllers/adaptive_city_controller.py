@@ -118,8 +118,8 @@ class AdaptiveCityController:
             action = self.agent.select_action(state, eval_mode=True)
             self.last_action = action
 
-            min_g = 6.0   # Minimum green for safe driver reaction
-            max_g = 35.0  # Maximum green to prevent indefinite starvation
+            min_g = 18.0  # Minimum green (calm, steady, human-interpretable pace)
+            max_g = 45.0  # Maximum green to prevent indefinite starvation
             should_switch = False
 
             # Check 1: Surge / Heavy Congestion on opposing corridor
@@ -134,7 +134,7 @@ class AdaptiveCityController:
             elif self.stage_timer >= min_g and cur_q == 0 and cur_app <= 1 and other_q > 0:
                 should_switch = True
                 self.target_corridor = other_corridor
-                saved_s = max(0.0, round(25.0 - self.stage_timer, 1))
+                saved_s = max(0.0, round(35.0 - self.stage_timer, 1))
                 self.last_explanation = (
                     f"🧠 AI Adaptive (DQN): {grp['desc']} is clear (0 queued). "
                     f"Cutting green short (saved {saved_s}s wasted time) → Transitioning to {CENTRAL_CORRIDORS[other_corridor]['desc']} ({other_q:.0f} queued)."
@@ -166,8 +166,8 @@ class AdaptiveCityController:
                     )
 
         elif self.stage == "MAIN_YELLOW":
-            # Strict 3.0s Yellow Clearance
-            if self.stage_timer >= 3.0:
+            # Strict 3.5s Yellow Clearance (clear visual transition)
+            if self.stage_timer >= 3.5:
                 self.current_corridor = 1 if self.current_corridor == 0 else 0
                 self.stage = "MAIN_GREEN"
                 self.stage_timer = 0.0

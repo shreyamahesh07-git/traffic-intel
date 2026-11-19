@@ -1371,6 +1371,13 @@
                             </div>
 
                             <div class="toolbar-group">
+                                <span class="toolbar-label">Simulation Pace:</span>
+                                <button class="btn" id="speed-05-btn" onclick="setSimulationSpeed(0.5)" title="Half Speed - Very Calm and Easy to Watch">0.5x Slow</button>
+                                <button class="btn btn-primary" id="speed-10-btn" onclick="setSimulationSpeed(1.0)" title="Normal Speed - Natural Urban Pace">1.0x Normal</button>
+                                <button class="btn" id="speed-20-btn" onclick="setSimulationSpeed(2.0)" title="Double Speed">2.0x Fast</button>
+                            </div>
+
+                            <div class="toolbar-group">
                                 <button class="btn btn-danger" id="btn-surge-action" onclick="triggerTrafficSurge('north')" title="Inject a burst of 8 real SUMO vehicles onto North Approach">
                                     <span>⚡</span> Create Traffic Surge
                                 </button>
@@ -3033,6 +3040,20 @@
                 .catch(e => console.error('Error setting scenario:', e));
         }
 
+        function setSimulationSpeed(multiplier) {
+            const form = new FormData();
+            form.append('multiplier', multiplier);
+            fetch('/api/control/sim_speed', { method: 'POST', body: form }).then(() => {
+                ['speed-05-btn', 'speed-10-btn', 'speed-20-btn'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.classList.remove('btn-primary'); el.classList.add('btn'); }
+                });
+                const activeId = multiplier === 0.5 ? 'speed-05-btn' : (multiplier === 1.0 ? 'speed-10-btn' : 'speed-20-btn');
+                document.getElementById(activeId)?.classList.add('btn-primary');
+                showToast(`⏱️ Simulation Pace Set to ${multiplier}x`);
+            });
+        }
+
         function triggerTrafficSurge(approach = 'north') {
             const form = new FormData();
             form.append('approach', approach);
@@ -3238,70 +3259,28 @@
                 }
             }
 
-            // LAYER 3: Painted Lane Centerlines & Medians
-            for (const edge of edges) {
-                for (const lane of edge.lanes || []) {
-                    const pts = lane.shape || [];
-                    if (pts.length < 2) continue;
+            // LAYER 3: Clean Asphalt Surface (Clutter-free, white dashed lines removed for vehicle clarity)
+            // (Road lines removed to ensure high contrast against moving vehicles)
 
-                    // Dashed White Lane Divider Lines
-                    simCtx.setLineDash([12, 10]);
-                    simCtx.lineWidth = 1.8;
-                    simCtx.strokeStyle = '#f8fafc';
-                    simCtx.beginPath();
-                    simCtx.moveTo(pts[0][0], -pts[0][1]);
-                    for (let i = 1; i < pts.length; i++) {
-                        simCtx.lineTo(pts[i][0], -pts[i][1]);
-                    }
-                    simCtx.stroke();
-                    simCtx.setLineDash([]);
-                }
-            }
-
-            // LAYER 4: Focused 4-Way Intersection Details (Stop Bars, Crosswalks, Yellow Medians)
+            // LAYER 4: Focused 4-Way Intersection Details (Clean Yellow Stop Bars, Zebra Crosswalks Removed)
             if (activeViewMode === 'FOCUSED_4WAY' || camera.zoom > 1.6) {
                 const cx = 760.0, cy = -440.0;
 
-                // Stop Lines across each approach (Yellow bold stop line at junction entrance)
+                // Crisp Yellow Stop Lines at each entrance (Clean 3px line, no clutter)
                 simCtx.strokeStyle = '#facc15';
-                simCtx.lineWidth = 4.5;
-                // North Stop Line (midN_to_central entering from top)
+                simCtx.lineWidth = 3.0;
+                // North Stop Line
                 simCtx.beginPath(); simCtx.moveTo(cx - 24, cy - 35); simCtx.lineTo(cx + 24, cy - 35); simCtx.stroke();
-                // South Stop Line (midS_to_central entering from bottom)
+                // South Stop Line
                 simCtx.beginPath(); simCtx.moveTo(cx - 24, cy + 35); simCtx.lineTo(cx + 24, cy + 35); simCtx.stroke();
-                // East Stop Line (tjunc_to_central entering from right)
+                // East Stop Line
                 simCtx.beginPath(); simCtx.moveTo(cx + 35, cy - 24); simCtx.lineTo(cx + 35, cy + 24); simCtx.stroke();
-                // West Stop Line (rb_to_central entering from left)
+                // West Stop Line
                 simCtx.beginPath(); simCtx.moveTo(cx - 35, cy - 24); simCtx.lineTo(cx - 35, cy + 24); simCtx.stroke();
-
-                // Pedestrian Zebra Crosswalks (Crisp White Striped Bars)
-                simCtx.strokeStyle = '#ffffff';
-                simCtx.lineWidth = 2.4;
-                // North Crosswalk
-                for (let ox = -20; ox <= 20; ox += 6) {
-                    simCtx.beginPath(); simCtx.moveTo(cx + ox, cy - 42); simCtx.lineTo(cx + ox, cy - 49); simCtx.stroke();
-                }
-                // South Crosswalk
-                for (let ox = -20; ox <= 20; ox += 6) {
-                    simCtx.beginPath(); simCtx.moveTo(cx + ox, cy + 42); simCtx.lineTo(cx + ox, cy + 49); simCtx.stroke();
-                }
-                // East Crosswalk
-                for (let oy = -20; oy <= 20; oy += 6) {
-                    simCtx.beginPath(); simCtx.moveTo(cx + 42, cy + oy); simCtx.lineTo(cx + 49, cy + oy); simCtx.stroke();
-                }
-                // West Crosswalk
-                for (let oy = -20; oy <= 20; oy += 6) {
-                    simCtx.beginPath(); simCtx.moveTo(cx - 42, cy + oy); simCtx.lineTo(cx - 49, cy + oy); simCtx.stroke();
-                }
-
-                // Intersection Core Center Dot / Hatch
-                simCtx.strokeStyle = 'rgba(250, 204, 21, 0.4)';
-                simCtx.lineWidth = 2.0;
-                simCtx.strokeRect(cx - 30, cy - 30, 60, 60);
             }
         }
 
-        // Render Distinct 3-Aspect Traffic Signals Matching TraCI Phase
+        // Render Miniature 3-Aspect Traffic Signals (Sleek, Compact, Placed on Corner Sidewalks to Not Block View)
         function renderTrafficLightSignals(tlsMap, int4way) {
             const cx = 760.0, cy = -440.0;
             const app = (int4way && int4way.approaches) || {};
@@ -3310,12 +3289,12 @@
             const eastSig  = app.east?.signal_color  || 'RED';
             const westSig  = app.west?.signal_color  || 'RED';
 
-            // 4 Distinct Signal Heads placed at the four approaches of TL_CENTRAL
+            // 4 Miniature Signal Heads placed on the corner sidewalk buffers away from vehicle lanes
             const SIGNAL_HEADS = [
-                { dir: 'NORTH', x: cx + 28, y: cy - 40, sig: northSig, rot: 0 },
-                { dir: 'SOUTH', x: cx - 28, y: cy + 40, sig: southSig, rot: Math.PI },
-                { dir: 'EAST',  x: cx + 40, y: cy + 28, sig: eastSig,  rot: Math.PI / 2 },
-                { dir: 'WEST',  x: cx - 40, y: cy - 28, sig: westSig,  rot: -Math.PI / 2 }
+                { dir: 'NORTH', x: cx + 28, y: cy - 48, sig: northSig, rot: 0 },
+                { dir: 'SOUTH', x: cx - 28, y: cy + 48, sig: southSig, rot: Math.PI },
+                { dir: 'EAST',  x: cx + 48, y: cy + 28, sig: eastSig,  rot: Math.PI / 2 },
+                { dir: 'WEST',  x: cx - 48, y: cy - 28, sig: westSig,  rot: -Math.PI / 2 }
             ];
 
             for (const h of SIGNAL_HEADS) {
@@ -3323,49 +3302,49 @@
                 simCtx.translate(h.x, h.y);
                 simCtx.rotate(h.rot);
 
-                // Signal Housing Mast / Arm Box
+                // Miniature Signal Housing (Width 8px, Height 20px - Unobtrusive)
                 simCtx.fillStyle = '#0f172a';
-                simCtx.strokeStyle = '#475569';
-                simCtx.lineWidth = 1.5;
+                simCtx.strokeStyle = '#64748b';
+                simCtx.lineWidth = 1.0;
                 simCtx.beginPath();
-                simCtx.roundRect(-10, -22, 20, 44, 4);
+                simCtx.roundRect(-4, -10, 8, 20, 2);
                 simCtx.fill();
                 simCtx.stroke();
 
-                // Red Lamp
+                // Red Lamp (Miniature 2.0px)
                 const isRed = h.sig === 'RED';
                 simCtx.fillStyle = isRed ? '#ef4444' : '#450a0a';
-                simCtx.beginPath(); simCtx.arc(0, -14, 5, 0, Math.PI * 2); simCtx.fill();
+                simCtx.beginPath(); simCtx.arc(0, -6.5, 2.0, 0, Math.PI * 2); simCtx.fill();
                 if (isRed) {
                     simCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
-                    simCtx.beginPath(); simCtx.arc(0, -14, 11, 0, Math.PI * 2); simCtx.fill();
+                    simCtx.beginPath(); simCtx.arc(0, -6.5, 4.5, 0, Math.PI * 2); simCtx.fill();
                 }
 
-                // Yellow Lamp
+                // Yellow Lamp (Miniature 2.0px)
                 const isYellow = h.sig === 'YELLOW';
                 simCtx.fillStyle = isYellow ? '#f59e0b' : '#451a03';
-                simCtx.beginPath(); simCtx.arc(0, 0, 5, 0, Math.PI * 2); simCtx.fill();
+                simCtx.beginPath(); simCtx.arc(0, 0, 2.0, 0, Math.PI * 2); simCtx.fill();
                 if (isYellow) {
                     simCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
-                    simCtx.beginPath(); simCtx.arc(0, 0, 11, 0, Math.PI * 2); simCtx.fill();
+                    simCtx.beginPath(); simCtx.arc(0, 0, 4.5, 0, Math.PI * 2); simCtx.fill();
                 }
 
-                // Green Lamp
+                // Green Lamp (Miniature 2.0px)
                 const isGreen = h.sig === 'GREEN';
                 simCtx.fillStyle = isGreen ? '#10b981' : '#022c22';
-                simCtx.beginPath(); simCtx.arc(0, 14, 5, 0, Math.PI * 2); simCtx.fill();
+                simCtx.beginPath(); simCtx.arc(0, 6.5, 2.0, 0, Math.PI * 2); simCtx.fill();
                 if (isGreen) {
                     simCtx.fillStyle = 'rgba(16, 185, 129, 0.4)';
-                    simCtx.beginPath(); simCtx.arc(0, 14, 11, 0, Math.PI * 2); simCtx.fill();
+                    simCtx.beginPath(); simCtx.arc(0, 6.5, 4.5, 0, Math.PI * 2); simCtx.fill();
                 }
 
                 simCtx.restore();
             }
 
-            // Draw active stop bar color on asphalt
+            // Draw clean colored stop bar indicator on asphalt (Neat 2.2px line)
             const drawActiveStopBar = (x1, y1, x2, y2, sig) => {
                 simCtx.strokeStyle = sig === 'GREEN' ? '#10b981' : (sig === 'YELLOW' ? '#f59e0b' : '#ef4444');
-                simCtx.lineWidth = 4.0;
+                simCtx.lineWidth = 2.2;
                 simCtx.beginPath();
                 simCtx.moveTo(x1, y1);
                 simCtx.lineTo(x2, y2);
