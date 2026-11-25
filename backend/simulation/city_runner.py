@@ -549,7 +549,10 @@ class CitySimulationRunner:
         Configures experimental traffic scenarios:
         - NORMAL: Balanced moderate traffic (~25-35 vehicles)
         - SURGE_NORTH: Concentrated heavy demand surge on North approach
+        - SURGE_SOUTH: Concentrated heavy demand surge on South approach
+        - SURGE_EW: Heavy East-West arterial demand surge
         - UNEVEN: North heavy, South moderate, East/West sparse
+        - CONGESTION_RECOVERY: Multi-direction peak congestion followed by adaptive clearing
         """
         scenario = scenario_name.upper()
         with self.lock:
@@ -557,9 +560,19 @@ class CitySimulationRunner:
             self.pending_surge.clear()
             if scenario == "SURGE_NORTH":
                 self.create_traffic_surge(approach="north", count=10)
+            elif scenario == "SURGE_SOUTH":
+                self.create_traffic_surge(approach="south", count=10)
+            elif scenario == "SURGE_EW":
+                self.create_traffic_surge(approach="east", count=8)
+                self.create_traffic_surge(approach="west", count=8)
             elif scenario == "UNEVEN":
                 self.create_traffic_surge(approach="north", count=8)
                 self.create_traffic_surge(approach="south", count=3)
+            elif scenario == "CONGESTION_RECOVERY":
+                self.create_traffic_surge(approach="north", count=8)
+                self.create_traffic_surge(approach="east", count=8)
+                self.create_traffic_surge(approach="south", count=6)
+                self.create_traffic_surge(approach="west", count=6)
             elif scenario == "NORMAL":
                 pass
             print(f"CitySimulationRunner: Switched scenario to {scenario}")
